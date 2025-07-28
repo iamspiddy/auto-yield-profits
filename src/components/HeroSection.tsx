@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TrendingUp, Shield, Coins } from "lucide-react";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-crypto.jpg";
 
 const HeroSection = () => {
@@ -35,8 +36,8 @@ const HeroSection = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="hero" size="lg" className="text-lg px-8 py-6 h-auto">
-                Start Earning Now
+              <Button variant="hero" size="lg" className="text-lg px-8 py-6 h-auto" asChild>
+                <Link to="/auth">Start Earning Now</Link>
               </Button>
               <Button variant="outline" size="lg" className="text-lg px-8 py-6 h-auto">
                 How It Works
