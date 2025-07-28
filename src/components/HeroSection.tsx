@@ -9,8 +9,8 @@ const HeroSection = () => {
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(68,68,68,.1)_25%,rgba(68,68,68,.1)_50%,transparent_50%,transparent_75%,rgba(68,68,68,.1)_75%,rgba(68,68,68,.1))] bg-[length:20px_20px] opacity-30"></div>
       
-      <div className="container mx-auto px-4 pt-20 pb-12 relative z-10">
-        <div className="flex flex-col items-center text-center space-y-12 min-h-[calc(100vh-120px)] justify-center">
+      <div className="container mx-auto px-4 pt-32 pb-12 relative z-10">
+        <div className="flex flex-col items-center text-center space-y-12 min-h-[calc(100vh-144px)] justify-center">
           {/* Centered Content */}
           <div className="space-y-8 animate-fade-in max-w-4xl">
             {/* Trust Badge */}
