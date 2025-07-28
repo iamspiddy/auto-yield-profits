@@ -10,31 +10,31 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(68,68,68,.1)_25%,rgba(68,68,68,.1)_50%,transparent_50%,transparent_75%,rgba(68,68,68,.1)_75%,rgba(68,68,68,.1))] bg-[length:20px_20px] opacity-30"></div>
       
       <div className="container mx-auto px-4 pt-20 pb-12 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[calc(100vh-120px)]">
-          {/* Left Column - Content */}
-          <div className="space-y-8 animate-fade-in">
+        <div className="flex flex-col items-center text-center space-y-12 min-h-[calc(100vh-120px)] justify-center">
+          {/* Centered Content */}
+          <div className="space-y-8 animate-fade-in max-w-4xl">
             {/* Trust Badge */}
-            <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm rounded-full px-4 py-2 w-fit shadow-card">
+            <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm rounded-full px-4 py-2 w-fit mx-auto shadow-card">
               <Shield className="h-4 w-4 text-success" />
               <span className="text-sm font-medium text-muted-foreground">100% Transparent & Secure</span>
             </div>
 
             {/* Main Headline */}
-            <div className="space-y-4">
-              <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight">
+            <div className="space-y-6">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight">
                 Earn Crypto
                 <span className="bg-gradient-primary bg-clip-text text-transparent"> Passively</span>
                 <br />
                 While You Sleep
               </h1>
               
-              <p className="text-xl text-muted-foreground leading-relaxed max-w-lg">
+              <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
                 Deposit your crypto, and let our team do the work. Weekly profits, transparent dashboards, and no trading stress.
               </p>
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="hero" size="lg" className="text-lg px-8 py-6 h-auto">
                 Start Earning Now
               </Button>
@@ -44,7 +44,7 @@ const HeroSection = () => {
             </div>
 
             {/* Trust Indicators */}
-            <div className="flex flex-wrap gap-6 pt-4">
+            <div className="flex flex-wrap justify-center gap-8 pt-6">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-success" />
                 <span className="text-sm text-muted-foreground">Weekly Returns</span>
@@ -65,8 +65,8 @@ const HeroSection = () => {
             </p>
           </div>
 
-          {/* Right Column - Hero Image/Visual */}
-          <div className="relative lg:block">
+          {/* Hero Image/Visual - Centered below content */}
+          <div className="relative max-w-2xl mx-auto">
             <div className="relative">
               <img 
                 src={heroImage} 
