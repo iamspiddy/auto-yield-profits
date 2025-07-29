@@ -118,12 +118,12 @@ const ReferralsManagement = () => {
       if (error) throw error;
 
       // Format the data to include user information
-      const formattedData = data?.map(item => ({
+      const formattedData = data?.map((item: any) => ({
         ...item,
-        referrer_name: item.referrer?.full_name,
-        referrer_email: item.referrer?.email,
-        referred_name: item.referred?.full_name,
-        referred_email: item.referred?.email
+        referrer_name: item.referrer?.full_name || 'Unknown',
+        referrer_email: item.referrer?.email || 'Unknown',
+        referred_name: item.referred?.full_name || 'Unknown',
+        referred_email: item.referred?.email || 'Unknown'
       })) || [];
 
       setReferrals(formattedData);
@@ -441,7 +441,7 @@ const ReferralsManagement = () => {
                         </TableCell>
                         <TableCell>{(referral.commission_rate * 100).toFixed(2)}%</TableCell>
                         <TableCell>
-                          <Badge variant={referral.total_earned > 0 ? 'success' : 'outline'}>
+                          <Badge variant={referral.total_earned > 0 ? 'secondary' : 'outline'}>
                             {formatCurrency(referral.total_earned)}
                           </Badge>
                         </TableCell>
@@ -576,7 +576,7 @@ const ReferralsManagement = () => {
                 </div>
                 <div>
                   <h4 className="text-sm font-medium mb-1">Total Earned</h4>
-                  <Badge variant={selectedReferral.total_earned > 0 ? 'success' : 'outline'}>
+                  <Badge variant={selectedReferral.total_earned > 0 ? 'secondary' : 'outline'}>
                     {formatCurrency(selectedReferral.total_earned)}
                   </Badge>
                 </div>

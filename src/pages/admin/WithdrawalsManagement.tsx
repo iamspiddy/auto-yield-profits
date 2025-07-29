@@ -84,7 +84,7 @@ const WithdrawalsManagement = () => {
       
       // Apply status filter
       if (filter !== 'all') {
-        query = query.eq('status', filter);
+        query = query.eq('status', filter as any);
       }
       
       // Apply date filter
@@ -117,10 +117,10 @@ const WithdrawalsManagement = () => {
       if (error) throw error;
 
       // Format the data to include user information
-      const formattedData = data?.map(item => ({
+      const formattedData = data?.map((item: any) => ({
         ...item,
-        user_email: item.profiles?.email,
-        user_name: item.profiles?.full_name
+        user_email: item.profiles?.email || 'Unknown',
+        user_name: item.profiles?.full_name || 'Unknown'
       })) || [];
 
       setWithdrawals(formattedData);
@@ -308,11 +308,11 @@ const WithdrawalsManagement = () => {
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'success';
+        return 'secondary';
       case 'rejected':
         return 'destructive';
       case 'processing':
-        return 'warning';
+        return 'outline';
       default:
         return 'outline';
     }

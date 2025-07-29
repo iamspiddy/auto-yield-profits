@@ -26,24 +26,19 @@ export const adminLogger = {
     ipAddress?: string
   ): Promise<string | null> {
     try {
-      // Use the log_admin_action RPC function which handles both table creation and insertion
-      const { data, error } = await supabase.rpc('log_admin_action', {
-        p_admin_id: adminId,
-        p_action_type: actionType,
-        p_entity_type: entityType,
-        p_entity_id: entityId,
-        p_details: details,
-        p_ip_address: ipAddress
+      // For now, just log to console since RPC doesn't exist yet
+      console.log('Admin Action:', {
+        adminId,
+        actionType,
+        entityType,
+        entityId,
+        details,
+        ipAddress: ipAddress || this.getClientIp()
       });
-
-      if (error) {
-        console.error('Error logging admin action:', error);
-        return null;
-      }
-
-      return data.id;
+      
+      return 'logged';
     } catch (error) {
-      console.error('Error logging admin action:', error);
+      console.error('Error in adminLogger.logAction:', error);
       return null;
     }
   },

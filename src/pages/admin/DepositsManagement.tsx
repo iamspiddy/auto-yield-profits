@@ -45,7 +45,7 @@ type Deposit = {
   user_id: string;
   amount: number;
   currency: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'completed';
   proof_file_url: string | null;
   notes: string | null;
   created_at: string;
@@ -54,6 +54,7 @@ type Deposit = {
   transaction_hash: string | null;
   user_email?: string;
   user_name?: string;
+  profiles?: any;
 };
 
 const DepositsManagement = () => {
@@ -79,22 +80,26 @@ const DepositsManagement = () => {
       setLoading(true);
       
       // Join with profiles to get user information
-      const { data, error } = await supabase
+      let query = supabase
         .from('deposits')
         .select(`
           *,
           profiles:user_id(email, full_name)
-        `)
-        .eq(filter !== 'all' ? 'status' : 'id', filter !== 'all' ? filter : deposits[0]?.id || '')
-        .order('created_at', { ascending: false });
+        `);
+
+      if (filter !== 'all') {
+        query = query.eq('status', filter as any);
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
 
       // Format the data to include user information
-      const formattedData = data?.map(item => ({
+      const formattedData = data?.map((item: any) => ({
         ...item,
-        user_email: item.profiles?.email,
-        user_name: item.profiles?.full_name
+        user_email: item.profiles?.email || 'Unknown',
+        user_name: item.profiles?.full_name || 'Unknown'
       })) || [];
 
       setDeposits(formattedData);
@@ -218,12 +223,23 @@ const DepositsManagement = () => {
             description: `Referral bonus from deposit ${depositId}`
           });
 
-        // Update total earned in referrals table
-        await supabase.rpc('increment_referral_earnings', {
-          p_referrer_id: profileData.referred_by,
-          p_referred_id: depositData.user_id,
-          p_amount: bonusAmount
-        });
+        // Update total earned in referrals table manually
+        const { data: currentReferral } = await supabase
+          .from('referrals')
+          .select('total_earned')
+          .eq('referrer_id', profileData.referred_by)
+          .eq('referred_id', depositData.user_id)
+          .single();
+
+        if (currentReferral) {
+          await supabase
+            .from('referrals')
+            .update({ 
+              total_earned: (currentReferral.total_earned || 0) + bonusAmount
+            })
+            .eq('referrer_id', profileData.referred_by)
+            .eq('referred_id', depositData.user_id);
+        }
       }
 
       toast({
@@ -519,11 +535,11 @@ const DepositsManagement = () => {
                         <TableCell>{formatDate(deposit.created_at)}</TableCell>
                         <TableCell>{formatCurrency(deposit.amount, deposit.currency)}</TableCell>
                         <TableCell>
-                          <Badge
-                            variant={
-                              deposit.status === 'approved' ? 'success' :
-                              deposit.status === 'rejected' ? 'destructive' : 'outline'
-                            }
+                           <Badge
+                             variant={
+                               deposit.status === 'approved' ? 'secondary' :
+                               deposit.status === 'rejected' ? 'destructive' : 'outline'
+                             }
                           >
                             {deposit.status}
                           </Badge>
@@ -595,11 +611,11 @@ const DepositsManagement = () => {
                 </div>
                 <div>
                   <h4 className="text-sm font-medium mb-1">Status</h4>
-                  <Badge
-                    variant={
-                      selectedDeposit.status === 'approved' ? 'success' :
-                      selectedDeposit.status === 'rejected' ? 'destructive' : 'outline'
-                    }
+                   <Badge
+                     variant={
+                       selectedDeposit.status === 'approved' ? 'secondary' :
+                       selectedDeposit.status === 'rejected' ? 'destructive' : 'outline'
+                     }
                   >
                     {selectedDeposit.status}
                   </Badge>

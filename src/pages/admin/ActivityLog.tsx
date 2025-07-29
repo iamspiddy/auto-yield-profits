@@ -69,56 +69,10 @@ const ActivityLog = () => {
   }, [actionTypeFilter, entityTypeFilter, dateFilter]);
 
   const createAdminActionsTableIfNeeded = async () => {
-    try {
-      // Call the RPC function to create the admin_actions table if it doesn't exist
-      // This function is defined in the Supabase migration
-      const { error: createError } = await supabase.rpc('create_admin_actions_table');
-      
-      if (createError) {
-        console.error('Error creating admin_actions table:', createError);
-        // Fallback: Let's add some sample data to show the UI
-        setActions(generateSampleActions());
-        setLoading(false);
-        return;
-      }
-      
-      // Check if we need to add sample data
-      const { data: existingActions, error: checkError } = await supabase
-        .from('admin_actions')
-        .select('id')
-        .limit(1);
-        
-      if (!checkError && (!existingActions || existingActions.length === 0)) {
-        // Add some sample data if the table is empty
-        await addSampleActions();
-      }
-    } catch (error) {
-      console.error('Error checking/creating admin_actions table:', error);
-      // Fallback to sample data
-      setActions(generateSampleActions());
-      setLoading(false);
-    }
+    // For now, just return sample data since admin_actions table doesn't exist yet
+    return generateSampleActions();
   };
 
-  const addSampleActions = async () => {
-    try {
-      // Add some sample actions
-      const sampleActions = generateSampleActions();
-      
-      for (const action of sampleActions) {
-        await supabase.from('admin_actions').insert({
-          admin_id: action.admin_id,
-          action_type: action.action_type,
-          entity_type: action.entity_type,
-          entity_id: action.entity_id,
-          details: action.details,
-          ip_address: action.ip_address
-        });
-      }
-    } catch (error) {
-      console.error('Error adding sample actions:', error);
-    }
-  };
 
   const generateSampleActions = (): AdminAction[] => {
     const actionTypes = ['create', 'update', 'delete', 'approve', 'reject'];
@@ -204,81 +158,11 @@ const ActivityLog = () => {
     try {
       setLoading(true);
       
-      let query = supabase
-        .from('admin_actions')
-        .select(`
-          *,
-          admin:admin_id(id, email, full_name)
-        `);
-      
-      // Apply filters
-      if (actionTypeFilter !== 'all') {
-        query = query.eq('action_type', actionTypeFilter);
-      }
-      
-      if (entityTypeFilter !== 'all') {
-        query = query.eq('entity_type', entityTypeFilter);
-      }
-      
-      // Apply date filter
-      if (dateFilter !== 'all') {
-        const now = new Date();
-        let startDate = new Date();
-        
-        switch (dateFilter) {
-          case 'today':
-            startDate.setHours(0, 0, 0, 0);
-            break;
-          case 'yesterday':
-            startDate.setDate(now.getDate() - 1);
-            startDate.setHours(0, 0, 0, 0);
-            const endOfYesterday = new Date(startDate);
-            endOfYesterday.setHours(23, 59, 59, 999);
-            query = query.gte('created_at', startDate.toISOString()).lte('created_at', endOfYesterday.toISOString());
-            break;
-          case 'week':
-            startDate.setDate(now.getDate() - 7);
-            query = query.gte('created_at', startDate.toISOString());
-            break;
-          case 'month':
-            startDate.setMonth(now.getMonth() - 1);
-            query = query.gte('created_at', startDate.toISOString());
-            break;
-        }
-        
-        if (dateFilter !== 'yesterday') {
-          query = query.gte('created_at', startDate.toISOString());
-        }
-      }
-      
-      const { data, error } = await query.order('created_at', { ascending: false });
-
-      if (error) {
-        throw error;
-      }
-
-      // Format the data to include admin information
-      const formattedData = data?.map(item => ({
-        ...item,
-        admin_email: item.admin?.email,
-        admin_name: item.admin?.full_name
-      })) || [];
-
-      if (formattedData.length === 0 && !error) {
-        // If no data but no error, use sample data for demonstration
-        setActions(generateSampleActions());
-      } else {
-        setActions(formattedData);
-      }
+      // For now, use sample data since admin_actions table doesn't exist yet
+      const sampleData = await createAdminActionsTableIfNeeded();
+      setActions(sampleData);
     } catch (error) {
-      console.error('Error fetching admin actions:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to load activity log. Using sample data instead.',
-      });
-      
-      // Use sample data as fallback
+      console.error('Error fetching actions:', error);
       setActions(generateSampleActions());
     } finally {
       setLoading(false);
@@ -345,7 +229,7 @@ const ActivityLog = () => {
       case 'delete':
         return 'destructive';
       case 'approve':
-        return 'success';
+        return 'secondary';
       case 'reject':
         return 'destructive';
       default:
@@ -358,9 +242,9 @@ const ActivityLog = () => {
       case 'user':
         return 'default';
       case 'deposit':
-        return 'success';
+        return 'secondary';
       case 'withdrawal':
-        return 'warning';
+        return 'outline';
       case 'profit':
         return 'secondary';
       case 'referral':

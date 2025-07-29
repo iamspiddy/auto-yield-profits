@@ -238,7 +238,7 @@ const UsersManagement = () => {
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
                         {user.kyc_verified ? (
-                          <Badge variant="success">Verified</Badge>
+                          <Badge variant="secondary">Verified</Badge>
                         ) : (
                           <Badge variant="destructive">Not Verified</Badge>
                         )}
@@ -293,7 +293,7 @@ const UsersManagement = () => {
                 <CardContent>
                   <div>
                     {selectedUser.profile.kyc_verified ? (
-                      <Badge variant="success">Verified</Badge>
+                      <Badge variant="secondary">Verified</Badge>
                     ) : (
                       <Badge variant="destructive">Not Verified</Badge>
                     )}
@@ -343,7 +343,7 @@ const UsersManagement = () => {
                           <TableCell>
                             <Badge
                               variant={
-                                deposit.status === 'approved' ? 'success' :
+                                deposit.status === 'approved' ? 'secondary' :
                                 deposit.status === 'rejected' ? 'destructive' : 'outline'
                               }
                             >
@@ -377,7 +377,7 @@ const UsersManagement = () => {
                           <TableCell>
                             <Badge
                               variant={
-                                withdrawal.status === 'completed' ? 'success' :
+                                withdrawal.status === 'completed' ? 'secondary' :
                                 withdrawal.status === 'rejected' ? 'destructive' : 'outline'
                               }
                             >
