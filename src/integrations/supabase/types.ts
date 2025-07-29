@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_actions: {
+        Row: {
+          action_type: string
+          admin_id: string
+          amount: number | null
+          created_at: string
+          details: Json
+          entity_id: string
+          entity_type: string
+          id: string
+          ip_address: string | null
+          reason: string | null
+        }
+        Insert: {
+          action_type: string
+          admin_id: string
+          amount?: number | null
+          created_at?: string
+          details?: Json
+          entity_id: string
+          entity_type: string
+          id?: string
+          ip_address?: string | null
+          reason?: string | null
+        }
+        Update: {
+          action_type?: string
+          admin_id?: string
+          amount?: number | null
+          created_at?: string
+          details?: Json
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          ip_address?: string | null
+          reason?: string | null
+        }
+        Relationships: []
+      }
       deposits: {
         Row: {
           amount: number
@@ -99,6 +138,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          balance: number | null
           created_at: string
           email: string
           full_name: string
@@ -110,6 +150,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          balance?: number | null
           created_at?: string
           email: string
           full_name: string
@@ -121,6 +162,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          balance?: number | null
           created_at?: string
           email?: string
           full_name?: string
@@ -278,12 +320,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_admin_actions_table: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _user_id: string
           _role: Database["public"]["Enums"]["app_role"]
         }
         Returns: boolean
+      }
+      log_admin_action: {
+        Args: {
+          p_admin_id: string
+          p_action_type: string
+          p_entity_type: string
+          p_entity_id: string
+          p_details: Json
+          p_ip_address?: string
+        }
+        Returns: string
       }
     }
     Enums: {
