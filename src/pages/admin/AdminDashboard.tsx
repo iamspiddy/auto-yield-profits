@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, CreditCard, Banknote, TrendingUp, UserPlus, Activity, Shield } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Users, CreditCard, Banknote, TrendingUp, UserPlus, Activity, Shield, Bug } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { testDatabaseConnection, getBasicStats } from '@/utils/dbTest';
 
 interface DashboardStats {
   totalUsers: number;
@@ -11,6 +13,15 @@ interface DashboardStats {
   activeReferrals: number;
   adminActions: number;
   pendingKYC: number;
+}
+
+interface RecentUser {
+  user_id: string;
+  full_name: string;
+  email: string;
+  created_at: string;
+  kyc_verified: boolean;
+  balance: number;
 }
 
 export const AdminDashboard = () => {
@@ -23,7 +34,9 @@ export const AdminDashboard = () => {
     adminActions: 0,
     pendingKYC: 0
   });
+  const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   useEffect(() => {
     fetchDashboardStats();
@@ -33,55 +46,87 @@ export const AdminDashboard = () => {
     setLoading(true);
     try {
       // Fetch total users
-      const { count: totalUsers } = await supabase
+      const { count: totalUsers, error: usersError } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true });
 
+      if (usersError) {
+        console.error('Error fetching users:', usersError);
+      }
+
       // Fetch pending deposits
-      const { count: pendingDeposits } = await supabase
+      const { count: pendingDeposits, error: depositsError } = await supabase
         .from('deposits')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'pending');
 
+      if (depositsError) {
+        console.error('Error fetching deposits:', depositsError);
+      }
+
       // Fetch pending withdrawals
-      const { count: pendingWithdrawals } = await supabase
+      const { count: pendingWithdrawals, error: withdrawalsError } = await supabase
         .from('withdrawals')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'pending');
 
+      if (withdrawalsError) {
+        console.error('Error fetching withdrawals:', withdrawalsError);
+      }
+
       // Fetch total volume (approved deposits + completed withdrawals)
-      const { data: deposits } = await supabase
+      const { data: deposits, error: depositsDataError } = await supabase
         .from('deposits')
         .select('amount')
         .eq('status', 'approved');
 
-      const { data: withdrawals } = await supabase
+      if (depositsDataError) {
+        console.error('Error fetching deposits data:', depositsDataError);
+      }
+
+      const { data: withdrawals, error: withdrawalsDataError } = await supabase
         .from('withdrawals')
         .select('amount')
         .eq('status', 'completed');
+
+      if (withdrawalsDataError) {
+        console.error('Error fetching withdrawals data:', withdrawalsDataError);
+      }
 
       const totalVolume = (deposits?.reduce((sum, d) => sum + Number(d.amount), 0) || 0) +
                          (withdrawals?.reduce((sum, w) => sum + Number(w.amount), 0) || 0);
 
       // Fetch active referrals
-      const { count: activeReferrals } = await supabase
+      const { count: activeReferrals, error: referralsError } = await supabase
         .from('referrals')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'active');
 
+      if (referralsError) {
+        console.error('Error fetching referrals:', referralsError);
+      }
+
       // Fetch today's admin actions
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const { count: adminActions } = await supabase
+      const { count: adminActions, error: actionsError } = await supabase
         .from('admin_actions')
         .select('*', { count: 'exact', head: true })
         .gte('created_at', today.toISOString());
 
-      // Fetch pending KYC
-      const { count: pendingKYC } = await supabase
+      if (actionsError) {
+        console.error('Error fetching admin actions:', actionsError);
+      }
+
+      // Fetch pending KYC (check both kyc_status and kyc_verified fields)
+      const { count: pendingKYC, error: kycError } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
-        .eq('kyc_status', 'pending');
+        .or('kyc_status.eq.pending,kyc_verified.eq.false');
+
+      if (kycError) {
+        console.error('Error fetching KYC data:', kycError);
+      }
 
       setStats({
         totalUsers: totalUsers || 0,
@@ -92,11 +137,31 @@ export const AdminDashboard = () => {
         adminActions: adminActions || 0,
         pendingKYC: pendingKYC || 0
       });
+
+      // Fetch recent users
+      const { data: users, error: recentUsersError } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, email, created_at, kyc_verified, balance')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (recentUsersError) {
+        console.error('Error fetching recent users:', recentUsersError);
+      } else {
+        setRecentUsers(users || []);
+      }
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDebugTest = async () => {
+    console.log('Running database debug test...');
+    const connectionTest = await testDatabaseConnection();
+    const basicStats = await getBasicStats();
+    setDebugInfo({ connectionTest, basicStats });
   };
 
   const dashboardStats = [
@@ -146,11 +211,22 @@ export const AdminDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-muted-foreground">
-          Monitor and manage your platform operations
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <p className="text-muted-foreground">
+            Monitor and manage your platform operations
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleDebugTest}
+          className="flex items-center gap-2"
+        >
+          <Bug className="h-4 w-4" />
+          Debug DB
+        </Button>
       </div>
 
       {/* Stats Grid */}
@@ -172,6 +248,47 @@ export const AdminDashboard = () => {
           </Card>
         ))}
       </div>
+
+      {/* Recent Users */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Users</CardTitle>
+          <CardDescription>Latest registered users on the platform</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Loading users...
+            </div>
+          ) : recentUsers.length > 0 ? (
+            <div className="space-y-4">
+              {recentUsers.map((user) => (
+                <div key={user.user_id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                      <Users className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{user.full_name || 'Unnamed User'}</p>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium">${user.balance?.toFixed(2) || '0.00'}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {user.kyc_verified ? 'Verified' : 'Unverified'}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No users found
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Quick Actions */}
       <div className="grid gap-6 md:grid-cols-2">
@@ -220,6 +337,68 @@ export const AdminDashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Debug Information */}
+      {debugInfo && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bug className="h-5 w-5" />
+              Debug Information
+            </CardTitle>
+            <CardDescription>Database connection and table status</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium mb-2">Connection Status</h4>
+                <p className={`text-sm ${debugInfo.connectionTest.connection ? 'text-green-600' : 'text-red-600'}`}>
+                  {debugInfo.connectionTest.connection ? 'Connected' : 'Not Connected'}
+                </p>
+              </div>
+              
+              <div>
+                <h4 className="font-medium mb-2">Table Status</h4>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  {Object.entries(debugInfo.connectionTest.tables).map(([table, accessible]) => (
+                    <div key={table} className="flex justify-between">
+                      <span>{table}</span>
+                      <span className={accessible ? 'text-green-600' : 'text-red-600'}>
+                        {accessible ? '✓' : '✗'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {debugInfo.basicStats && (
+                <div>
+                  <h4 className="font-medium mb-2">Record Counts</h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    {Object.entries(debugInfo.basicStats).map(([table, count]) => (
+                      <div key={table} className="flex justify-between">
+                        <span>{table}</span>
+                        <span>{count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {debugInfo.connectionTest.errors.length > 0 && (
+                <div>
+                  <h4 className="font-medium mb-2 text-red-600">Errors</h4>
+                  <div className="space-y-1 text-sm text-red-600">
+                    {debugInfo.connectionTest.errors.map((error: string, index: number) => (
+                      <p key={index}>{error}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
