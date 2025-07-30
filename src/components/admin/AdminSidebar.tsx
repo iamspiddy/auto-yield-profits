@@ -9,7 +9,8 @@ import {
   Activity,
   Menu,
   X,
-  LayoutDashboard
+  LayoutDashboard,
+  Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -21,6 +22,7 @@ const navigation = [
   { name: 'Withdrawals', href: '/admin/withdrawals', icon: Banknote },
   { name: 'Profit Distribution', href: '/admin/profits', icon: TrendingUp },
   { name: 'Referrals', href: '/admin/referrals', icon: UserPlus },
+  { name: 'KYC Management', href: '/admin/kyc', icon: Shield },
   { name: 'Activity Log', href: '/admin/activity', icon: Activity },
 ];
 

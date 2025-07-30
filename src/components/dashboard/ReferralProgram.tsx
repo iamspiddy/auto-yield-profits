@@ -61,6 +61,17 @@ const ReferralProgram = () => {
     };
 
     fetchReferralData();
+    
+    // Listen for manual refresh events
+    const handleRefresh = () => {
+      fetchReferralData();
+    };
+
+    window.addEventListener('dashboard-refresh', handleRefresh);
+
+    return () => {
+      window.removeEventListener('dashboard-refresh', handleRefresh);
+    };
   }, [user]);
 
   const referralLink = `${window.location.origin}/auth?ref=${referralData.referralCode}`;

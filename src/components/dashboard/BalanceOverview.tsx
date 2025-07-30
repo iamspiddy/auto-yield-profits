@@ -59,7 +59,7 @@ const BalanceOverview = () => {
         const pendingWithdrawals = withdrawals?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
 
         setBalanceData({
-          walletBalance: walletBalance + totalEarnings - pendingWithdrawals,
+          walletBalance: walletBalance - pendingWithdrawals,
           totalEarnings,
           pendingWithdrawals,
           kycVerified: profile?.kyc_verified || false
@@ -72,6 +72,35 @@ const BalanceOverview = () => {
     };
 
     fetchBalanceData();
+    
+    // Set up real-time subscription for profile changes
+    const channel = supabase
+      .channel('profile-changes')
+      .on('postgres_changes', 
+        { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'profiles',
+          filter: `user_id=eq.${user.id}`
+        }, 
+        () => {
+          // Refresh data when profile is updated
+          fetchBalanceData();
+        }
+      )
+      .subscribe();
+
+    // Listen for manual refresh events
+    const handleRefresh = () => {
+      fetchBalanceData();
+    };
+
+    window.addEventListener('dashboard-refresh', handleRefresh);
+
+    return () => {
+      supabase.removeChannel(channel);
+      window.removeEventListener('dashboard-refresh', handleRefresh);
+    };
   }, [user]);
 
   if (loading) {

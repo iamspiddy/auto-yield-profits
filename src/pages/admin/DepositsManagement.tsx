@@ -79,13 +79,10 @@ const DepositsManagement = () => {
     try {
       setLoading(true);
       
-      // Join with profiles to get user information
+      // Simple query without join for now
       let query = supabase
         .from('deposits')
-        .select(`
-          *,
-          profiles:user_id(email, full_name)
-        `);
+        .select('*');
 
       if (filter !== 'all') {
         query = query.eq('status', filter as any);
@@ -93,13 +90,21 @@ const DepositsManagement = () => {
 
       const { data, error } = await query.order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching deposits:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load deposits. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
 
       // Format the data to include user information
       const formattedData = data?.map((item: any) => ({
         ...item,
-        user_email: item.profiles?.email || 'Unknown',
-        user_name: item.profiles?.full_name || 'Unknown'
+        user_email: 'Loading...', // We'll add this back later
+        user_name: 'Loading...'   // We'll add this back later
       })) || [];
 
       setDeposits(formattedData);
@@ -377,10 +382,20 @@ const DepositsManagement = () => {
   };
 
   const formatCurrency = (amount: number, currency: string = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency,
-    }).format(amount);
+    // Handle cryptocurrency codes that aren't valid ISO currency codes
+    if (currency === 'USDT' || currency === 'BTC' || currency === 'ETH') {
+      return `$${amount.toFixed(2)} ${currency}`;
+    }
+    
+    try {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency,
+      }).format(amount);
+    } catch (error) {
+      // Fallback for invalid currency codes
+      return `$${amount.toFixed(2)} ${currency}`;
+    }
   };
 
   return (

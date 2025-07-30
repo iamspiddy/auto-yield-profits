@@ -5,6 +5,7 @@ import { TrendingUp, Calendar, DollarSign } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import CryptoChart from './CryptoChart';
 
 interface EarningsData {
   date: string;
@@ -79,6 +80,17 @@ const EarningsOverview = () => {
     };
 
     fetchEarningsData();
+    
+    // Listen for manual refresh events
+    const handleRefresh = () => {
+      fetchEarningsData();
+    };
+
+    window.addEventListener('dashboard-refresh', handleRefresh);
+
+    return () => {
+      window.removeEventListener('dashboard-refresh', handleRefresh);
+    };
   }, [user]);
 
   if (loading) {
@@ -95,90 +107,96 @@ const EarningsOverview = () => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center">
-            <TrendingUp className="h-5 w-5 mr-2" />
-            Earnings Overview
-          </CardTitle>
-          <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="weekly">Weekly</SelectItem>
-              <SelectItem value="monthly">Monthly</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 p-4 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Weekly Earnings</p>
-                <p className="text-xl font-bold text-green-600">${summary.weeklyEarnings.toFixed(2)}</p>
+    <div className="space-y-6">
+      {/* Earnings Overview Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center">
+              <TrendingUp className="h-5 w-5 mr-2" />
+              Earnings Overview
+            </CardTitle>
+            <Select value={period} onValueChange={setPeriod}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Weekly Earnings</p>
+                  <p className="text-xl font-bold text-green-600">${summary.weeklyEarnings.toFixed(2)}</p>
+                </div>
+                <DollarSign className="h-6 w-6 text-green-600" />
               </div>
-              <DollarSign className="h-6 w-6 text-green-600" />
+            </div>
+
+            <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Monthly Earnings</p>
+                  <p className="text-xl font-bold text-blue-600">${summary.monthlyEarnings.toFixed(2)}</p>
+                </div>
+                <TrendingUp className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Next Payout</p>
+                  <p className="text-xl font-bold text-purple-600">{summary.nextPayout}</p>
+                </div>
+                <Calendar className="h-6 w-6 text-purple-600" />
+              </div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 p-4 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Monthly Earnings</p>
-                <p className="text-xl font-bold text-blue-600">${summary.monthlyEarnings.toFixed(2)}</p>
-              </div>
-              <TrendingUp className="h-6 w-6 text-blue-600" />
-            </div>
+          {/* Earnings Chart */}
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={earningsData}>
+                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                <XAxis 
+                  dataKey="date" 
+                  fontSize={12}
+                  className="text-muted-foreground"
+                />
+                <YAxis 
+                  fontSize={12}
+                  className="text-muted-foreground"
+                  tickFormatter={(value) => `$${value}`}
+                />
+                <Tooltip 
+                  formatter={(value) => [`$${Number(value).toFixed(2)}`, 'Earnings']}
+                  labelFormatter={(label) => `Date: ${label}`}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="amount" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={2}
+                  dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
+        </CardContent>
+      </Card>
 
-          <div className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 p-4 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Next Payout</p>
-                <p className="text-xl font-bold text-purple-600">{summary.nextPayout}</p>
-              </div>
-              <Calendar className="h-6 w-6 text-purple-600" />
-            </div>
-          </div>
-        </div>
-
-        {/* Chart */}
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={earningsData}>
-              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-              <XAxis 
-                dataKey="date" 
-                fontSize={12}
-                className="text-muted-foreground"
-              />
-              <YAxis 
-                fontSize={12}
-                className="text-muted-foreground"
-                tickFormatter={(value) => `$${value}`}
-              />
-              <Tooltip 
-                formatter={(value) => [`$${Number(value).toFixed(2)}`, 'Earnings']}
-                labelFormatter={(label) => `Date: ${label}`}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="amount" 
-                stroke="hsl(var(--primary))" 
-                strokeWidth={2}
-                dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </CardContent>
-    </Card>
+      {/* Crypto Market Chart */}
+      <CryptoChart />
+    </div>
   );
 };
 

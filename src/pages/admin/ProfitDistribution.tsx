@@ -97,12 +97,23 @@ const ProfitDistribution = () => {
       
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('user_id, email, full_name, kyc_verified, referral_code, referred_by, created_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      setUsers(data || []);
+      // Map the data to match the User interface
+      const mappedUsers = (data || []).map(profile => ({
+        id: profile.user_id, // Use user_id as the id
+        email: profile.email,
+        full_name: profile.full_name,
+        kyc_verified: profile.kyc_verified || false,
+        referral_code: profile.referral_code,
+        referred_by: profile.referred_by,
+        created_at: profile.created_at
+      }));
+
+      setUsers(mappedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({
@@ -213,11 +224,23 @@ const ProfitDistribution = () => {
           currency: payoutCurrency,
           source: 'admin_distribution',
           description: payoutDescription || 'Profit distribution',
-          created_by: user?.id
+          created_by: user?.id,
+          earnings_date: new Date().toISOString().split('T')[0]
         })
         .select();
 
       if (error) throw error;
+
+      // Update user balance
+      const { error: balanceError } = await supabase
+        .from('profiles')
+        .update({ 
+          balance: (selectedUser.balance || 0) + amount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', selectedUser.id);
+
+      if (balanceError) throw balanceError;
 
       // Create transaction record
       await supabase
@@ -237,8 +260,9 @@ const ProfitDistribution = () => {
         description: `Successfully distributed ${amount} ${payoutCurrency} to ${selectedUser.full_name}.`,
       });
 
-      // Refresh earnings list
+      // Refresh earnings list and user list
       fetchUserEarnings(selectedUser.id);
+      fetchUsers(); // Refresh user list to update balances
       setPayoutAmount('');
       setPayoutDescription('');
     } catch (error) {
@@ -292,10 +316,14 @@ const ProfitDistribution = () => {
       let userBalances: Record<string, number> = {};
       
       if (batchPayoutType === 'percentage') {
-        // For now, use mock balance calculation since RPC doesn't exist
-        // TODO: Implement proper balance calculation
-        selectedUserIds.forEach(userId => {
-          userBalances[userId] = 1000; // Mock balance
+        // Get actual user balances from profiles table
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, balance')
+          .in('user_id', selectedUserIds);
+        
+        profiles?.forEach(profile => {
+          userBalances[profile.user_id] = profile.balance || 0;
         });
       }
       
@@ -324,11 +352,23 @@ const ProfitDistribution = () => {
             currency: batchPayoutCurrency,
             source: 'admin_distribution',
             description,
-            created_by: user?.id
+            created_by: user?.id,
+            earnings_date: new Date().toISOString().split('T')[0]
           })
           .select();
 
         if (error) throw error;
+
+        // Update user balance
+        const { error: balanceError } = await supabase
+          .from('profiles')
+          .update({ 
+            balance: (userBalances[userId] || 0) + payoutAmount,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId);
+
+        if (balanceError) throw balanceError;
 
         // Create transaction record
         await supabase
@@ -352,7 +392,7 @@ const ProfitDistribution = () => {
       // Reset selections and close modal
       setSelectedUsers(new Set());
       setBatchPayoutOpen(false);
-      fetchUsers(); // Refresh user list
+      fetchUsers(); // Refresh user list to update balances
     } catch (error) {
       console.error('Error processing batch payout:', error);
       toast({
@@ -379,6 +419,11 @@ const ProfitDistribution = () => {
   };
 
   const formatCurrency = (amount: number, currency: string = 'USD') => {
+    // Handle crypto currencies that aren't supported by Intl.NumberFormat
+    if (currency === 'USDT' || currency === 'BTC' || currency === 'ETH') {
+      return `${currency} ${amount.toFixed(2)}`;
+    }
+    
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency,

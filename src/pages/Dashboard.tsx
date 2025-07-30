@@ -1,16 +1,28 @@
-import React from 'react';
+import React, { useState, useCallback, createContext, useContext } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import BalanceOverview from '@/components/dashboard/BalanceOverview';
-import DepositPanel from '@/components/dashboard/DepositPanel';
 import EarningsOverview from '@/components/dashboard/EarningsOverview';
-import WithdrawalPanel from '@/components/dashboard/WithdrawalPanel';
 import TransactionHistory from '@/components/dashboard/TransactionHistory';
 import ReferralProgram from '@/components/dashboard/ReferralProgram';
+import LiveNotifications from '@/components/dashboard/LiveNotifications';
+import { Button } from '@/components/ui/button';
+import { DollarSign, ArrowUpRight, ArrowDownLeft, RefreshCw } from 'lucide-react';
+
+// Create a refresh context
+const RefreshContext = createContext<{ refresh: () => void }>({ refresh: () => {} });
+
+export const useRefresh = () => useContext(RefreshContext);
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  const handleRefresh = useCallback(() => {
+    // Trigger a global refresh event
+    window.dispatchEvent(new CustomEvent('dashboard-refresh'));
+  }, []);
 
   if (loading) {
     return (
@@ -25,23 +37,57 @@ const Dashboard = () => {
   }
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <BalanceOverview />
-            <EarningsOverview />
-            <TransactionHistory />
+    <RefreshContext.Provider value={{ refresh: handleRefresh }}>
+      <DashboardLayout>
+        <div className="space-y-6">
+          {/* Primary Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center sm:justify-end">
+            <Button 
+              onClick={handleRefresh}
+              variant="outline"
+              className="flex items-center gap-2"
+              size="sm"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Refresh
+            </Button>
+            <Button 
+              onClick={() => navigate('/deposit')}
+              className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 text-lg font-semibold"
+              size="lg"
+            >
+              <DollarSign className="h-5 w-5" />
+              <ArrowUpRight className="h-5 w-5" />
+              Deposit Funds
+            </Button>
+            <Button 
+              onClick={() => navigate('/withdraw')}
+              variant="outline"
+              className="flex items-center gap-2 border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-6 py-3 text-lg font-semibold"
+              size="lg"
+            >
+              <ArrowDownLeft className="h-5 w-5" />
+              Withdraw Funds
+            </Button>
           </div>
-          
-          <div className="space-y-6">
-            <DepositPanel />
-            <WithdrawalPanel />
-            <ReferralProgram />
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <BalanceOverview />
+              <EarningsOverview />
+              <TransactionHistory />
+            </div>
+            
+            <div className="space-y-6">
+              <ReferralProgram />
+            </div>
           </div>
+
+          {/* Live Notifications */}
+          <LiveNotifications />
         </div>
-      </div>
-    </DashboardLayout>
+      </DashboardLayout>
+    </RefreshContext.Provider>
   );
 };
 

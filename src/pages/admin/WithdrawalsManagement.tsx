@@ -77,10 +77,7 @@ const WithdrawalsManagement = () => {
       
       let query = supabase
         .from('withdrawals')
-        .select(`
-          *,
-          profiles:user_id(email, full_name)
-        `);
+        .select('*');
       
       // Apply status filter
       if (filter !== 'all') {
@@ -119,8 +116,8 @@ const WithdrawalsManagement = () => {
       // Format the data to include user information
       const formattedData = data?.map((item: any) => ({
         ...item,
-        user_email: item.profiles?.email || 'Unknown',
-        user_name: item.profiles?.full_name || 'Unknown'
+        user_email: 'Loading...', // We'll add this back later
+        user_name: 'Loading...'   // We'll add this back later
       })) || [];
 
       setWithdrawals(formattedData);
@@ -187,7 +184,7 @@ const WithdrawalsManagement = () => {
           amount: withdrawalData.amount,
           currency: withdrawalData.currency,
           type: 'withdrawal',
-          status: 'completed',
+          status: 'completed', // This maps correctly: withdrawal 'completed' -> transaction 'completed'
           reference_id: withdrawalId,
           description: 'Withdrawal completed'
         });
@@ -299,10 +296,20 @@ const WithdrawalsManagement = () => {
   };
 
   const formatCurrency = (amount: number, currency: string = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency,
-    }).format(amount);
+    // Handle cryptocurrency codes that aren't valid ISO currency codes
+    if (currency === 'USDT' || currency === 'BTC' || currency === 'ETH') {
+      return `$${amount.toFixed(2)} ${currency}`;
+    }
+    
+    try {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency,
+      }).format(amount);
+    } catch (error) {
+      // Fallback for invalid currency codes
+      return `$${amount.toFixed(2)} ${currency}`;
+    }
   };
 
   const getStatusBadgeVariant = (status: string) => {

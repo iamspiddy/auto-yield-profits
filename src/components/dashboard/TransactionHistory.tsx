@@ -51,6 +51,17 @@ const TransactionHistory = () => {
     };
 
     fetchTransactions();
+    
+    // Listen for manual refresh events
+    const handleRefresh = () => {
+      fetchTransactions();
+    };
+
+    window.addEventListener('dashboard-refresh', handleRefresh);
+
+    return () => {
+      window.removeEventListener('dashboard-refresh', handleRefresh);
+    };
   }, [user, filter]);
 
   const getTransactionIcon = (type: string) => {

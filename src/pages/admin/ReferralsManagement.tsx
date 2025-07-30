@@ -102,11 +102,7 @@ const ReferralsManagement = () => {
       
       let query = supabase
         .from('referrals')
-        .select(`
-          *,
-          referrer:referrer_id(id, email, full_name),
-          referred:referred_id(id, email, full_name)
-        `);
+        .select('*');
       
       // Apply filter if needed
       if (filter === 'active') {
@@ -117,14 +113,31 @@ const ReferralsManagement = () => {
 
       if (error) throw error;
 
+      // Get user information for referrers and referred users
+      const referrerIds = [...new Set(data?.map(item => item.referrer_id) || [])];
+      const referredIds = [...new Set(data?.map(item => item.referred_id) || [])];
+      
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, email, full_name')
+        .in('user_id', [...referrerIds, ...referredIds]);
+
+      // Create a map for quick lookup
+      const profilesMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
+
       // Format the data to include user information
-      const formattedData = data?.map((item: any) => ({
-        ...item,
-        referrer_name: item.referrer?.full_name || 'Unknown',
-        referrer_email: item.referrer?.email || 'Unknown',
-        referred_name: item.referred?.full_name || 'Unknown',
-        referred_email: item.referred?.email || 'Unknown'
-      })) || [];
+      const formattedData = data?.map((item: any) => {
+        const referrerProfile = profilesMap.get(item.referrer_id);
+        const referredProfile = profilesMap.get(item.referred_id);
+        
+        return {
+          ...item,
+          referrer_name: referrerProfile?.full_name || 'Unknown',
+          referrer_email: referrerProfile?.email || 'Unknown',
+          referred_name: referredProfile?.full_name || 'Unknown',
+          referred_email: referredProfile?.email || 'Unknown'
+        };
+      }) || [];
 
       setReferrals(formattedData);
     } catch (error) {
@@ -147,7 +160,7 @@ const ReferralsManagement = () => {
       const { data: userData, error: userError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', userId)
+        .eq('user_id', userId)
         .single();
       
       if (userError) throw userError;
@@ -174,7 +187,7 @@ const ReferralsManagement = () => {
     const { data: userData, error: userError } = await supabase
       .from('profiles')
       .select('*')
-      .eq('id', userId)
+      .eq('user_id', userId)
       .single();
     
     if (userError) return null;
@@ -199,13 +212,13 @@ const ReferralsManagement = () => {
     const children: ReferralTreeNode[] = [];
     if (level < 3 && referredUsers) {
       for (const referredUser of referredUsers) {
-        const childNode = await buildReferralTree(referredUser.id, level + 1);
+        const childNode = await buildReferralTree(referredUser.user_id, level + 1);
         if (childNode) children.push(childNode);
       }
     }
     
     return {
-      user_id: userData.id,
+      user_id: userData.user_id,
       name: userData.full_name,
       email: userData.email,
       level,
@@ -316,10 +329,20 @@ const ReferralsManagement = () => {
   };
 
   const formatCurrency = (amount: number, currency: string = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency,
-    }).format(amount);
+    // Handle cryptocurrency codes that aren't valid ISO currency codes
+    if (currency === 'USDT' || currency === 'BTC' || currency === 'ETH') {
+      return `$${amount.toFixed(2)} ${currency}`;
+    }
+    
+    try {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency,
+      }).format(amount);
+    } catch (error) {
+      // Fallback for invalid currency codes
+      return `$${amount.toFixed(2)} ${currency}`;
+    }
   };
 
   const renderReferralTreeNode = (node: ReferralTreeNode) => {

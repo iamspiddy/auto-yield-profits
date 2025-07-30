@@ -82,7 +82,8 @@ const UsersManagement = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('user_id, full_name, email, kyc_verified, referral_code, referred_by, created_at, balance');
+        .select('user_id, full_name, email, kyc_verified, referral_code, referred_by, created_at, balance')
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       setUsers(data || []);
@@ -126,22 +127,10 @@ const UsersManagement = () => {
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
-      // Calculate balance from deposits, withdrawals, and earnings
-      const totalDeposits = (deposits || [])
-        .filter(d => d.status === 'approved')
-        .reduce((sum, d) => sum + Number(d.amount), 0);
-      
-      const totalWithdrawals = (withdrawals || [])
-        .filter(w => w.status === 'completed')
-        .reduce((sum, w) => sum + Number(w.amount), 0);
-      
-      const totalEarnings = (earnings || []).reduce((sum, e) => sum + Number(e.amount), 0);
-      
-      const calculatedBalance = totalDeposits + totalEarnings - totalWithdrawals;
-
+      // Use the balance from profiles table (which is updated by transactions)
       setSelectedUser({
         ...profile,
-        balance: profile.balance || calculatedBalance,
+        balance: profile.balance || 0,
         deposits: deposits || [],
         withdrawals: withdrawals || [],
         earnings: earnings || []
@@ -285,8 +274,11 @@ const UsersManagement = () => {
         balance: newBalance
       });
 
-      // Refresh users list
+      // Refresh users list and user details
       fetchUsers();
+      if (selectedUser) {
+        fetchUserDetails(selectedUser.user_id);
+      }
 
       toast({
         title: "Success",

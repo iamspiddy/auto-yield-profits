@@ -49,15 +49,37 @@ const ActivityLog = () => {
     try {
       const { data, error } = await supabase
         .from('admin_actions')
-        .select(`
-          *,
-          profiles!admin_id(full_name, email)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(100);
 
       if (error) throw error;
-      setActions((data || []) as AdminAction[]);
+
+      // Get admin profile information
+      const adminIds = [...new Set(data?.map(item => item.admin_id) || [])];
+      
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, email, full_name')
+        .in('user_id', adminIds);
+
+      // Create a map for quick lookup
+      const profilesMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
+
+      // Format the data to include admin information
+      const formattedData = (data || []).map((item: any) => {
+        const adminProfile = profilesMap.get(item.admin_id);
+        
+        return {
+          ...item,
+          profiles: {
+            full_name: adminProfile?.full_name || 'Unknown Admin',
+            email: adminProfile?.email || 'Unknown'
+          }
+        };
+      });
+
+      setActions(formattedData as AdminAction[]);
     } catch (error) {
       console.error('Error fetching actions:', error);
       setActions([]);

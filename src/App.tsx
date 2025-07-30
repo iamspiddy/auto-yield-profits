@@ -9,6 +9,12 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Deposit from "./pages/Deposit";
+import Withdraw from "./pages/Withdraw";
+import History from "./pages/History";
+import Referrals from "./pages/Referrals";
+import Profile from "./pages/Profile";
+import KYC from "./pages/KYC";
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import { Suspense, lazy } from "react";
@@ -20,6 +26,7 @@ const WithdrawalsManagement = lazy(() => import('./pages/admin/WithdrawalsManage
 const ProfitDistribution = lazy(() => import('./pages/admin/ProfitDistribution'));
 const ReferralsManagement = lazy(() => import('./pages/admin/ReferralsManagement'));
 const ActivityLog = lazy(() => import('./pages/admin/ActivityLog'));
+const KYCManagement = lazy(() => import('./pages/admin/KYCManagement'));
 
 const queryClient = new QueryClient();
 
@@ -34,6 +41,12 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/deposit" element={<Deposit />} />
+            <Route path="/withdraw" element={<Withdraw />} />
+            <Route path="/history" element={<History />} />
+            <Route path="/referrals" element={<Referrals />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/kyc" element={<KYC />} />
             <Route path="/admin/*" element={
               <AdminGuard>
                 <AdminLayout>
@@ -45,6 +58,7 @@ const App = () => (
                       <Route path="/withdrawals" element={<WithdrawalsManagement />} />
                       <Route path="/profits" element={<ProfitDistribution />} />
                       <Route path="/referrals" element={<ReferralsManagement />} />
+                      <Route path="/kyc" element={<KYCManagement />} />
                       <Route path="/activity" element={<ActivityLog />} />
                     </Routes>
                   </Suspense>
