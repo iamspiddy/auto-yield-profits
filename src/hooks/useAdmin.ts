@@ -1,14 +1,21 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
-export const useAdmin = () => {
+interface AdminStatus {
+  isAdmin: boolean;
+  loading: boolean;
+  error: string | null;
+}
+
+export const useAdmin = (): AdminStatus => {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkAdminRole = async () => {
+    const checkAdminStatus = async () => {
       if (!user) {
         setIsAdmin(false);
         setLoading(false);
@@ -16,29 +23,31 @@ export const useAdmin = () => {
       }
 
       try {
-        const { data, error } = await supabase
-          .from('user_roles')
+        setLoading(true);
+        setError(null);
+
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
           .select('role')
           .eq('user_id', user.id)
-          .eq('role', 'admin')
-          .maybeSingle();
+          .single();
 
-        if (error) {
-          console.error('Error checking admin role:', error);
-          setIsAdmin(false);
-        } else {
-          setIsAdmin(!!data);
+        if (profileError) {
+          throw profileError;
         }
-      } catch (error) {
-        console.error('Error checking admin role:', error);
+
+        setIsAdmin(profile?.role === 'admin');
+      } catch (err: any) {
+        console.error('Error checking admin status:', err);
+        setError(err.message || 'Failed to verify admin status');
         setIsAdmin(false);
       } finally {
         setLoading(false);
       }
     };
 
-    checkAdminRole();
+    checkAdminStatus();
   }, [user]);
 
-  return { isAdmin, loading };
+  return { isAdmin, loading, error };
 };

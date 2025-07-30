@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { AdminGuard } from "@/components/admin/AdminGuard";
+import AdminGuard from "@/components/admin/AdminGuard";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -15,6 +15,7 @@ import History from "./pages/History";
 import Referrals from "./pages/Referrals";
 import Profile from "./pages/Profile";
 import KYC from "./pages/KYC";
+import AdminLogin from "./pages/admin/AdminLogin";
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import { Suspense, lazy } from "react";
@@ -47,12 +48,15 @@ const App = () => (
             <Route path="/referrals" element={<Referrals />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/kyc" element={<KYC />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/*" element={
               <AdminGuard>
                 <AdminLayout>
                   <Suspense fallback={<div className="p-8 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}>
                     <Routes>
-                      <Route path="/" element={<AdminDashboard />} />
+                      <Route path="/dashboard" element={<AdminDashboard />} />
                       <Route path="/users" element={<UsersManagement />} />
                       <Route path="/deposits" element={<DepositsManagement />} />
                       <Route path="/withdrawals" element={<WithdrawalsManagement />} />

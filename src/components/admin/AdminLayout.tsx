@@ -18,7 +18,13 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
   const { user, signOut } = useAuth();
 
   const handleSignOut = async () => {
-    await signOut();
+    try {
+      await signOut();
+      // Redirect to admin login after logout
+      window.location.href = '/admin/login';
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   return (
