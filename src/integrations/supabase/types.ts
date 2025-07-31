@@ -7,347 +7,618 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
-  }
   public: {
     Tables: {
-      admin_actions: {
+      admin_logs: {
         Row: {
+          id: string
+          admin_id: string | null
           action_type: string
-          admin_id: string
+          target_user_id: string | null
+          target_table: string | null
+          target_record_id: string | null
           amount: number | null
-          created_at: string
-          details: Json
-          entity_id: string
-          entity_type: string
-          id: string
+          currency: string | null
+          description: string | null
+          metadata: Json | null
           ip_address: string | null
-          reason: string | null
+          user_agent: string | null
+          created_at: string | null
         }
         Insert: {
+          id?: string
+          admin_id?: string | null
           action_type: string
-          admin_id: string
+          target_user_id?: string | null
+          target_table?: string | null
+          target_record_id?: string | null
           amount?: number | null
-          created_at?: string
-          details?: Json
-          entity_id: string
-          entity_type: string
-          id?: string
+          currency?: string | null
+          description?: string | null
+          metadata?: Json | null
           ip_address?: string | null
-          reason?: string | null
+          user_agent?: string | null
+          created_at?: string | null
         }
         Update: {
+          id?: string
+          admin_id?: string | null
           action_type?: string
-          admin_id?: string
+          target_user_id?: string | null
+          target_table?: string | null
+          target_record_id?: string | null
           amount?: number | null
-          created_at?: string
-          details?: Json
-          entity_id?: string
-          entity_type?: string
-          id?: string
+          currency?: string | null
+          description?: string | null
+          metadata?: Json | null
           ip_address?: string | null
-          reason?: string | null
-        }
-        Relationships: []
-      }
-      deposits: {
-        Row: {
-          amount: number
-          created_at: string
-          currency: string
-          id: string
-          notes: string | null
-          proof_file_url: string | null
-          status: Database["public"]["Enums"]["transaction_status"]
-          transaction_hash: string | null
-          updated_at: string
-          user_id: string
-          verified_at: string | null
-          verified_by: string | null
-        }
-        Insert: {
-          amount: number
-          created_at?: string
-          currency?: string
-          id?: string
-          notes?: string | null
-          proof_file_url?: string | null
-          status?: Database["public"]["Enums"]["transaction_status"]
-          transaction_hash?: string | null
-          updated_at?: string
-          user_id: string
-          verified_at?: string | null
-          verified_by?: string | null
-        }
-        Update: {
-          amount?: number
-          created_at?: string
-          currency?: string
-          id?: string
-          notes?: string | null
-          proof_file_url?: string | null
-          status?: Database["public"]["Enums"]["transaction_status"]
-          transaction_hash?: string | null
-          updated_at?: string
-          user_id?: string
-          verified_at?: string | null
-          verified_by?: string | null
-        }
-        Relationships: []
-      }
-      earnings: {
-        Row: {
-          amount: number
-          created_at: string
-          currency: string
-          deposit_id: string | null
-          earnings_date: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          amount: number
-          created_at?: string
-          currency?: string
-          deposit_id?: string | null
-          earnings_date?: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string
-          currency?: string
-          deposit_id?: string | null
-          earnings_date?: string
-          id?: string
-          user_id?: string
+          user_agent?: string | null
+          created_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "earnings_deposit_id_fkey"
-            columns: ["deposit_id"]
+            foreignKeyName: "admin_logs_admin_id_fkey"
+            columns: ["admin_id"]
             isOneToOne: false
-            referencedRelation: "deposits"
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "admin_logs_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      deposits: {
+        Row: {
+          id: string
+          user_id: string
+          amount: number
+          currency: string
+          proof_file_url: string | null
+          transaction_hash: string | null
+          status: string
+          verified_at: string | null
+          verified_by: string | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          amount: number
+          currency: string
+          proof_file_url?: string | null
+          transaction_hash?: string | null
+          status: string
+          verified_at?: string | null
+          verified_by?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          amount?: number
+          currency?: string
+          proof_file_url?: string | null
+          transaction_hash?: string | null
+          status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deposits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      earnings: {
+        Row: {
+          id: string
+          user_id: string
+          amount: number
+          currency: string
+          earnings_date: string
+          deposit_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          reference_id: string | null
+          source: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          amount: number
+          currency: string
+          earnings_date: string
+          deposit_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          reference_id?: string | null
+          source?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          amount?: number
+          currency?: string
+          earnings_date?: string
+          deposit_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          reference_id?: string | null
+          source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "earnings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      kyc_documents: {
+        Row: {
+          id: string
+          user_id: string | null
+          document_type: string
+          file_url: string
+          file_name: string | null
+          file_size: number | null
+          uploaded_at: string | null
+          verified: boolean | null
+          verified_by: string | null
+          verified_at: string | null
+          rejection_reason: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          document_type: string
+          file_url: string
+          file_name?: string | null
+          file_size?: number | null
+          uploaded_at?: string | null
+          verified?: boolean | null
+          verified_by?: string | null
+          verified_at?: string | null
+          rejection_reason?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          document_type?: string
+          file_url?: string
+          file_name?: string | null
+          file_size?: number | null
+          uploaded_at?: string | null
+          verified?: boolean | null
+          verified_by?: string | null
+          verified_at?: string | null
+          rejection_reason?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kyc_documents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
         ]
       }
       profiles: {
         Row: {
-          balance: number | null
-          created_at: string
-          email: string
-          full_name: string
           id: string
+          user_id: string
+          full_name: string
+          email: string
           kyc_verified: boolean | null
           referral_code: string
           referred_by: string | null
+          created_at: string
           updated_at: string
-          user_id: string
+          balance: number | null
+          username: string | null
+          avatar_url: string | null
+          kyc_status: string | null
+          kyc_id_url: string | null
+          kyc_selfie_url: string | null
+          last_login: string | null
+          kyc_submitted_at: string | null
+          kyc_rejection_reason: string | null
+          date_of_birth: string | null
         }
         Insert: {
-          balance?: number | null
-          created_at?: string
-          email: string
-          full_name: string
           id?: string
-          kyc_verified?: boolean | null
-          referral_code?: string
-          referred_by?: string | null
-          updated_at?: string
           user_id: string
+          full_name: string
+          email: string
+          kyc_verified?: boolean | null
+          referral_code: string
+          referred_by?: string | null
+          created_at?: string
+          updated_at?: string
+          balance?: number | null
+          username?: string | null
+          avatar_url?: string | null
+          kyc_status?: string | null
+          kyc_id_url?: string | null
+          kyc_selfie_url?: string | null
+          last_login?: string | null
+          kyc_submitted_at?: string | null
+          kyc_rejection_reason?: string | null
+          date_of_birth?: string | null
         }
         Update: {
-          balance?: number | null
-          created_at?: string
-          email?: string
-          full_name?: string
           id?: string
+          user_id?: string
+          full_name?: string
+          email?: string
           kyc_verified?: boolean | null
           referral_code?: string
           referred_by?: string | null
+          created_at?: string
           updated_at?: string
-          user_id?: string
+          balance?: number | null
+          username?: string | null
+          avatar_url?: string | null
+          kyc_status?: string | null
+          kyc_id_url?: string | null
+          kyc_selfie_url?: string | null
+          last_login?: string | null
+          kyc_submitted_at?: string | null
+          kyc_rejection_reason?: string | null
+          date_of_birth?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "profiles_referred_by_fkey"
-            columns: ["referred_by"]
+            foreignKeyName: "profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      referral_earnings: {
+        Row: {
+          id: string
+          referrer_id: string
+          referred_user_id: string
+          amount: number
+          currency: string
+          source_type: string
+          source_id: string | null
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          referrer_id: string
+          referred_user_id: string
+          amount: number
+          currency: string
+          source_type: string
+          source_id?: string | null
+          status: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          referrer_id?: string
+          referred_user_id?: string
+          amount?: number
+          currency?: string
+          source_type?: string
+          source_id?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_earnings_referrer_id_fkey"
+            columns: ["referrer_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "referral_earnings_referred_user_id_fkey"
+            columns: ["referred_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
         ]
       }
       referrals: {
         Row: {
-          commission_rate: number | null
-          created_at: string
           id: string
-          referred_id: string
           referrer_id: string
+          referred_id: string
+          status: string
+          commission_earned: number | null
+          commission_rate: number | null
           total_earned: number | null
+          created_at: string
+          updated_at: string
         }
         Insert: {
-          commission_rate?: number | null
-          created_at?: string
           id?: string
-          referred_id: string
           referrer_id: string
+          referred_id: string
+          status: string
+          commission_earned?: number | null
+          commission_rate?: number | null
           total_earned?: number | null
+          created_at?: string
+          updated_at?: string
         }
         Update: {
-          commission_rate?: number | null
-          created_at?: string
           id?: string
-          referred_id?: string
           referrer_id?: string
+          referred_id?: string
+          status?: string
+          commission_earned?: number | null
+          commission_rate?: number | null
           total_earned?: number | null
+          created_at?: string
+          updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       transactions: {
         Row: {
-          amount: number
-          created_at: string
-          currency: string
-          description: string | null
           id: string
-          reference_id: string | null
-          status: Database["public"]["Enums"]["transaction_status"]
-          type: Database["public"]["Enums"]["transaction_type"]
           user_id: string
+          type: string
+          amount: number
+          currency: string
+          status: string
+          reference_id: string | null
+          description: string | null
+          created_at: string
         }
         Insert: {
-          amount: number
-          created_at?: string
-          currency?: string
-          description?: string | null
           id?: string
-          reference_id?: string | null
-          status?: Database["public"]["Enums"]["transaction_status"]
-          type: Database["public"]["Enums"]["transaction_type"]
           user_id: string
+          type: string
+          amount: number
+          currency: string
+          status: string
+          reference_id?: string | null
+          description?: string | null
+          created_at?: string
         }
         Update: {
-          amount?: number
-          created_at?: string
-          currency?: string
-          description?: string | null
           id?: string
-          reference_id?: string | null
-          status?: Database["public"]["Enums"]["transaction_status"]
-          type?: Database["public"]["Enums"]["transaction_type"]
           user_id?: string
+          type?: string
+          amount?: number
+          currency?: string
+          status?: string
+          reference_id?: string | null
+          description?: string | null
+          created_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       user_roles: {
         Row: {
-          created_at: string
           id: string
-          role: Database["public"]["Enums"]["app_role"]
           user_id: string
+          role: string
+          created_at: string
         }
         Insert: {
-          created_at?: string
           id?: string
-          role?: Database["public"]["Enums"]["app_role"]
           user_id: string
+          role: string
+          created_at?: string
         }
         Update: {
-          created_at?: string
           id?: string
-          role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+          role?: string
+          created_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       withdrawals: {
         Row: {
-          amount: number
-          bank_info: Json | null
-          created_at: string
-          currency: string
           id: string
-          notes: string | null
+          user_id: string
+          amount: number
+          currency: string
+          wallet_address: string
+          bank_info: Json | null
+          status: string
+          transaction_hash: string | null
           processed_at: string | null
           processed_by: string | null
-          status: Database["public"]["Enums"]["withdrawal_status"]
-          transaction_hash: string | null
+          notes: string | null
+          created_at: string
           updated_at: string
-          user_id: string
-          wallet_address: string
         }
         Insert: {
-          amount: number
-          bank_info?: Json | null
-          created_at?: string
-          currency?: string
           id?: string
-          notes?: string | null
+          user_id: string
+          amount: number
+          currency: string
+          wallet_address: string
+          bank_info?: Json | null
+          status: string
+          transaction_hash?: string | null
           processed_at?: string | null
           processed_by?: string | null
-          status?: Database["public"]["Enums"]["withdrawal_status"]
-          transaction_hash?: string | null
+          notes?: string | null
+          created_at?: string
           updated_at?: string
-          user_id: string
-          wallet_address: string
         }
         Update: {
-          amount?: number
-          bank_info?: Json | null
-          created_at?: string
-          currency?: string
           id?: string
-          notes?: string | null
+          user_id?: string
+          amount?: number
+          currency?: string
+          wallet_address?: string
+          bank_info?: Json | null
+          status?: string
+          transaction_hash?: string | null
           processed_at?: string | null
           processed_by?: string | null
-          status?: Database["public"]["Enums"]["withdrawal_status"]
-          transaction_hash?: string | null
+          notes?: string | null
+          created_at?: string
           updated_at?: string
-          user_id?: string
-          wallet_address?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "withdrawals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      create_admin_actions_table: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
       has_role: {
         Args: {
           _user_id: string
-          _role: Database["public"]["Enums"]["app_role"]
+          _role: string
         }
         Returns: boolean
       }
+      add_admin_role: {
+        Args: {
+          _user_id: string
+        }
+        Returns: void
+      }
+      remove_admin_role: {
+        Args: {
+          _user_id: string
+        }
+        Returns: void
+      }
+      get_admin_users: {
+        Args: Record<string, never>
+        Returns: {
+          user_id: string
+          email: string
+        }[]
+      }
       log_admin_action: {
         Args: {
-          p_admin_id: string
-          p_action_type: string
-          p_entity_type: string
-          p_entity_id: string
-          p_details: Json
-          p_ip_address?: string
+          _action_type: string
+          _target_user_id?: string
+          _target_table?: string
+          _target_record_id?: string
+          _amount?: number
+          _currency?: string
+          _description?: string
+          _metadata?: Json
         }
         Returns: string
       }
+      get_admin_logs: {
+        Args: {
+          _limit?: number
+          _offset?: number
+          _action_type?: string
+          _admin_id?: string
+          _target_user_id?: string
+        }
+        Returns: {
+          id: string
+          admin_email: string
+          action_type: string
+          target_user_email: string
+          target_table: string
+          target_record_id: string
+          amount: number
+          currency: string
+          description: string
+          created_at: string
+        }[]
+      }
+      get_user_kyc_status: {
+        Args: {
+          _user_id: string
+        }
+        Returns: {
+          user_id: string
+          kyc_verified: boolean
+          kyc_status: string
+          kyc_submitted_at: string
+          documents_count: number
+        }[]
+      }
     }
     Enums: {
-      app_role: "user" | "admin"
-      transaction_status: "pending" | "approved" | "rejected" | "completed"
-      transaction_type: "deposit" | "profit" | "withdrawal" | "referral_bonus"
-      withdrawal_status: "pending" | "processing" | "completed" | "rejected"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -475,7 +746,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["user", "admin"],
+      app_role: ["user"],
       transaction_status: ["pending", "approved", "rejected", "completed"],
       transaction_type: ["deposit", "profit", "withdrawal", "referral_bonus"],
       withdrawal_status: ["pending", "processing", "completed", "rejected"],

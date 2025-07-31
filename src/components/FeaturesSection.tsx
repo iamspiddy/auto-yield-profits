@@ -11,7 +11,7 @@ const features = [
   {
     icon: Shield,
     title: "Transparent Process",
-    description: "Admin-managed with full transaction history and real-time balance updates.",
+    description: "Automated with full transaction history and real-time balance updates.",
     color: "text-primary"
   },
   {

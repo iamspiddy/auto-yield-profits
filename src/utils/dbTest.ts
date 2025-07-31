@@ -25,7 +25,7 @@ export const testDatabaseConnection = async () => {
     }
 
     // Test each table
-    const tables = ['profiles', 'deposits', 'withdrawals', 'referrals', 'admin_actions', 'earnings', 'transactions'];
+    const tables = ['profiles', 'deposits', 'withdrawals', 'referrals', 'earnings', 'transactions'];
     
     for (const table of tables) {
       try {
@@ -65,7 +65,7 @@ export const getBasicStats = async () => {
       deposits: 0,
       withdrawals: 0,
       referrals: 0,
-      admin_actions: 0,
+  
       earnings: 0,
       transactions: 0
     };
@@ -93,6 +93,66 @@ export const getBasicStats = async () => {
     return stats;
   } catch (error) {
     console.error('Error getting basic stats:', error);
+    return null;
+  }
+};
+
+/**
+ * Test if there's any data in the database
+ */
+export const testDatabaseData = async () => {
+  try {
+    console.log('Testing database data...');
+    
+    // Test profiles table
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('user_id, email, full_name, role')
+      .limit(5);
+
+    if (profilesError) {
+      console.error('Error fetching profiles:', profilesError);
+    } else {
+      console.log('Profiles found:', profiles?.length || 0);
+      console.log('Sample profiles:', profiles);
+    }
+
+    // Test deposits table
+    const { data: deposits, error: depositsError } = await supabase
+      .from('deposits')
+      .select('*')
+      .limit(5);
+
+    if (depositsError) {
+      console.error('Error fetching deposits:', depositsError);
+    } else {
+      console.log('Deposits found:', deposits?.length || 0);
+      console.log('Sample deposits:', deposits);
+    }
+
+    // Test withdrawals table
+    const { data: withdrawals, error: withdrawalsError } = await supabase
+      .from('withdrawals')
+      .select('*')
+      .limit(5);
+
+    if (withdrawalsError) {
+      console.error('Error fetching withdrawals:', withdrawalsError);
+    } else {
+      console.log('Withdrawals found:', withdrawals?.length || 0);
+      console.log('Sample withdrawals:', withdrawals);
+    }
+
+    return {
+      profiles: profiles?.length || 0,
+      deposits: deposits?.length || 0,
+      withdrawals: withdrawals?.length || 0,
+      sampleProfiles: profiles,
+      sampleDeposits: deposits,
+      sampleWithdrawals: withdrawals
+    };
+  } catch (error) {
+    console.error('Error testing database data:', error);
     return null;
   }
 }; 

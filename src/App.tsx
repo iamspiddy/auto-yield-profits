@@ -4,10 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-import AdminGuard from "@/components/admin/AdminGuard";
-import { AdminLayout } from "@/components/admin/AdminLayout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import Dashboard from "./pages/Dashboard";
 import Deposit from "./pages/Deposit";
 import Withdraw from "./pages/Withdraw";
@@ -15,19 +14,21 @@ import History from "./pages/History";
 import Referrals from "./pages/Referrals";
 import Profile from "./pages/Profile";
 import KYC from "./pages/KYC";
-import AdminLogin from "./pages/admin/AdminLogin";
-import { AdminDashboard } from "./pages/admin/AdminDashboard";
 import NotFound from "./pages/NotFound";
-import { Suspense, lazy } from "react";
 
-// Lazy load admin pages
-const UsersManagement = lazy(() => import('./pages/admin/UsersManagement'));
-const DepositsManagement = lazy(() => import('./pages/admin/DepositsManagement'));
-const WithdrawalsManagement = lazy(() => import('./pages/admin/WithdrawalsManagement'));
-const ProfitDistribution = lazy(() => import('./pages/admin/ProfitDistribution'));
-const ReferralsManagement = lazy(() => import('./pages/admin/ReferralsManagement'));
-const ActivityLog = lazy(() => import('./pages/admin/ActivityLog'));
-const KYCManagement = lazy(() => import('./pages/admin/KYCManagement'));
+// Admin pages
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminDeposits from "./pages/admin/AdminDeposits";
+import AdminWithdrawals from "./pages/admin/AdminWithdrawals";
+import AdminProfits from "./pages/admin/AdminProfits";
+import AdminPins from "./pages/admin/AdminPins";
+import AdminKYC from "./pages/admin/AdminKYC";
+import AdminReferrals from "./pages/admin/AdminReferrals";
+import AdminLogs from "./pages/admin/AdminLogs";
+import AdminSetup from "./pages/admin/AdminSetup";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/deposit" element={<Deposit />} />
             <Route path="/withdraw" element={<Withdraw />} />
@@ -51,24 +53,19 @@ const App = () => (
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/*" element={
-              <AdminGuard>
-                <AdminLayout>
-                  <Suspense fallback={<div className="p-8 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}>
-                    <Routes>
-                      <Route path="/dashboard" element={<AdminDashboard />} />
-                      <Route path="/users" element={<UsersManagement />} />
-                      <Route path="/deposits" element={<DepositsManagement />} />
-                      <Route path="/withdrawals" element={<WithdrawalsManagement />} />
-                      <Route path="/profits" element={<ProfitDistribution />} />
-                      <Route path="/referrals" element={<ReferralsManagement />} />
-                      <Route path="/kyc" element={<KYCManagement />} />
-                      <Route path="/activity" element={<ActivityLog />} />
-                    </Routes>
-                  </Suspense>
-                </AdminLayout>
-              </AdminGuard>
-            } />
+            <Route path="/admin/setup" element={<AdminSetup />} />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="deposits" element={<AdminDeposits />} />
+              <Route path="withdrawals" element={<AdminWithdrawals />} />
+              <Route path="profits" element={<AdminProfits />} />
+              <Route path="pins" element={<AdminPins />} />
+              <Route path="kyc" element={<AdminKYC />} />
+              <Route path="referrals" element={<AdminReferrals />} />
+              <Route path="logs" element={<AdminLogs />} />
+            </Route>
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

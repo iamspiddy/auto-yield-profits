@@ -108,6 +108,9 @@ const EarningsOverview = () => {
 
   return (
     <div className="space-y-6">
+      {/* Crypto Market Chart - Moved to top */}
+      <CryptoChart />
+      
       {/* Earnings Overview Card */}
       <Card>
         <CardHeader>
@@ -193,9 +196,6 @@ const EarningsOverview = () => {
           </div>
         </CardContent>
       </Card>
-
-      {/* Crypto Market Chart */}
-      <CryptoChart />
     </div>
   );
 };

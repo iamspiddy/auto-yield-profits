@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { ArrowDownLeft, ArrowLeft, Wallet, Check } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ArrowDownLeft, ArrowLeft, TrendingUp, Lock, Check } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -18,44 +19,48 @@ const Withdraw = () => {
   const [walletAddress, setWalletAddress] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [balance, setBalance] = useState(0);
+  const [availableEarnings, setAvailableEarnings] = useState(0);
+  const [showPinDialog, setShowPinDialog] = useState(false);
+  const [pin, setPin] = useState('');
 
   useEffect(() => {
     if (!user) return;
 
-    const fetchBalance = async () => {
+    const fetchAvailableEarnings = async () => {
       try {
-        // Fetch approved deposits (wallet balance)
-        const { data: deposits } = await supabase
-          .from('deposits')
-          .select('amount')
-          .eq('user_id', user.id)
-          .eq('status', 'approved');
-
         // Fetch total earnings
         const { data: earnings } = await supabase
           .from('earnings')
           .select('amount')
           .eq('user_id', user.id);
 
-        // Fetch pending withdrawals
-        const { data: withdrawals } = await supabase
+        // Get pending earnings withdrawals
+        const { data: pendingEarningsWithdrawals } = await supabase
           .from('withdrawals')
           .select('amount')
           .eq('user_id', user.id)
+          .eq('withdrawal_type', 'earnings')
           .in('status', ['pending', 'processing']);
 
-        const totalDeposits = deposits?.reduce((sum, deposit) => sum + Number(deposit.amount), 0) || 0;
-        const totalEarnings = earnings?.reduce((sum, earning) => sum + Number(earning.amount), 0) || 0;
-        const pendingWithdrawals = withdrawals?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
+        // Get completed earnings withdrawals (deductions)
+        const { data: completedEarningsWithdrawals } = await supabase
+          .from('withdrawals')
+          .select('amount')
+          .eq('user_id', user.id)
+          .eq('withdrawal_type', 'earnings')
+          .eq('status', 'completed');
 
-        setBalance(totalDeposits + totalEarnings - pendingWithdrawals);
+        const totalEarnings = earnings?.reduce((sum, earning) => sum + Number(earning.amount), 0) || 0;
+        const pendingEarningsAmount = pendingEarningsWithdrawals?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
+        const completedEarningsDeductions = completedEarningsWithdrawals?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
+        
+        setAvailableEarnings(totalEarnings - pendingEarningsAmount - completedEarningsDeductions);
       } catch (error) {
-        console.error('Error fetching balance:', error);
+        console.error('Error fetching earnings:', error);
       }
     };
 
-    fetchBalance();
+    fetchAvailableEarnings();
   }, [user]);
 
   if (loading) {
@@ -93,47 +98,72 @@ const Withdraw = () => {
       return;
     }
 
-    if (withdrawalAmount > balance) {
+    if (withdrawalAmount > availableEarnings) {
       toast({
-        title: "Insufficient Balance",
-        description: `Available balance: $${balance.toFixed(2)} USDT`,
+        title: "Insufficient Earnings",
+        description: `Available earnings: $${availableEarnings.toFixed(2)} USDT`,
         variant: "destructive"
       });
       return;
     }
 
+    // Show PIN dialog instead of processing immediately
+    setShowPinDialog(true);
+  };
+
+  const handlePinVerification = async () => {
+    if (!user || !pin) return;
+
     setIsSubmitting(true);
 
     try {
-      // Create withdrawal record
-      const { error: withdrawalError } = await supabase
-        .from('withdrawals')
-        .insert({
-          user_id: user.id,
-          amount: withdrawalAmount,
-          wallet_address: walletAddress,
-          status: 'pending'
+      // Verify PIN with admin
+      const { data: pinVerification, error: pinError } = await supabase
+        .rpc('verify_withdrawal_pin', {
+          _user_id: user.id,
+          _pin: pin
         });
 
-      if (withdrawalError) throw withdrawalError;
-
-      // Create transaction record
-      await supabase
-        .from('transactions')
-        .insert({
-          user_id: user.id,
-          type: 'withdrawal',
-          amount: withdrawalAmount,
-          status: 'pending',
-          description: `Withdrawal of ${amount} USDT to ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+      if (pinError || !pinVerification) {
+        toast({
+          title: "Invalid PIN",
+          description: "The PIN you entered is invalid or has expired.",
+          variant: "destructive"
         });
+        return;
+      }
+
+      // PIN is valid, proceed with withdrawal
+      const withdrawalAmount = parseFloat(amount);
+
+      // Create withdrawal record using raw SQL to avoid type issues
+      console.log('Creating withdrawal...');
+      const { data: withdrawalData, error: withdrawalError } = await supabase
+        .rpc('create_withdrawal', {
+          p_user_id: user.id,
+          p_amount: withdrawalAmount,
+          p_wallet_address: walletAddress,
+          p_withdrawal_type: 'earnings'
+        });
+
+      if (withdrawalError) {
+        console.error('Withdrawal error:', withdrawalError);
+        throw withdrawalError;
+      }
+      console.log('Withdrawal created successfully:', withdrawalData);
+
+      // Transaction is automatically created by the trigger handle_withdrawal_transaction()
+      // No need to create it manually to avoid duplicate key violations
+      console.log('Withdrawal created successfully, transaction will be created by trigger');
 
       toast({
         title: "Withdrawal Requested",
-        description: "Your withdrawal request has been submitted for processing."
+        description: "Your earnings withdrawal request has been submitted for processing."
       });
 
       setSubmitted(true);
+      setPin('');
+      setShowPinDialog(false);
       
     } catch (error: any) {
       toast({
@@ -192,21 +222,21 @@ const Withdraw = () => {
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <ArrowDownLeft className="h-5 w-5" />
-                Withdraw Funds
+                Withdraw Earnings
               </span>
               <Badge variant="outline">Min: $10</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Balance Display */}
-            <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/5 p-4 rounded-lg border border-blue-500/20">
+            {/* Earnings Display */}
+            <div className="bg-gradient-to-r from-green-500/10 to-green-600/5 p-4 rounded-lg border border-green-500/20">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Available Balance</p>
-                  <p className="text-2xl font-bold text-blue-600">${balance.toFixed(2)}</p>
+                  <p className="text-sm text-muted-foreground">Available Earnings</p>
+                  <p className="text-2xl font-bold text-green-600">${availableEarnings.toFixed(2)}</p>
                   <p className="text-xs text-muted-foreground">USDT</p>
                 </div>
-                <Wallet className="h-8 w-8 text-blue-600" />
+                <TrendingUp className="h-8 w-8 text-green-600" />
               </div>
             </div>
 
@@ -220,12 +250,13 @@ const Withdraw = () => {
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   min="10"
+                  max={availableEarnings}
                   step="0.01"
                   required
                   className="text-lg"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Minimum withdrawal: $10 USDT
+                  Minimum withdrawal: $10 USDT • Maximum: ${availableEarnings.toFixed(2)} USDT
                 </p>
               </div>
 
@@ -252,11 +283,58 @@ const Withdraw = () => {
 
             <div className="bg-muted/50 p-4 rounded-lg">
               <p className="text-sm text-muted-foreground text-center">
-                Withdrawals are reviewed and processed within 24–48 hours
+                Withdrawals are reviewed and processed within 24–48 hours<br/>
+                You will need a 4-digit PIN from admin to complete withdrawal
               </p>
             </div>
           </CardContent>
         </Card>
+
+        {/* PIN Verification Dialog */}
+        <Dialog open={showPinDialog} onOpenChange={setShowPinDialog}>
+          <DialogContent className="bg-gray-800 border-gray-700">
+            <DialogHeader>
+              <DialogTitle className="text-white flex items-center gap-2">
+                <Lock className="h-5 w-5" />
+                Enter Withdrawal PIN
+              </DialogTitle>
+              <DialogDescription className="text-gray-400">
+                Please enter the 4-digit PIN provided by admin to complete your withdrawal request.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="pin">4-Digit PIN</Label>
+                <Input
+                  id="pin"
+                  type="password"
+                  placeholder="Enter 4-digit PIN"
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value)}
+                  maxLength={4}
+                  pattern="[0-9]{4}"
+                  required
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handlePinVerification} 
+                  className="flex-1"
+                  disabled={isSubmitting || pin.length !== 4}
+                >
+                  {isSubmitting ? 'Verifying...' : 'Verify & Submit'}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowPinDialog(false)}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );

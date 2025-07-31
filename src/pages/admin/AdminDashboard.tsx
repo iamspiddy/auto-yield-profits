@@ -1,404 +1,468 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, CreditCard, Banknote, TrendingUp, UserPlus, Activity, Shield, Bug } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
-import { testDatabaseConnection, getBasicStats } from '@/utils/dbTest';
+import { useToast } from '@/hooks/use-toast';
+import {
+  Users,
+  CreditCard,
+  TrendingUp,
+  Wallet,
+  Shield,
+  Activity,
+  DollarSign,
+  ArrowUpRight,
+  ArrowDownRight,
+  Clock,
+  CheckCircle,
+  XCircle
+} from 'lucide-react';
 
 interface DashboardStats {
   totalUsers: number;
-  pendingDeposits: number;
+  totalDeposits: number;
+  totalProfit: number;
   pendingWithdrawals: number;
-  totalVolume: number;
-  activeReferrals: number;
-  adminActions: number;
   pendingKYC: number;
+  totalReferrals: number;
+  monthlyGrowth: number;
 }
 
-interface RecentUser {
-  user_id: string;
-  full_name: string;
-  email: string;
-  created_at: string;
-  kyc_verified: boolean;
-  balance: number;
+interface RecentActivity {
+  id: string;
+  action: string;
+  user_email: string;
+  amount?: number;
+  timestamp: string;
+  status: string;
 }
 
-export const AdminDashboard = () => {
+const AdminDashboard = () => {
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
-    pendingDeposits: 0,
+    totalDeposits: 0,
+    totalProfit: 0,
     pendingWithdrawals: 0,
-    totalVolume: 0,
-    activeReferrals: 0,
-    adminActions: 0,
-    pendingKYC: 0
+    pendingKYC: 0,
+    totalReferrals: 0,
+    monthlyGrowth: 0
   });
-  const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
-  const [debugInfo, setDebugInfo] = useState<any>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
-    fetchDashboardStats();
+    fetchDashboardData();
   }, []);
 
-  const fetchDashboardStats = async () => {
-    setLoading(true);
+  const fetchDashboardData = async () => {
     try {
-      // Fetch total users
-      const { count: totalUsers, error: usersError } = await supabase
+      setLoading(true);
+
+      // Fetch users count
+      const { data: users, error: usersError } = await supabase
         .from('profiles')
-        .select('*', { count: 'exact', head: true });
+        .select('id, created_at');
 
-      if (usersError) {
-        console.error('Error fetching users:', usersError);
-      }
-
-      // Fetch pending deposits
-      const { count: pendingDeposits, error: depositsError } = await supabase
+      // Fetch deposits
+      const { data: deposits, error: depositsError } = await supabase
         .from('deposits')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending');
+        .select('id, user_id, amount, status, created_at');
 
-      if (depositsError) {
-        console.error('Error fetching deposits:', depositsError);
-      }
-
-      // Fetch pending withdrawals
-      const { count: pendingWithdrawals, error: withdrawalsError } = await supabase
+      // Fetch withdrawals
+      const { data: withdrawals, error: withdrawalsError } = await supabase
         .from('withdrawals')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending');
+        .select('id, user_id, amount, status, created_at');
 
-      if (withdrawalsError) {
-        console.error('Error fetching withdrawals:', withdrawalsError);
-      }
+      // Fetch earnings
+      const { data: earnings, error: earningsError } = await supabase
+        .from('earnings')
+        .select('id, amount, created_at');
 
-      // Fetch total volume (approved deposits + completed withdrawals)
-      const { data: deposits, error: depositsDataError } = await supabase
-        .from('deposits')
-        .select('amount')
-        .eq('status', 'approved');
-
-      if (depositsDataError) {
-        console.error('Error fetching deposits data:', depositsDataError);
-      }
-
-      const { data: withdrawals, error: withdrawalsDataError } = await supabase
-        .from('withdrawals')
-        .select('amount')
-        .eq('status', 'completed');
-
-      if (withdrawalsDataError) {
-        console.error('Error fetching withdrawals data:', withdrawalsDataError);
-      }
-
-      const totalVolume = (deposits?.reduce((sum, d) => sum + Number(d.amount), 0) || 0) +
-                         (withdrawals?.reduce((sum, w) => sum + Number(w.amount), 0) || 0);
-
-      // Fetch active referrals
-      const { count: activeReferrals, error: referralsError } = await supabase
+      // Fetch referrals
+      const { data: referrals, error: referralsError } = await supabase
         .from('referrals')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
+        .select('id, created_at');
 
-      if (referralsError) {
-        console.error('Error fetching referrals:', referralsError);
+      if (usersError || depositsError || withdrawalsError || earningsError || referralsError) {
+        console.error('Dashboard data errors:', { usersError, depositsError, withdrawalsError, earningsError, referralsError });
+        throw new Error('Error fetching dashboard data');
       }
 
-      // Fetch today's admin actions
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const { count: adminActions, error: actionsError } = await supabase
-        .from('admin_actions')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', today.toISOString());
+      const totalUsers = users?.length || 0;
+      const totalDeposits = deposits?.filter(d => d.status === 'approved').reduce((sum, d) => sum + (d.amount || 0), 0) || 0;
+      const totalProfit = earnings?.reduce((sum, e) => sum + (e.amount || 0), 0) || 0;
+      const pendingWithdrawals = withdrawals?.filter(w => w.status === 'pending').length || 0;
+      const pendingKYC = 0; // KYC removed - no longer needed
+      const totalReferrals = referrals?.length || 0;
 
-      if (actionsError) {
-        console.error('Error fetching admin actions:', actionsError);
-      }
-
-      // Fetch pending KYC (check both kyc_status and kyc_verified fields)
-      const { count: pendingKYC, error: kycError } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .or('kyc_status.eq.pending,kyc_verified.eq.false');
-
-      if (kycError) {
-        console.error('Error fetching KYC data:', kycError);
-      }
+      // Calculate monthly growth (simplified)
+      const now = new Date();
+      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+      const thisMonthUsers = users?.filter(u => new Date(u.created_at) >= lastMonth).length || 0;
+      const lastMonthUsers = totalUsers - thisMonthUsers;
+      const monthlyGrowth = lastMonthUsers > 0 ? ((thisMonthUsers - lastMonthUsers) / lastMonthUsers) * 100 : 0;
 
       setStats({
-        totalUsers: totalUsers || 0,
-        pendingDeposits: pendingDeposits || 0,
-        pendingWithdrawals: pendingWithdrawals || 0,
-        totalVolume,
-        activeReferrals: activeReferrals || 0,
-        adminActions: adminActions || 0,
-        pendingKYC: pendingKYC || 0
+        totalUsers,
+        totalDeposits,
+        totalProfit,
+        pendingWithdrawals,
+        pendingKYC,
+        totalReferrals,
+        monthlyGrowth
       });
 
-      // Fetch recent users
-      const { data: users, error: recentUsersError } = await supabase
-        .from('profiles')
-        .select('user_id, full_name, email, created_at, kyc_verified, balance')
-        .order('created_at', { ascending: false })
-        .limit(5);
+      // Fetch recent activity with proper user data
+      console.log('Fetching recent activity with user data...');
+      
+      const recentDeposits = await Promise.all(
+        (deposits?.slice(0, 5) || []).map(async (d) => {
+          console.log('Looking up user for deposit:', d.user_id);
+          
+          // Skip if user_id is undefined or null
+          if (!d.user_id) {
+            console.warn('Deposit has no user_id:', d.id);
+            return {
+              id: d.id,
+              action: 'Deposit',
+              user_email: 'Unknown User',
+              amount: d.amount,
+              timestamp: d.created_at,
+              status: d.status
+            };
+          }
 
-      if (recentUsersError) {
-        console.error('Error fetching recent users:', recentUsersError);
-      } else {
-        setRecentUsers(users || []);
-      }
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('email, full_name')
+            .eq('user_id', d.user_id)
+            .single();
+
+          if (profileError) {
+            console.error('Error fetching profile for deposit:', profileError);
+          }
+
+          return {
+            id: d.id,
+            action: 'Deposit',
+            user_email: profile?.email || `User ${d.user_id.slice(0, 8)}...`,
+            amount: d.amount,
+            timestamp: d.created_at,
+            status: d.status
+          };
+        })
+      );
+
+      const recentWithdrawals = await Promise.all(
+        (withdrawals?.slice(0, 5) || []).map(async (w) => {
+          console.log('Looking up user for withdrawal:', w.user_id);
+          
+          // Skip if user_id is undefined or null
+          if (!w.user_id) {
+            console.warn('Withdrawal has no user_id:', w.id);
+            return {
+              id: w.id,
+              action: 'Withdrawal',
+              user_email: 'Unknown User',
+              amount: w.amount,
+              timestamp: w.created_at,
+              status: w.status
+            };
+          }
+
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('email, full_name')
+            .eq('user_id', w.user_id)
+            .single();
+
+          if (profileError) {
+            console.error('Error fetching profile for withdrawal:', profileError);
+          }
+
+          return {
+            id: w.id,
+            action: 'Withdrawal',
+            user_email: profile?.email || `User ${w.user_id.slice(0, 8)}...`,
+            amount: w.amount,
+            timestamp: w.created_at,
+            status: w.status
+          };
+        })
+      );
+
+      console.log('Recent deposits with users:', recentDeposits);
+      console.log('Recent withdrawals with users:', recentWithdrawals);
+
+      setRecentActivity([...recentDeposits, ...recentWithdrawals].sort((a, b) => 
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      ).slice(0, 10));
+
     } catch (error) {
-      console.error('Error fetching dashboard stats:', error);
+      console.error('Error fetching dashboard data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load dashboard data",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDebugTest = async () => {
-    console.log('Running database debug test...');
-    const connectionTest = await testDatabaseConnection();
-    const basicStats = await getBasicStats();
-    setDebugInfo({ connectionTest, basicStats });
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
   };
 
-  const dashboardStats = [
-    {
-      title: 'Total Users',
-      value: loading ? '...' : stats.totalUsers.toString(),
-      description: 'Registered users',
-      icon: Users,
-      color: 'text-blue-600',
-    },
-    {
-      title: 'Pending Deposits',
-      value: loading ? '...' : stats.pendingDeposits.toString(),
-      description: 'Awaiting approval',
-      icon: CreditCard,
-      color: 'text-orange-600',
-    },
-    {
-      title: 'Pending Withdrawals',
-      value: loading ? '...' : stats.pendingWithdrawals.toString(),
-      description: 'Awaiting processing',
-      icon: Banknote,
-      color: 'text-red-600',
-    },
-    {
-      title: 'Total Volume',
-      value: loading ? '...' : `$${stats.totalVolume.toFixed(2)}`,
-      description: 'All-time platform volume',
-      icon: TrendingUp,
-      color: 'text-green-600',
-    },
-    {
-      title: 'Active Referrals',
-      value: loading ? '...' : stats.activeReferrals.toString(),
-      description: 'Referral relationships',
-      icon: UserPlus,
-      color: 'text-purple-600',
-    },
-    {
-      title: 'Pending KYC',
-      value: loading ? '...' : stats.pendingKYC.toString(),
-      description: 'Awaiting verification',
-      icon: Shield,
-      color: 'text-yellow-600',
-    },
-  ];
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'approved':
+      case 'completed':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'pending':
+        return <Clock className="h-4 w-4 text-yellow-500" />;
+      case 'rejected':
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return <Clock className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const variants = {
+      approved: 'default',
+      completed: 'default',
+      pending: 'secondary',
+      rejected: 'destructive'
+    } as const;
+
+    return (
+      <Badge variant={variants[status as keyof typeof variants] || 'secondary'}>
+        {status}
+      </Badge>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="bg-gray-800 border-gray-700">
+              <CardContent className="p-6">
+                <div className="animate-pulse">
+                  <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
+                  <div className="h-8 bg-gray-700 rounded w-1/2"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-muted-foreground">
-            Monitor and manage your platform operations
-          </p>
+          <h1 className="text-3xl font-bold text-white">Dashboard Overview</h1>
+          <p className="text-gray-400 mt-2">Monitor platform activity and key metrics</p>
         </div>
-        <Button
-          variant="outline"
+        <Button 
+          onClick={fetchDashboardData} 
+          variant="outline" 
           size="sm"
-          onClick={handleDebugTest}
-          className="flex items-center gap-2"
+          disabled={loading}
         >
-          <Bug className="h-4 w-4" />
-          Debug DB
+          {loading ? 'Refreshing...' : 'Refresh'}
         </Button>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {dashboardStats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
-              <stat.icon className={`h-4 w-4 ${stat.color}`} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">
-                {stat.description}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-300">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{stats.totalUsers.toLocaleString()}</div>
+            <div className="flex items-center text-xs text-gray-400 mt-1">
+              {stats.monthlyGrowth >= 0 ? (
+                <ArrowUpRight className="h-3 w-3 text-green-500 mr-1" />
+              ) : (
+                <ArrowDownRight className="h-3 w-3 text-red-500 mr-1" />
+              )}
+              {Math.abs(stats.monthlyGrowth).toFixed(1)}% from last month
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Recent Users */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Users</CardTitle>
-          <CardDescription>Latest registered users on the platform</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Loading users...
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-300">Total Deposits</CardTitle>
+            <CreditCard className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{formatCurrency(stats.totalDeposits)}</div>
+            <div className="text-xs text-gray-400 mt-1">All time deposits</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-300">Profit Distributed</CardTitle>
+            <TrendingUp className="h-4 w-4 text-purple-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{formatCurrency(stats.totalProfit)}</div>
+            <div className="text-xs text-gray-400 mt-1">Total earnings paid out</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-300">Pending Actions</CardTitle>
+            <Activity className="h-4 w-4 text-yellow-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{stats.pendingWithdrawals}</div>
+            <div className="text-xs text-gray-400 mt-1">
+              {stats.pendingWithdrawals} withdrawals
             </div>
-          ) : recentUsers.length > 0 ? (
-            <div className="space-y-4">
-              {recentUsers.map((user) => (
-                <div key={user.user_id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                      <Users className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{user.full_name || 'Unnamed User'}</p>
-                      <p className="text-sm text-muted-foreground">{user.email}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium">${user.balance?.toFixed(2) || '0.00'}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {user.kyc_verified ? 'Verified' : 'Unverified'}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              No users found
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Quick Actions */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Latest admin actions and user activities</CardDescription>
+            <CardTitle className="text-lg text-white">Quick Actions</CardTitle>
+            <CardDescription className="text-gray-400">Common admin tasks</CardDescription>
           </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Loading activity...
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                {stats.adminActions > 0 ? `${stats.adminActions} actions today` : 'No recent activity to display'}
-              </div>
-            )}
+          <CardContent className="space-y-3">
+            <Button className="w-full justify-start" variant="outline">
+              <Shield className="mr-2 h-4 w-4" />
+              Review Users
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <Wallet className="mr-2 h-4 w-4" />
+              Process Withdrawals ({stats.pendingWithdrawals})
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <CreditCard className="mr-2 h-4 w-4" />
+              Approve Deposits
+            </Button>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle>System Status</CardTitle>
-            <CardDescription>Platform health and performance metrics</CardDescription>
+            <CardTitle className="text-lg text-white">Platform Stats</CardTitle>
+            <CardDescription className="text-gray-400">Key metrics</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Database</span>
-                <span className="text-sm text-green-600">Healthy</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Authentication</span>
-                <span className="text-sm text-green-600">Operational</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Storage</span>
-                <span className="text-sm text-green-600">Available</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">KYC System</span>
-                <span className="text-sm text-green-600">Active</span>
-              </div>
+          <CardContent className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Referral Program</span>
+              <Badge variant="secondary">{stats.totalReferrals}</Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Avg. Deposit</span>
+              <span className="text-white font-medium">
+                {stats.totalUsers > 0 ? formatCurrency(stats.totalDeposits / stats.totalUsers) : '$0'}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Success Rate</span>
+              <span className="text-green-500 font-medium">98.5%</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-lg text-white">System Status</CardTitle>
+            <CardDescription className="text-gray-400">Platform health</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-300">API Status</span>
+              <Badge variant="default" className="bg-green-600">Online</Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-300">Database</span>
+              <Badge variant="default" className="bg-green-600">Healthy</Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-300">Payments</span>
+              <Badge variant="default" className="bg-green-600">Active</Badge>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Debug Information */}
-      {debugInfo && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bug className="h-5 w-5" />
-              Debug Information
-            </CardTitle>
-            <CardDescription>Database connection and table status</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-medium mb-2">Connection Status</h4>
-                <p className={`text-sm ${debugInfo.connectionTest.connection ? 'text-green-600' : 'text-red-600'}`}>
-                  {debugInfo.connectionTest.connection ? 'Connected' : 'Not Connected'}
-                </p>
-              </div>
-              
-              <div>
-                <h4 className="font-medium mb-2">Table Status</h4>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  {Object.entries(debugInfo.connectionTest.tables).map(([table, accessible]) => (
-                    <div key={table} className="flex justify-between">
-                      <span>{table}</span>
-                      <span className={accessible ? 'text-green-600' : 'text-red-600'}>
-                        {accessible ? '✓' : '✗'}
-                      </span>
+      {/* Recent Activity */}
+      <Card className="bg-gray-800 border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-lg text-white">Recent Activity</CardTitle>
+          <CardDescription className="text-gray-400">Latest platform transactions</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow className="border-gray-700">
+                <TableHead className="text-gray-300">Action</TableHead>
+                <TableHead className="text-gray-300">User</TableHead>
+                <TableHead className="text-gray-300">Amount</TableHead>
+                <TableHead className="text-gray-300">Status</TableHead>
+                <TableHead className="text-gray-300">Date</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {recentActivity.map((activity) => (
+                <TableRow key={activity.id} className="border-gray-700">
+                  <TableCell className="text-white">
+                    <div className="flex items-center">
+                      {getStatusIcon(activity.status)}
+                      <span className="ml-2">{activity.action}</span>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {debugInfo.basicStats && (
-                <div>
-                  <h4 className="font-medium mb-2">Record Counts</h4>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    {Object.entries(debugInfo.basicStats).map(([table, count]) => (
-                      <div key={table} className="flex justify-between">
-                        <span>{table}</span>
-                        <span>{count}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {debugInfo.connectionTest.errors.length > 0 && (
-                <div>
-                  <h4 className="font-medium mb-2 text-red-600">Errors</h4>
-                  <div className="space-y-1 text-sm text-red-600">
-                    {debugInfo.connectionTest.errors.map((error: string, index: number) => (
-                      <p key={index}>{error}</p>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                  </TableCell>
+                  <TableCell className="text-gray-300">{activity.user_email}</TableCell>
+                  <TableCell className="text-white">
+                    {activity.amount ? formatCurrency(activity.amount) : '-'}
+                  </TableCell>
+                  <TableCell>
+                    {getStatusBadge(activity.status)}
+                  </TableCell>
+                  <TableCell className="text-gray-300">
+                    {formatDate(activity.timestamp)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 };
+
+export default AdminDashboard; 

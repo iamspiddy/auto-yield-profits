@@ -9,15 +9,13 @@ interface BalanceData {
   walletBalance: number;
   totalEarnings: number;
   pendingWithdrawals: number;
-  kycVerified: boolean;
 }
 
 const BalanceOverview = () => {
   const [balanceData, setBalanceData] = useState<BalanceData>({
     walletBalance: 0,
     totalEarnings: 0,
-    pendingWithdrawals: 0,
-    kycVerified: false
+    pendingWithdrawals: 0
   });
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -27,42 +25,55 @@ const BalanceOverview = () => {
 
     const fetchBalanceData = async () => {
       try {
-        // Fetch user profile for KYC status
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('kyc_verified')
-          .eq('user_id', user.id)
-          .single();
-
-        // Fetch approved deposits (wallet balance)
+        // Fetch approved deposits only (wallet balance = deposited funds only)
         const { data: deposits } = await supabase
           .from('deposits')
           .select('amount')
           .eq('user_id', user.id)
           .eq('status', 'approved');
 
-        // Fetch total earnings
+        // Fetch total earnings (distributed profits)
         const { data: earnings } = await supabase
           .from('earnings')
           .select('amount')
           .eq('user_id', user.id);
 
+        // Fetch completed withdrawals to subtract from deposited amount (only wallet withdrawals)
+        const { data: completedWalletWithdrawals } = await supabase
+          .from('withdrawals')
+          .select('amount')
+          .eq('user_id', user.id)
+          .eq('status', 'completed')
+          .eq('withdrawal_type', 'wallet');
+
         // Fetch pending withdrawals
-        const { data: withdrawals } = await supabase
+        const { data: pendingWithdrawalsData } = await supabase
           .from('withdrawals')
           .select('amount')
           .eq('user_id', user.id)
           .in('status', ['pending', 'processing']);
 
-        const walletBalance = deposits?.reduce((sum, deposit) => sum + Number(deposit.amount), 0) || 0;
+        // Fetch completed earnings withdrawals (deductions)
+        const { data: completedEarningsWithdrawals } = await supabase
+          .from('withdrawals')
+          .select('amount')
+          .eq('user_id', user.id)
+          .eq('status', 'completed')
+          .eq('withdrawal_type', 'earnings');
+
+        // Calculate wallet balance: deposited funds only (affected only by wallet withdrawals)
+        const totalDeposits = deposits?.reduce((sum, deposit) => sum + Number(deposit.amount), 0) || 0;
+        const totalCompletedWalletWithdrawals = completedWalletWithdrawals?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
+        const walletBalance = totalDeposits - totalCompletedWalletWithdrawals;
+        
         const totalEarnings = earnings?.reduce((sum, earning) => sum + Number(earning.amount), 0) || 0;
-        const pendingWithdrawals = withdrawals?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
+        const pendingWithdrawals = pendingWithdrawalsData?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
+        const completedEarningsDeductions = completedEarningsWithdrawals?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
 
         setBalanceData({
-          walletBalance: walletBalance - pendingWithdrawals,
-          totalEarnings,
-          pendingWithdrawals,
-          kycVerified: profile?.kyc_verified || false
+          walletBalance: walletBalance,  // Wallet balance should not be affected by pending withdrawals
+          totalEarnings: totalEarnings - pendingWithdrawals - completedEarningsDeductions,  // Subtract both pending and completed earnings withdrawals
+          pendingWithdrawals
         });
       } catch (error) {
         console.error('Error fetching balance data:', error);
@@ -129,19 +140,6 @@ const BalanceOverview = () => {
             <Wallet className="h-5 w-5 mr-2" />
             Balance Overview
           </span>
-          <Badge variant={balanceData.kycVerified ? "default" : "secondary"} className="flex items-center">
-            {balanceData.kycVerified ? (
-              <>
-                <ShieldCheck className="h-3 w-3 mr-1" />
-                KYC Verified
-              </>
-            ) : (
-              <>
-                <ShieldAlert className="h-3 w-3 mr-1" />
-                Unverified
-              </>
-            )}
-          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>

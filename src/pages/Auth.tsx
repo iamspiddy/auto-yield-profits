@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,12 +22,23 @@ const Auth = () => {
   
   const { signUp, signIn, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     if (user) {
       navigate('/dashboard');
     }
-  }, [user, navigate]);
+
+    // Check for confirmation error from URL
+    const error = searchParams.get('error');
+    if (error === 'confirmation_failed') {
+      toast({
+        title: "Error",
+        description: "An error occurred. Please try again.",
+        variant: "destructive"
+      });
+    }
+  }, [user, navigate, searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,18 +69,21 @@ const Auth = () => {
           return;
         }
 
-        const { error } = await signUp(email, password, fullName, referralCode || undefined);
+        const { error, message } = await signUp(email, password, fullName, referralCode || undefined);
         if (error) {
           toast({
             title: "Registration Failed",
             description: error.message,
             variant: "destructive"
           });
-        } else {
+        } else if (message) {
           toast({
             title: "Account Created!",
-            description: "Please check your email to verify your account."
+            description: message
           });
+          // Switch to login mode after successful signup
+          setIsLogin(true);
+          setEmail(email); // Keep the email for easy login
         }
       }
     } finally {

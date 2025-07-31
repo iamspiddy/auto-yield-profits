@@ -133,28 +133,34 @@ const Profile = () => {
     if (!user) return;
     
     try {
+      // Fetch approved deposits only (wallet balance = deposited funds only)
       const { data: deposits } = await supabase
         .from('deposits')
         .select('amount')
         .eq('user_id', user.id)
         .eq('status', 'approved');
 
-      const { data: earnings } = await supabase
-        .from('earnings')
-        .select('amount')
-        .eq('user_id', user.id);
-
-      const { data: withdrawals } = await supabase
+      // Fetch completed withdrawals to subtract from deposited amount
+      const { data: completedWithdrawals } = await supabase
         .from('withdrawals')
         .select('amount')
         .eq('user_id', user.id)
-        .in('status', ['pending', 'processing', 'completed']);
+        .eq('status', 'completed');
 
+      // Get pending withdrawals to subtract from available balance
+      const { data: pendingWithdrawals } = await supabase
+        .from('withdrawals')
+        .select('amount')
+        .eq('user_id', user.id)
+        .in('status', ['pending', 'processing']);
+
+      // Calculate wallet balance: deposited funds only
       const totalDeposits = deposits?.reduce((sum, deposit) => sum + Number(deposit.amount), 0) || 0;
-      const totalEarnings = earnings?.reduce((sum, earning) => sum + Number(earning.amount), 0) || 0;
-      const totalWithdrawals = withdrawals?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
+      const totalCompletedWithdrawals = completedWithdrawals?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
+      const walletBalance = totalDeposits - totalCompletedWithdrawals;
+      const pendingWithdrawalsAmount = pendingWithdrawals?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
 
-      setWalletBalance(totalDeposits + totalEarnings - totalWithdrawals);
+      setWalletBalance(walletBalance - pendingWithdrawalsAmount);
     } catch (error) {
       console.error('Error fetching wallet balance:', error);
     }
