@@ -1,0 +1,221 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류",
+    "success": "성공",
+    "cancel": "취소",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "편집",
+    "view": "보기",
+    "back": "뒤로",
+    "next": "다음",
+    "previous": "이전",
+    "submit": "제출",
+    "confirm": "확인",
+    "close": "닫기",
+    "yes": "예",
+    "no": "아니오",
+    "copy": "복사",
+    "copied": "복사됨!",
+    "language": "언어"
+  },
+  "navigation": {
+    "home": "홈",
+    "dashboard": "대시보드",
+    "deposit": "입금",
+    "withdraw": "출금",
+    "history": "내역",
+    "referrals": "추천",
+    "profile": "프로필",
+    "kyc": "KYC",
+    "logout": "로그아웃",
+    "login": "로그인",
+    "register": "가입"
+  },
+  "hero": {
+    "title": "자동화 암호화폐 거래 플랫폼",
+    "subtitle": "AI 기반 수익 최적화 및 안전한 이익 관리",
+    "cta": "거래 시작",
+    "learnMore": "자세히 보기",
+    "features": {
+      "ai": "AI 기반 거래",
+      "security": "은행급 보안",
+      "profits": "고수익 수익률",
+      "automation": "완전 자동화"
+    }
+  },
+  "dashboard": {
+    "title": "대시보드",
+    "welcome": "다시 오신 것을 환영합니다",
+    "balance": {
+      "title": "총 잔액",
+      "available": "사용 가능",
+      "invested": "투자됨",
+      "profit": "이익"
+    },
+    "earnings": {
+      "title": "수익 개요",
+      "today": "오늘",
+      "week": "이번 주",
+      "month": "이번 달",
+      "total": "총계"
+    },
+    "quickActions": {
+      "title": "빠른 작업",
+      "deposit": "자금 입금",
+      "withdraw": "출금",
+      "invest": "지금 투자"
+    },
+    "recentActivity": {
+      "title": "최근 활동",
+      "noActivity": "최근 활동 없음"
+    }
+  },
+  "deposit": {
+    "title": "자금 입금",
+    "subtitle": "계정에 자금을 추가하여 수익 창출 시작",
+    "amount": "금액",
+    "currency": "통화",
+    "method": "결제 방법",
+    "processing": "처리 중...",
+    "success": "입금 성공!",
+    "error": "입금 실패. 다시 시도해 주세요.",
+    "minAmount": "최소 금액: $10",
+    "maxAmount": "최대 금액: $100,000",
+    "fee": "처리 수수료: 2.5%",
+    "confirm": "입금 확인"
+  },
+  "withdraw": {
+    "title": "자금 출금",
+    "subtitle": "수익을 지갑으로 출금",
+    "amount": "금액",
+    "wallet": "지갑 주소",
+    "fee": "출금 수수료: 1%",
+    "minAmount": "최소 출금: $50",
+    "processing": "출금 처리 중...",
+    "success": "출금 시작됨!",
+    "error": "출금 실패. 다시 시도해 주세요.",
+    "confirm": "출금 확인",
+    "pin": "PIN 입력",
+    "pinRequired": "출금에 PIN 필요"
+  },
+  "profile": {
+    "title": "프로필",
+    "personalInfo": "개인 정보",
+    "security": "보안 설정",
+    "preferences": "환경 설정",
+    "firstName": "이름",
+    "lastName": "성",
+    "email": "이메일",
+    "phone": "전화",
+    "country": "국가",
+    "updateProfile": "프로필 업데이트",
+    "changePassword": "비밀번호 변경",
+    "enable2FA": "2FA 활성화",
+    "language": "언어",
+    "notifications": "알림"
+  },
+  "kyc": {
+    "title": "KYC 인증",
+    "subtitle": "신원 확인을 완료하여 모든 기능 잠금 해제",
+    "status": {
+      "pending": "대기 중",
+      "approved": "승인됨",
+      "rejected": "거부됨",
+      "notSubmitted": "제출되지 않음"
+    },
+    "documents": {
+      "title": "필요한 서류",
+      "idCard": "신분증",
+      "passport": "여권",
+      "selfie": "신분증과 셀카",
+      "utility": "공과금 고지서"
+    },
+    "upload": "서류 업로드",
+    "submit": "검토를 위해 제출",
+    "processing": "처리 중...",
+    "success": "KYC 제출 성공!",
+    "error": "KYC 제출 실패. 다시 시도해 주세요."
+  },
+  "referrals": {
+    "title": "추천 프로그램",
+    "subtitle": "친구를 초대하여 보상 획득",
+    "code": "귀하의 추천 코드",
+    "link": "귀하의 추천 링크",
+    "stats": {
+      "totalReferrals": "총 추천 수",
+      "activeReferrals": "활성 추천",
+      "totalEarnings": "총 수익"
+    },
+    "rewards": {
+      "title": "보상",
+      "perReferral": "추천당",
+      "lifetime": "평생 수익"
+    },
+    "share": "공유"
+  },
+  "auth": {
+    "login": {
+      "title": "로그인",
+      "subtitle": "Auto Yield Profits에 다시 오신 것을 환영합니다",
+      "email": "이메일",
+      "password": "비밀번호",
+      "forgotPassword": "비밀번호를 잊으셨나요?",
+      "noAccount": "계정이 없으신가요?",
+      "signUp": "가입"
+    },
+    "register": {
+      "title": "계정 만들기",
+      "subtitle": "오늘 Auto Yield Profits에 가입하세요",
+      "firstName": "이름",
+      "lastName": "성",
+      "email": "이메일",
+      "password": "비밀번호",
+      "confirmPassword": "비밀번호 확인",
+      "agree": "서비스 약관에 동의합니다",
+      "haveAccount": "이미 계정이 있으신가요?",
+      "signIn": "로그인"
+    },
+    "forgotPassword": {
+      "title": "비밀번호 재설정",
+      "subtitle": "재설정 지침을 받으려면 이메일을 입력하세요",
+      "email": "이메일",
+      "sendReset": "재설정 링크 보내기"
+    }
+  },
+  "admin": {
+    "title": "관리자 패널",
+    "dashboard": "대시보드",
+    "users": "사용자",
+    "deposits": "입금",
+    "withdrawals": "출금",
+    "profits": "이익",
+    "kyc": "KYC",
+    "referrals": "추천",
+    "logs": "로그",
+    "settings": "설정",
+    "stats": {
+      "totalUsers": "총 사용자",
+      "activeUsers": "활성 사용자",
+      "totalDeposits": "총 입금",
+      "pendingWithdrawals": "대기 중인 출금",
+      "totalProfit": "총 이익"
+    }
+  },
+  "notifications": {
+    "depositSuccess": "입금 성공!",
+    "withdrawalSuccess": "출금 시작됨!",
+    "kycApproved": "KYC 승인됨!",
+    "kycRejected": "KYC 거부됨. 요구사항을 확인하세요.",
+    "profileUpdated": "프로필이 성공적으로 업데이트됨!",
+    "error": "오류가 발생했습니다. 다시 시도해 주세요."
+  },
+  "errors": {
+    "network": "네트워크 오류. 연결을 확인하세요.",
+    "unauthorized": "권한이 없습니다. 다시 로그인하세요.",
+    "notFound": "페이지를 찾을 수 없습니다.",
+    "serverError": "서버 오류. 나중에 다시 시도하세요.",
+    "validation": "입력을 확인하고 다시 시도하세요."
+  }
+} 

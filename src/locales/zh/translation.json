@@ -1,0 +1,221 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "view": "查看",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "submit": "提交",
+    "confirm": "确认",
+    "close": "关闭",
+    "yes": "是",
+    "no": "否",
+    "copy": "复制",
+    "copied": "已复制！",
+    "language": "语言"
+  },
+  "navigation": {
+    "home": "首页",
+    "dashboard": "仪表板",
+    "deposit": "存款",
+    "withdraw": "提款",
+    "history": "历史",
+    "referrals": "推荐",
+    "profile": "个人资料",
+    "kyc": "KYC",
+    "logout": "退出登录",
+    "login": "登录",
+    "register": "注册"
+  },
+  "hero": {
+    "title": "自动化加密货币交易平台",
+    "subtitle": "AI驱动的收益优化，安全利润管理",
+    "cta": "开始交易",
+    "learnMore": "了解更多",
+    "features": {
+      "ai": "AI驱动交易",
+      "security": "银行级安全",
+      "profits": "高收益回报",
+      "automation": "完全自动化"
+    }
+  },
+  "dashboard": {
+    "title": "仪表板",
+    "welcome": "欢迎回来",
+    "balance": {
+      "title": "总余额",
+      "available": "可用",
+      "invested": "已投资",
+      "profit": "利润"
+    },
+    "earnings": {
+      "title": "收益概览",
+      "today": "今天",
+      "week": "本周",
+      "month": "本月",
+      "total": "总计"
+    },
+    "quickActions": {
+      "title": "快速操作",
+      "deposit": "存入资金",
+      "withdraw": "提款",
+      "invest": "立即投资"
+    },
+    "recentActivity": {
+      "title": "最近活动",
+      "noActivity": "无最近活动"
+    }
+  },
+  "deposit": {
+    "title": "存入资金",
+    "subtitle": "向您的账户添加资金开始赚取收益",
+    "amount": "金额",
+    "currency": "货币",
+    "method": "支付方式",
+    "processing": "处理中...",
+    "success": "存款成功！",
+    "error": "存款失败。请重试。",
+    "minAmount": "最低金额：$10",
+    "maxAmount": "最高金额：$100,000",
+    "fee": "处理费：2.5%",
+    "confirm": "确认存款"
+  },
+  "withdraw": {
+    "title": "提取资金",
+    "subtitle": "将您的收益提取到钱包",
+    "amount": "金额",
+    "wallet": "钱包地址",
+    "fee": "提款费：1%",
+    "minAmount": "最低提款：$50",
+    "processing": "处理提款中...",
+    "success": "提款已启动！",
+    "error": "提款失败。请重试。",
+    "confirm": "确认提款",
+    "pin": "输入PIN",
+    "pinRequired": "提款需要PIN"
+  },
+  "profile": {
+    "title": "个人资料",
+    "personalInfo": "个人信息",
+    "security": "安全设置",
+    "preferences": "偏好设置",
+    "firstName": "名字",
+    "lastName": "姓氏",
+    "email": "邮箱",
+    "phone": "电话",
+    "country": "国家",
+    "updateProfile": "更新个人资料",
+    "changePassword": "修改密码",
+    "enable2FA": "启用2FA",
+    "language": "语言",
+    "notifications": "通知"
+  },
+  "kyc": {
+    "title": "KYC验证",
+    "subtitle": "完成身份验证以解锁所有功能",
+    "status": {
+      "pending": "待处理",
+      "approved": "已批准",
+      "rejected": "已拒绝",
+      "notSubmitted": "未提交"
+    },
+    "documents": {
+      "title": "所需文件",
+      "idCard": "身份证",
+      "passport": "护照",
+      "selfie": "证件自拍",
+      "utility": "水电费账单"
+    },
+    "upload": "上传文件",
+    "submit": "提交审核",
+    "processing": "处理中...",
+    "success": "KYC提交成功！",
+    "error": "KYC提交失败。请重试。"
+  },
+  "referrals": {
+    "title": "推荐计划",
+    "subtitle": "邀请朋友获得奖励",
+    "code": "您的推荐码",
+    "link": "您的推荐链接",
+    "stats": {
+      "totalReferrals": "总推荐数",
+      "activeReferrals": "活跃推荐",
+      "totalEarnings": "总收入"
+    },
+    "rewards": {
+      "title": "奖励",
+      "perReferral": "每次推荐",
+      "lifetime": "终身收益"
+    },
+    "share": "分享"
+  },
+  "auth": {
+    "login": {
+      "title": "登录",
+      "subtitle": "欢迎回到Auto Yield Profits",
+      "email": "邮箱",
+      "password": "密码",
+      "forgotPassword": "忘记密码？",
+      "noAccount": "没有账户？",
+      "signUp": "注册"
+    },
+    "register": {
+      "title": "创建账户",
+      "subtitle": "立即加入Auto Yield Profits",
+      "firstName": "名字",
+      "lastName": "姓氏",
+      "email": "邮箱",
+      "password": "密码",
+      "confirmPassword": "确认密码",
+      "agree": "我同意服务条款",
+      "haveAccount": "已有账户？",
+      "signIn": "登录"
+    },
+    "forgotPassword": {
+      "title": "重置密码",
+      "subtitle": "输入您的邮箱接收重置说明",
+      "email": "邮箱",
+      "sendReset": "发送重置链接"
+    }
+  },
+  "admin": {
+    "title": "管理面板",
+    "dashboard": "仪表板",
+    "users": "用户",
+    "deposits": "存款",
+    "withdrawals": "提款",
+    "profits": "利润",
+    "kyc": "KYC",
+    "referrals": "推荐",
+    "logs": "日志",
+    "settings": "设置",
+    "stats": {
+      "totalUsers": "总用户数",
+      "activeUsers": "活跃用户",
+      "totalDeposits": "总存款",
+      "pendingWithdrawals": "待处理提款",
+      "totalProfit": "总利润"
+    }
+  },
+  "notifications": {
+    "depositSuccess": "存款成功！",
+    "withdrawalSuccess": "提款已启动！",
+    "kycApproved": "KYC已批准！",
+    "kycRejected": "KYC被拒绝。请检查要求。",
+    "profileUpdated": "个人资料更新成功！",
+    "error": "发生错误。请重试。"
+  },
+  "errors": {
+    "network": "网络错误。请检查您的连接。",
+    "unauthorized": "未授权。请重新登录。",
+    "notFound": "页面未找到。",
+    "serverError": "服务器错误。请稍后重试。",
+    "validation": "请检查您的输入并重试。"
+  }
+} 

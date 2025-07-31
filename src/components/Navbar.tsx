@@ -2,9 +2,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -15,10 +18,10 @@ const Navbar = () => {
   };
 
   const navLinks = [
-    { label: "How It Works", id: "how-it-works" },
-    { label: "Features", id: "features" },
-    { label: "Referrals", id: "referrals" },
-    { label: "FAQ", id: "faq" },
+    { label: t("navigation.howItWorks", "How It Works"), id: "how-it-works" },
+    { label: t("navigation.features", "Features"), id: "features" },
+    { label: t("navigation.referrals", "Referrals"), id: "referrals" },
+    { label: t("navigation.faq", "FAQ"), id: "faq" },
   ];
 
   return (
@@ -46,12 +49,13 @@ const Navbar = () => {
           </div>
 
           {/* CTA Button - Desktop */}
-          <div className="hidden md:flex space-x-2">
+          <div className="hidden md:flex items-center space-x-2">
+            <LanguageSwitcher />
             <Button variant="outline" size="sm" asChild>
-              <Link to="/auth">Log In</Link>
+              <Link to="/auth">{t("navigation.login", "Log In")}</Link>
             </Button>
             <Button variant="default" size="sm" asChild>
-              <Link to="/auth">Get Started</Link>
+              <Link to="/auth">{t("navigation.register", "Get Started")}</Link>
             </Button>
           </div>
 
@@ -85,11 +89,14 @@ const Navbar = () => {
                 </button>
               ))}
               <div className="pt-2 space-y-2">
+                <div className="px-3 py-2">
+                  <LanguageSwitcher />
+                </div>
                 <Button variant="outline" size="sm" className="w-full" asChild>
-                  <Link to="/auth">Log In</Link>
+                  <Link to="/auth">{t("navigation.login", "Log In")}</Link>
                 </Button>
                 <Button variant="default" size="sm" className="w-full" asChild>
-                  <Link to="/auth">Get Started</Link>
+                  <Link to="/auth">{t("navigation.register", "Get Started")}</Link>
                 </Button>
               </div>
             </div>

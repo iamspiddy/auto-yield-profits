@@ -1,0 +1,221 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "view": "Ver",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "submit": "Enviar",
+    "confirm": "Confirmar",
+    "close": "Fechar",
+    "yes": "Sim",
+    "no": "Não",
+    "copy": "Copiar",
+    "copied": "Copiado!",
+    "language": "Idioma"
+  },
+  "navigation": {
+    "home": "Início",
+    "dashboard": "Painel",
+    "deposit": "Depositar",
+    "withdraw": "Sacar",
+    "history": "Histórico",
+    "referrals": "Indicações",
+    "profile": "Perfil",
+    "kyc": "KYC",
+    "logout": "Sair",
+    "login": "Entrar",
+    "register": "Registrar"
+  },
+  "hero": {
+    "title": "Plataforma de Trading Crypto Automatizada",
+    "subtitle": "Otimização de rendimentos com IA e gestão segura de lucros",
+    "cta": "Começar a Operar",
+    "learnMore": "Saiba Mais",
+    "features": {
+      "ai": "Trading com IA",
+      "security": "Segurança Bancária",
+      "profits": "Altos Rendimentos",
+      "automation": "Totalmente Automatizado"
+    }
+  },
+  "dashboard": {
+    "title": "Painel",
+    "welcome": "Bem-vindo de volta",
+    "balance": {
+      "title": "Saldo Total",
+      "available": "Disponível",
+      "invested": "Investido",
+      "profit": "Lucro"
+    },
+    "earnings": {
+      "title": "Visão Geral dos Ganhos",
+      "today": "Hoje",
+      "week": "Esta Semana",
+      "month": "Este Mês",
+      "total": "Total"
+    },
+    "quickActions": {
+      "title": "Ações Rápidas",
+      "deposit": "Depositar Fundos",
+      "withdraw": "Sacar",
+      "invest": "Investir Agora"
+    },
+    "recentActivity": {
+      "title": "Atividade Recente",
+      "noActivity": "Nenhuma atividade recente"
+    }
+  },
+  "deposit": {
+    "title": "Depositar Fundos",
+    "subtitle": "Adicione fundos à sua conta para começar a ganhar",
+    "amount": "Valor",
+    "currency": "Moeda",
+    "method": "Método de Pagamento",
+    "processing": "Processando...",
+    "success": "Depósito realizado com sucesso!",
+    "error": "Falha no depósito. Tente novamente.",
+    "minAmount": "Valor mínimo: $10",
+    "maxAmount": "Valor máximo: $100.000",
+    "fee": "Taxa de processamento: 2,5%",
+    "confirm": "Confirmar Depósito"
+  },
+  "withdraw": {
+    "title": "Sacar Fundos",
+    "subtitle": "Saque seus ganhos para sua carteira",
+    "amount": "Valor",
+    "wallet": "Endereço da Carteira",
+    "fee": "Taxa de saque: 1%",
+    "minAmount": "Saque mínimo: $50",
+    "processing": "Processando saque...",
+    "success": "Saque iniciado!",
+    "error": "Falha no saque. Tente novamente.",
+    "confirm": "Confirmar Saque",
+    "pin": "Digite o PIN",
+    "pinRequired": "PIN necessário para saque"
+  },
+  "profile": {
+    "title": "Perfil",
+    "personalInfo": "Informações Pessoais",
+    "security": "Configurações de Segurança",
+    "preferences": "Preferências",
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
+    "email": "E-mail",
+    "phone": "Telefone",
+    "country": "País",
+    "updateProfile": "Atualizar Perfil",
+    "changePassword": "Alterar Senha",
+    "enable2FA": "Ativar 2FA",
+    "language": "Idioma",
+    "notifications": "Notificações"
+  },
+  "kyc": {
+    "title": "Verificação KYC",
+    "subtitle": "Complete sua verificação de identidade para desbloquear todos os recursos",
+    "status": {
+      "pending": "Pendente",
+      "approved": "Aprovado",
+      "rejected": "Rejeitado",
+      "notSubmitted": "Não Enviado"
+    },
+    "documents": {
+      "title": "Documentos Necessários",
+      "idCard": "Documento de Identidade",
+      "passport": "Passaporte",
+      "selfie": "Selfie com Documento",
+      "utility": "Conta de Luz"
+    },
+    "upload": "Enviar Documento",
+    "submit": "Enviar para Revisão",
+    "processing": "Processando...",
+    "success": "KYC enviado com sucesso!",
+    "error": "Falha no envio do KYC. Tente novamente."
+  },
+  "referrals": {
+    "title": "Programa de Indicações",
+    "subtitle": "Ganhe recompensas convidando amigos",
+    "code": "Seu Código de Indicação",
+    "link": "Seu Link de Indicação",
+    "stats": {
+      "totalReferrals": "Total de Indicações",
+      "activeReferrals": "Indicações Ativas",
+      "totalEarnings": "Ganhos Totais"
+    },
+    "rewards": {
+      "title": "Recompensas",
+      "perReferral": "Por Indicação",
+      "lifetime": "Ganhos Vitalícios"
+    },
+    "share": "Compartilhar"
+  },
+  "auth": {
+    "login": {
+      "title": "Entrar",
+      "subtitle": "Bem-vindo de volta ao Auto Yield Profits",
+      "email": "E-mail",
+      "password": "Senha",
+      "forgotPassword": "Esqueceu a senha?",
+      "noAccount": "Não tem uma conta?",
+      "signUp": "Registrar"
+    },
+    "register": {
+      "title": "Criar Conta",
+      "subtitle": "Junte-se ao Auto Yield Profits hoje",
+      "firstName": "Nome",
+      "lastName": "Sobrenome",
+      "email": "E-mail",
+      "password": "Senha",
+      "confirmPassword": "Confirmar Senha",
+      "agree": "Concordo com os Termos de Serviço",
+      "haveAccount": "Já tem uma conta?",
+      "signIn": "Entrar"
+    },
+    "forgotPassword": {
+      "title": "Redefinir Senha",
+      "subtitle": "Digite seu e-mail para receber instruções de redefinição",
+      "email": "E-mail",
+      "sendReset": "Enviar Link de Redefinição"
+    }
+  },
+  "admin": {
+    "title": "Painel Administrativo",
+    "dashboard": "Painel",
+    "users": "Usuários",
+    "deposits": "Depósitos",
+    "withdrawals": "Saques",
+    "profits": "Lucros",
+    "kyc": "KYC",
+    "referrals": "Indicações",
+    "logs": "Logs",
+    "settings": "Configurações",
+    "stats": {
+      "totalUsers": "Total de Usuários",
+      "activeUsers": "Usuários Ativos",
+      "totalDeposits": "Total de Depósitos",
+      "pendingWithdrawals": "Saques Pendentes",
+      "totalProfit": "Lucro Total"
+    }
+  },
+  "notifications": {
+    "depositSuccess": "Depósito realizado com sucesso!",
+    "withdrawalSuccess": "Saque iniciado!",
+    "kycApproved": "KYC aprovado!",
+    "kycRejected": "KYC rejeitado. Verifique os requisitos.",
+    "profileUpdated": "Perfil atualizado com sucesso!",
+    "error": "Ocorreu um erro. Tente novamente."
+  },
+  "errors": {
+    "network": "Erro de rede. Verifique sua conexão.",
+    "unauthorized": "Não autorizado. Faça login novamente.",
+    "notFound": "Página não encontrada.",
+    "serverError": "Erro do servidor. Tente mais tarde.",
+    "validation": "Verifique seus dados e tente novamente."
+  }
+} 

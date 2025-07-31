@@ -1,0 +1,221 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "submit": "Soumettre",
+    "confirm": "Confirmer",
+    "close": "Fermer",
+    "yes": "Oui",
+    "no": "Non",
+    "copy": "Copier",
+    "copied": "Copié !",
+    "language": "Langue"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "dashboard": "Tableau de bord",
+    "deposit": "Dépôt",
+    "withdraw": "Retrait",
+    "history": "Historique",
+    "referrals": "Parrainage",
+    "profile": "Profil",
+    "kyc": "KYC",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "register": "S'inscrire"
+  },
+  "hero": {
+    "title": "Plateforme de Trading Crypto Automatisé",
+    "subtitle": "Optimisation des rendements alimentée par l'IA avec gestion sécurisée des profits",
+    "cta": "Commencer à Trader",
+    "learnMore": "En Savoir Plus",
+    "features": {
+      "ai": "Trading Alimenté par l'IA",
+      "security": "Sécurité Bancaire",
+      "profits": "Rendements Élevés",
+      "automation": "Entièrement Automatisé"
+    }
+  },
+  "dashboard": {
+    "title": "Tableau de Bord",
+    "welcome": "Bon retour",
+    "balance": {
+      "title": "Solde Total",
+      "available": "Disponible",
+      "invested": "Investi",
+      "profit": "Profit"
+    },
+    "earnings": {
+      "title": "Aperçu des Gains",
+      "today": "Aujourd'hui",
+      "week": "Cette Semaine",
+      "month": "Ce Mois",
+      "total": "Total"
+    },
+    "quickActions": {
+      "title": "Actions Rapides",
+      "deposit": "Déposer des Fonds",
+      "withdraw": "Retirer",
+      "invest": "Investir Maintenant"
+    },
+    "recentActivity": {
+      "title": "Activité Récente",
+      "noActivity": "Aucune activité récente"
+    }
+  },
+  "deposit": {
+    "title": "Déposer des Fonds",
+    "subtitle": "Ajoutez des fonds à votre compte pour commencer à gagner",
+    "amount": "Montant",
+    "currency": "Devise",
+    "method": "Méthode de Paiement",
+    "processing": "Traitement...",
+    "success": "Dépôt réussi !",
+    "error": "Échec du dépôt. Veuillez réessayer.",
+    "minAmount": "Montant minimum : 10 $",
+    "maxAmount": "Montant maximum : 100 000 $",
+    "fee": "Frais de traitement : 2,5 %",
+    "confirm": "Confirmer le Dépôt"
+  },
+  "withdraw": {
+    "title": "Retirer des Fonds",
+    "subtitle": "Retirez vos gains vers votre portefeuille",
+    "amount": "Montant",
+    "wallet": "Adresse du Portefeuille",
+    "fee": "Frais de retrait : 1 %",
+    "minAmount": "Retrait minimum : 50 $",
+    "processing": "Traitement du retrait...",
+    "success": "Retrait initié !",
+    "error": "Échec du retrait. Veuillez réessayer.",
+    "confirm": "Confirmer le Retrait",
+    "pin": "Entrer le PIN",
+    "pinRequired": "PIN requis pour le retrait"
+  },
+  "profile": {
+    "title": "Profil",
+    "personalInfo": "Informations Personnelles",
+    "security": "Paramètres de Sécurité",
+    "preferences": "Préférences",
+    "firstName": "Prénom",
+    "lastName": "Nom de Famille",
+    "email": "Email",
+    "phone": "Téléphone",
+    "country": "Pays",
+    "updateProfile": "Mettre à Jour le Profil",
+    "changePassword": "Changer le Mot de Passe",
+    "enable2FA": "Activer la 2FA",
+    "language": "Langue",
+    "notifications": "Notifications"
+  },
+  "kyc": {
+    "title": "Vérification KYC",
+    "subtitle": "Complétez votre vérification d'identité pour débloquer toutes les fonctionnalités",
+    "status": {
+      "pending": "En Attente",
+      "approved": "Approuvé",
+      "rejected": "Rejeté",
+      "notSubmitted": "Non Soumis"
+    },
+    "documents": {
+      "title": "Documents Requis",
+      "idCard": "Carte d'Identité",
+      "passport": "Passeport",
+      "selfie": "Selfie avec Pièce d'Identité",
+      "utility": "Facture d'Électricité"
+    },
+    "upload": "Télécharger le Document",
+    "submit": "Soumettre pour Révision",
+    "processing": "Traitement...",
+    "success": "KYC soumis avec succès !",
+    "error": "Échec de la soumission KYC. Veuillez réessayer."
+  },
+  "referrals": {
+    "title": "Programme de Parrainage",
+    "subtitle": "Gagnez des récompenses en invitant des amis",
+    "code": "Votre Code de Parrainage",
+    "link": "Votre Lien de Parrainage",
+    "stats": {
+      "totalReferrals": "Total des Parrainages",
+      "activeReferrals": "Parrainages Actifs",
+      "totalEarnings": "Gains Totaux"
+    },
+    "rewards": {
+      "title": "Récompenses",
+      "perReferral": "Par Parrainage",
+      "lifetime": "Gains à Vie"
+    },
+    "share": "Partager"
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Bon retour sur Auto Yield Profits",
+      "email": "Email",
+      "password": "Mot de Passe",
+      "forgotPassword": "Mot de Passe Oublié ?",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "signUp": "S'inscrire"
+    },
+    "register": {
+      "title": "Créer un Compte",
+      "subtitle": "Rejoignez Auto Yield Profits aujourd'hui",
+      "firstName": "Prénom",
+      "lastName": "Nom de Famille",
+      "email": "Email",
+      "password": "Mot de Passe",
+      "confirmPassword": "Confirmer le Mot de Passe",
+      "agree": "J'accepte les Conditions d'Utilisation",
+      "haveAccount": "Vous avez déjà un compte ?",
+      "signIn": "Se Connecter"
+    },
+    "forgotPassword": {
+      "title": "Réinitialiser le Mot de Passe",
+      "subtitle": "Entrez votre email pour recevoir les instructions de réinitialisation",
+      "email": "Email",
+      "sendReset": "Envoyer le Lien de Réinitialisation"
+    }
+  },
+  "admin": {
+    "title": "Panneau d'Administration",
+    "dashboard": "Tableau de Bord",
+    "users": "Utilisateurs",
+    "deposits": "Dépôts",
+    "withdrawals": "Retraits",
+    "profits": "Profits",
+    "kyc": "KYC",
+    "referrals": "Parrainages",
+    "logs": "Journaux",
+    "settings": "Paramètres",
+    "stats": {
+      "totalUsers": "Total des Utilisateurs",
+      "activeUsers": "Utilisateurs Actifs",
+      "totalDeposits": "Total des Dépôts",
+      "pendingWithdrawals": "Retraits en Attente",
+      "totalProfit": "Profit Total"
+    }
+  },
+  "notifications": {
+    "depositSuccess": "Dépôt réussi !",
+    "withdrawalSuccess": "Retrait initié !",
+    "kycApproved": "KYC approuvé !",
+    "kycRejected": "KYC rejeté. Veuillez vérifier les exigences.",
+    "profileUpdated": "Profil mis à jour avec succès !",
+    "error": "Une erreur s'est produite. Veuillez réessayer."
+  },
+  "errors": {
+    "network": "Erreur réseau. Veuillez vérifier votre connexion.",
+    "unauthorized": "Non autorisé. Veuillez vous reconnecter.",
+    "notFound": "Page non trouvée.",
+    "serverError": "Erreur serveur. Veuillez réessayer plus tard.",
+    "validation": "Veuillez vérifier vos saisies et réessayer."
+  }
+} 

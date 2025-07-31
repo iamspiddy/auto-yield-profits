@@ -1,0 +1,221 @@
+{
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "success": "成功",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "delete": "削除",
+    "edit": "編集",
+    "view": "表示",
+    "back": "戻る",
+    "next": "次へ",
+    "previous": "前へ",
+    "submit": "送信",
+    "confirm": "確認",
+    "close": "閉じる",
+    "yes": "はい",
+    "no": "いいえ",
+    "copy": "コピー",
+    "copied": "コピーしました！",
+    "language": "言語"
+  },
+  "navigation": {
+    "home": "ホーム",
+    "dashboard": "ダッシュボード",
+    "deposit": "入金",
+    "withdraw": "出金",
+    "history": "履歴",
+    "referrals": "紹介",
+    "profile": "プロフィール",
+    "kyc": "KYC",
+    "logout": "ログアウト",
+    "login": "ログイン",
+    "register": "登録"
+  },
+  "hero": {
+    "title": "自動化暗号通貨取引プラットフォーム",
+    "subtitle": "AI駆動の収益最適化と安全な利益管理",
+    "cta": "取引を開始",
+    "learnMore": "詳細を見る",
+    "features": {
+      "ai": "AI駆動取引",
+      "security": "銀行レベルのセキュリティ",
+      "profits": "高収益リターン",
+      "automation": "完全自動化"
+    }
+  },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "welcome": "おかえりなさい",
+    "balance": {
+      "title": "総残高",
+      "available": "利用可能",
+      "invested": "投資済み",
+      "profit": "利益"
+    },
+    "earnings": {
+      "title": "収益概要",
+      "today": "今日",
+      "week": "今週",
+      "month": "今月",
+      "total": "合計"
+    },
+    "quickActions": {
+      "title": "クイックアクション",
+      "deposit": "資金を入金",
+      "withdraw": "出金",
+      "invest": "今すぐ投資"
+    },
+    "recentActivity": {
+      "title": "最近の活動",
+      "noActivity": "最近の活動はありません"
+    }
+  },
+  "deposit": {
+    "title": "資金を入金",
+    "subtitle": "アカウントに資金を追加して収益を開始",
+    "amount": "金額",
+    "currency": "通貨",
+    "method": "支払い方法",
+    "processing": "処理中...",
+    "success": "入金が成功しました！",
+    "error": "入金に失敗しました。再試行してください。",
+    "minAmount": "最小金額：$10",
+    "maxAmount": "最大金額：$100,000",
+    "fee": "処理手数料：2.5%",
+    "confirm": "入金を確認"
+  },
+  "withdraw": {
+    "title": "資金を出金",
+    "subtitle": "収益をウォレットに出金",
+    "amount": "金額",
+    "wallet": "ウォレットアドレス",
+    "fee": "出金手数料：1%",
+    "minAmount": "最小出金額：$50",
+    "processing": "出金処理中...",
+    "success": "出金が開始されました！",
+    "error": "出金に失敗しました。再試行してください。",
+    "confirm": "出金を確認",
+    "pin": "PINを入力",
+    "pinRequired": "出金にはPINが必要です"
+  },
+  "profile": {
+    "title": "プロフィール",
+    "personalInfo": "個人情報",
+    "security": "セキュリティ設定",
+    "preferences": "設定",
+    "firstName": "名",
+    "lastName": "姓",
+    "email": "メール",
+    "phone": "電話",
+    "country": "国",
+    "updateProfile": "プロフィールを更新",
+    "changePassword": "パスワードを変更",
+    "enable2FA": "2FAを有効化",
+    "language": "言語",
+    "notifications": "通知"
+  },
+  "kyc": {
+    "title": "KYC認証",
+    "subtitle": "身元確認を完了してすべての機能をアンロック",
+    "status": {
+      "pending": "保留中",
+      "approved": "承認済み",
+      "rejected": "拒否",
+      "notSubmitted": "未提出"
+    },
+    "documents": {
+      "title": "必要な書類",
+      "idCard": "身分証明書",
+      "passport": "パスポート",
+      "selfie": "身分証明書との自撮り",
+      "utility": "公共料金請求書"
+    },
+    "upload": "書類をアップロード",
+    "submit": "審査に提出",
+    "processing": "処理中...",
+    "success": "KYCが正常に提出されました！",
+    "error": "KYC提出に失敗しました。再試行してください。"
+  },
+  "referrals": {
+    "title": "紹介プログラム",
+    "subtitle": "友達を招待して報酬を獲得",
+    "code": "あなたの紹介コード",
+    "link": "あなたの紹介リンク",
+    "stats": {
+      "totalReferrals": "総紹介数",
+      "activeReferrals": "アクティブな紹介",
+      "totalEarnings": "総収益"
+    },
+    "rewards": {
+      "title": "報酬",
+      "perReferral": "紹介ごと",
+      "lifetime": "生涯収益"
+    },
+    "share": "共有"
+  },
+  "auth": {
+    "login": {
+      "title": "ログイン",
+      "subtitle": "Auto Yield Profitsへようこそ",
+      "email": "メール",
+      "password": "パスワード",
+      "forgotPassword": "パスワードを忘れましたか？",
+      "noAccount": "アカウントをお持ちでない方",
+      "signUp": "登録"
+    },
+    "register": {
+      "title": "アカウント作成",
+      "subtitle": "今日Auto Yield Profitsに参加",
+      "firstName": "名",
+      "lastName": "姓",
+      "email": "メール",
+      "password": "パスワード",
+      "confirmPassword": "パスワード確認",
+      "agree": "利用規約に同意します",
+      "haveAccount": "すでにアカウントをお持ちですか？",
+      "signIn": "ログイン"
+    },
+    "forgotPassword": {
+      "title": "パスワードリセット",
+      "subtitle": "リセット手順を受け取るためにメールを入力",
+      "email": "メール",
+      "sendReset": "リセットリンクを送信"
+    }
+  },
+  "admin": {
+    "title": "管理者パネル",
+    "dashboard": "ダッシュボード",
+    "users": "ユーザー",
+    "deposits": "入金",
+    "withdrawals": "出金",
+    "profits": "利益",
+    "kyc": "KYC",
+    "referrals": "紹介",
+    "logs": "ログ",
+    "settings": "設定",
+    "stats": {
+      "totalUsers": "総ユーザー数",
+      "activeUsers": "アクティブユーザー",
+      "totalDeposits": "総入金額",
+      "pendingWithdrawals": "保留中の出金",
+      "totalProfit": "総利益"
+    }
+  },
+  "notifications": {
+    "depositSuccess": "入金が成功しました！",
+    "withdrawalSuccess": "出金が開始されました！",
+    "kycApproved": "KYCが承認されました！",
+    "kycRejected": "KYCが拒否されました。要件を確認してください。",
+    "profileUpdated": "プロフィールが正常に更新されました！",
+    "error": "エラーが発生しました。再試行してください。"
+  },
+  "errors": {
+    "network": "ネットワークエラー。接続を確認してください。",
+    "unauthorized": "認証されていません。再ログインしてください。",
+    "notFound": "ページが見つかりません。",
+    "serverError": "サーバーエラー。後でもう一度お試しください。",
+    "validation": "入力を確認して再試行してください。"
+  }
+} 

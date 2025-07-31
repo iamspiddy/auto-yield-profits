@@ -1,0 +1,221 @@
+{
+  "common": {
+    "loading": "Laden...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "view": "Anzeigen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "submit": "Absenden",
+    "confirm": "Bestätigen",
+    "close": "Schließen",
+    "yes": "Ja",
+    "no": "Nein",
+    "copy": "Kopieren",
+    "copied": "Kopiert!",
+    "language": "Sprache"
+  },
+  "navigation": {
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "deposit": "Einzahlen",
+    "withdraw": "Auszahlen",
+    "history": "Verlauf",
+    "referrals": "Empfehlungen",
+    "profile": "Profil",
+    "kyc": "KYC",
+    "logout": "Abmelden",
+    "login": "Anmelden",
+    "register": "Registrieren"
+  },
+  "hero": {
+    "title": "Automatisierte Krypto-Trading-Plattform",
+    "subtitle": "KI-gestützte Renditeoptimierung mit sicherer Gewinnverwaltung",
+    "cta": "Jetzt Trading Starten",
+    "learnMore": "Mehr Erfahren",
+    "features": {
+      "ai": "KI-gestütztes Trading",
+      "security": "Bankensicherheit",
+      "profits": "Hohe Renditen",
+      "automation": "Vollautomatisiert"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Willkommen zurück",
+    "balance": {
+      "title": "Gesamtsaldo",
+      "available": "Verfügbar",
+      "invested": "Investiert",
+      "profit": "Gewinn"
+    },
+    "earnings": {
+      "title": "Ertragsübersicht",
+      "today": "Heute",
+      "week": "Diese Woche",
+      "month": "Dieser Monat",
+      "total": "Gesamt"
+    },
+    "quickActions": {
+      "title": "Schnellaktionen",
+      "deposit": "Geld Einzahlen",
+      "withdraw": "Auszahlen",
+      "invest": "Jetzt Investieren"
+    },
+    "recentActivity": {
+      "title": "Letzte Aktivitäten",
+      "noActivity": "Keine kürzlichen Aktivitäten"
+    }
+  },
+  "deposit": {
+    "title": "Geld Einzahlen",
+    "subtitle": "Fügen Sie Ihrem Konto Geld hinzu, um mit dem Verdienen zu beginnen",
+    "amount": "Betrag",
+    "currency": "Währung",
+    "method": "Zahlungsmethode",
+    "processing": "Verarbeitung...",
+    "success": "Einzahlung erfolgreich!",
+    "error": "Einzahlung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "minAmount": "Mindestbetrag: $10",
+    "maxAmount": "Höchstbetrag: $100.000",
+    "fee": "Bearbeitungsgebühr: 2,5%",
+    "confirm": "Einzahlung Bestätigen"
+  },
+  "withdraw": {
+    "title": "Geld Auszahlen",
+    "subtitle": "Zahlen Sie Ihre Gewinne auf Ihr Wallet aus",
+    "amount": "Betrag",
+    "wallet": "Wallet-Adresse",
+    "fee": "Auszahlungsgebühr: 1%",
+    "minAmount": "Mindestauszahlung: $50",
+    "processing": "Auszahlung wird verarbeitet...",
+    "success": "Auszahlung initiiert!",
+    "error": "Auszahlung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "confirm": "Auszahlung Bestätigen",
+    "pin": "PIN eingeben",
+    "pinRequired": "PIN für Auszahlung erforderlich"
+  },
+  "profile": {
+    "title": "Profil",
+    "personalInfo": "Persönliche Informationen",
+    "security": "Sicherheitseinstellungen",
+    "preferences": "Einstellungen",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "country": "Land",
+    "updateProfile": "Profil Aktualisieren",
+    "changePassword": "Passwort Ändern",
+    "enable2FA": "2FA Aktivieren",
+    "language": "Sprache",
+    "notifications": "Benachrichtigungen"
+  },
+  "kyc": {
+    "title": "KYC-Verifizierung",
+    "subtitle": "Vervollständigen Sie Ihre Identitätsverifizierung, um alle Funktionen freizuschalten",
+    "status": {
+      "pending": "Ausstehend",
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt",
+      "notSubmitted": "Nicht Eingereicht"
+    },
+    "documents": {
+      "title": "Erforderliche Dokumente",
+      "idCard": "Personalausweis",
+      "passport": "Reisepass",
+      "selfie": "Selfie mit Ausweis",
+      "utility": "Stromrechnung"
+    },
+    "upload": "Dokument Hochladen",
+    "submit": "Zur Überprüfung Einreichen",
+    "processing": "Verarbeitung...",
+    "success": "KYC erfolgreich eingereicht!",
+    "error": "KYC-Einreichung fehlgeschlagen. Bitte versuchen Sie es erneut."
+  },
+  "referrals": {
+    "title": "Empfehlungsprogramm",
+    "subtitle": "Verdienen Sie Belohnungen durch das Einladen von Freunden",
+    "code": "Ihr Empfehlungscode",
+    "link": "Ihr Empfehlungslink",
+    "stats": {
+      "totalReferrals": "Gesamte Empfehlungen",
+      "activeReferrals": "Aktive Empfehlungen",
+      "totalEarnings": "Gesamteinnahmen"
+    },
+    "rewards": {
+      "title": "Belohnungen",
+      "perReferral": "Pro Empfehlung",
+      "lifetime": "Lebenslange Einnahmen"
+    },
+    "share": "Teilen"
+  },
+  "auth": {
+    "login": {
+      "title": "Anmelden",
+      "subtitle": "Willkommen zurück bei Auto Yield Profits",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "forgotPassword": "Passwort vergessen?",
+      "noAccount": "Haben Sie kein Konto?",
+      "signUp": "Registrieren"
+    },
+    "register": {
+      "title": "Konto Erstellen",
+      "subtitle": "Treten Sie Auto Yield Profits heute bei",
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "confirmPassword": "Passwort Bestätigen",
+      "agree": "Ich stimme den Nutzungsbedingungen zu",
+      "haveAccount": "Haben Sie bereits ein Konto?",
+      "signIn": "Anmelden"
+    },
+    "forgotPassword": {
+      "title": "Passwort Zurücksetzen",
+      "subtitle": "Geben Sie Ihre E-Mail ein, um Zurücksetzungsanweisungen zu erhalten",
+      "email": "E-Mail",
+      "sendReset": "Zurücksetzungslink Senden"
+    }
+  },
+  "admin": {
+    "title": "Admin-Panel",
+    "dashboard": "Dashboard",
+    "users": "Benutzer",
+    "deposits": "Einzahlungen",
+    "withdrawals": "Auszahlungen",
+    "profits": "Gewinne",
+    "kyc": "KYC",
+    "referrals": "Empfehlungen",
+    "logs": "Protokolle",
+    "settings": "Einstellungen",
+    "stats": {
+      "totalUsers": "Gesamtbenutzer",
+      "activeUsers": "Aktive Benutzer",
+      "totalDeposits": "Gesamteinzahlungen",
+      "pendingWithdrawals": "Ausstehende Auszahlungen",
+      "totalProfit": "Gesamtgewinn"
+    }
+  },
+  "notifications": {
+    "depositSuccess": "Einzahlung erfolgreich!",
+    "withdrawalSuccess": "Auszahlung initiiert!",
+    "kycApproved": "KYC genehmigt!",
+    "kycRejected": "KYC abgelehnt. Bitte überprüfen Sie die Anforderungen.",
+    "profileUpdated": "Profil erfolgreich aktualisiert!",
+    "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+  },
+  "errors": {
+    "network": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.",
+    "unauthorized": "Nicht autorisiert. Bitte melden Sie sich erneut an.",
+    "notFound": "Seite nicht gefunden.",
+    "serverError": "Serverfehler. Bitte versuchen Sie es später erneut.",
+    "validation": "Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut."
+  }
+} 

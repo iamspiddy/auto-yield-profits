@@ -1,0 +1,224 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "language": "Language"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "deposit": "Deposit",
+    "withdraw": "Withdraw",
+    "history": "History",
+    "referrals": "Referrals",
+    "profile": "Profile",
+    "kyc": "KYC",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register",
+    "howItWorks": "How It Works",
+    "features": "Features",
+    "faq": "FAQ"
+  },
+  "hero": {
+    "title": "Automated Crypto Trading Platform",
+    "subtitle": "Advanced AI-powered yield optimization with secure profit management",
+    "cta": "Start Trading Now",
+    "learnMore": "Learn More",
+    "features": {
+      "ai": "AI-Powered Trading",
+      "security": "Bank-Grade Security",
+      "profits": "High Yield Returns",
+      "automation": "Fully Automated"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "balance": {
+      "title": "Total Balance",
+      "available": "Available",
+      "invested": "Invested",
+      "profit": "Profit"
+    },
+    "earnings": {
+      "title": "Earnings Overview",
+      "today": "Today",
+      "week": "This Week",
+      "month": "This Month",
+      "total": "Total"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "deposit": "Deposit Funds",
+      "withdraw": "Withdraw",
+      "invest": "Invest Now"
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "noActivity": "No recent activity"
+    }
+  },
+  "deposit": {
+    "title": "Deposit Funds",
+    "subtitle": "Add funds to your account to start earning",
+    "amount": "Amount",
+    "currency": "Currency",
+    "method": "Payment Method",
+    "processing": "Processing...",
+    "success": "Deposit successful!",
+    "error": "Deposit failed. Please try again.",
+    "minAmount": "Minimum amount: $10",
+    "maxAmount": "Maximum amount: $100,000",
+    "fee": "Processing fee: 2.5%",
+    "confirm": "Confirm Deposit"
+  },
+  "withdraw": {
+    "title": "Withdraw Funds",
+    "subtitle": "Withdraw your earnings to your wallet",
+    "amount": "Amount",
+    "wallet": "Wallet Address",
+    "fee": "Withdrawal fee: 1%",
+    "minAmount": "Minimum withdrawal: $50",
+    "processing": "Processing withdrawal...",
+    "success": "Withdrawal initiated!",
+    "error": "Withdrawal failed. Please try again.",
+    "confirm": "Confirm Withdrawal",
+    "pin": "Enter PIN",
+    "pinRequired": "PIN required for withdrawal"
+  },
+  "profile": {
+    "title": "Profile",
+    "personalInfo": "Personal Information",
+    "security": "Security Settings",
+    "preferences": "Preferences",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "country": "Country",
+    "updateProfile": "Update Profile",
+    "changePassword": "Change Password",
+    "enable2FA": "Enable 2FA",
+    "language": "Language",
+    "notifications": "Notifications"
+  },
+  "kyc": {
+    "title": "KYC Verification",
+    "subtitle": "Complete your identity verification to unlock all features",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "notSubmitted": "Not Submitted"
+    },
+    "documents": {
+      "title": "Required Documents",
+      "idCard": "Government ID",
+      "passport": "Passport",
+      "selfie": "Selfie with ID",
+      "utility": "Utility Bill"
+    },
+    "upload": "Upload Document",
+    "submit": "Submit for Review",
+    "processing": "Processing...",
+    "success": "KYC submitted successfully!",
+    "error": "KYC submission failed. Please try again."
+  },
+  "referrals": {
+    "title": "Referral Program",
+    "subtitle": "Earn rewards by inviting friends",
+    "code": "Your Referral Code",
+    "link": "Your Referral Link",
+    "stats": {
+      "totalReferrals": "Total Referrals",
+      "activeReferrals": "Active Referrals",
+      "totalEarnings": "Total Earnings"
+    },
+    "rewards": {
+      "title": "Rewards",
+      "perReferral": "Per Referral",
+      "lifetime": "Lifetime Earnings"
+    },
+    "share": "Share"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "subtitle": "Welcome back to Auto Yield Profits",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot Password?",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign Up"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join Auto Yield Profits today",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "agree": "I agree to the Terms of Service",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign In"
+    },
+    "forgotPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your email to receive reset instructions",
+      "email": "Email",
+      "sendReset": "Send Reset Link"
+    }
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "deposits": "Deposits",
+    "withdrawals": "Withdrawals",
+    "profits": "Profits",
+    "kyc": "KYC",
+    "referrals": "Referrals",
+    "logs": "Logs",
+    "settings": "Settings",
+    "stats": {
+      "totalUsers": "Total Users",
+      "activeUsers": "Active Users",
+      "totalDeposits": "Total Deposits",
+      "pendingWithdrawals": "Pending Withdrawals",
+      "totalProfit": "Total Profit"
+    }
+  },
+  "notifications": {
+    "depositSuccess": "Deposit successful!",
+    "withdrawalSuccess": "Withdrawal initiated!",
+    "kycApproved": "KYC approved!",
+    "kycRejected": "KYC rejected. Please check requirements.",
+    "profileUpdated": "Profile updated successfully!",
+    "error": "An error occurred. Please try again."
+  },
+  "errors": {
+    "network": "Network error. Please check your connection.",
+    "unauthorized": "Unauthorized. Please login again.",
+    "notFound": "Page not found.",
+    "serverError": "Server error. Please try again later.",
+    "validation": "Please check your input and try again."
+  }
+} 
