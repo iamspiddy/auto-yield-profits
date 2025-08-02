@@ -107,30 +107,7 @@ const AdminLogs = () => {
         });
       });
 
-      // Fetch KYC verifications
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select(`
-          user_id,
-          updated_at,
-          kyc_verified
-        `)
-        .not('kyc_verified', 'is', null);
 
-      profiles?.forEach(profile => {
-        if (profile.updated_at) {
-          logs.push({
-            id: `kyc_${profile.user_id}`,
-            admin_id: 'admin', // We don't track which admin did this
-            action_type: 'kyc_verification',
-            target_user_id: profile.user_id,
-            amount: null,
-            description: `KYC ${profile.kyc_verified ? 'verified' : 'rejected'}`,
-            created_at: profile.updated_at,
-            target_user: { email: 'user@example.com', full_name: 'User' } // Placeholder
-          });
-        }
-      });
 
       // Sort by date (newest first)
       logs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
@@ -241,7 +218,6 @@ const AdminLogs = () => {
     const labels = {
       deposit_approval: 'Deposit Approval',
       withdrawal_processing: 'Withdrawal Processing',
-      kyc_verification: 'KYC Verification',
       profit_distribution: 'Profit Distribution',
       user_management: 'User Management'
     };
@@ -254,8 +230,6 @@ const AdminLogs = () => {
         return <CreditCard className="h-4 w-4 text-green-500" />;
       case 'withdrawal_processing':
         return <Wallet className="h-4 w-4 text-blue-500" />;
-      case 'kyc_verification':
-        return <Shield className="h-4 w-4 text-purple-500" />;
       case 'profit_distribution':
         return <TrendingUp className="h-4 w-4 text-orange-500" />;
       case 'user_management':
@@ -269,7 +243,6 @@ const AdminLogs = () => {
     const variants = {
       deposit_approval: 'default',
       withdrawal_processing: 'secondary',
-      kyc_verification: 'outline',
       profit_distribution: 'default',
       user_management: 'secondary'
     } as const;
@@ -291,14 +264,12 @@ const AdminLogs = () => {
 
     const depositLogs = logs.filter(log => log.action_type === 'deposit_approval').length;
     const withdrawalLogs = logs.filter(log => log.action_type === 'withdrawal_processing').length;
-    const kycLogs = logs.filter(log => log.action_type === 'kyc_verification').length;
 
     return {
       totalLogs,
       todayLogs,
       depositLogs,
-      withdrawalLogs,
-      kycLogs
+      withdrawalLogs
     };
   };
 
@@ -386,16 +357,7 @@ const AdminLogs = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">KYC Reviews</CardTitle>
-            <Shield className="h-4 w-4 text-purple-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats.kycLogs}</div>
-            <div className="text-xs text-gray-400 mt-1">KYC verifications</div>
-          </CardContent>
-        </Card>
+
       </div>
 
       {/* Filters */}
@@ -421,7 +383,6 @@ const AdminLogs = () => {
                 <SelectItem value="all">All Actions</SelectItem>
                 <SelectItem value="deposit_approval">Deposit Approvals</SelectItem>
                 <SelectItem value="withdrawal_processing">Withdrawal Processing</SelectItem>
-                <SelectItem value="kyc_verification">KYC Verifications</SelectItem>
                 <SelectItem value="profit_distribution">Profit Distributions</SelectItem>
                 <SelectItem value="user_management">User Management</SelectItem>
               </SelectContent>

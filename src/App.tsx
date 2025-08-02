@@ -14,7 +14,7 @@ import Withdraw from "./pages/Withdraw";
 import History from "./pages/History";
 import Referrals from "./pages/Referrals";
 import Profile from "./pages/Profile";
-import KYC from "./pages/KYC";
+
 import NotFound from "./pages/NotFound";
 
 // Admin pages
@@ -26,7 +26,7 @@ import AdminDeposits from "./pages/admin/AdminDeposits";
 import AdminWithdrawals from "./pages/admin/AdminWithdrawals";
 import AdminProfits from "./pages/admin/AdminProfits";
 import AdminPins from "./pages/admin/AdminPins";
-import AdminKYC from "./pages/admin/AdminKYC";
+
 import AdminReferrals from "./pages/admin/AdminReferrals";
 import AdminLogs from "./pages/admin/AdminLogs";
 import AdminSetup from "./pages/admin/AdminSetup";
@@ -55,7 +55,7 @@ const App = () => {
             <Route path="/history" element={<History />} />
             <Route path="/referrals" element={<Referrals />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/kyc" element={<KYC />} />
+
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
@@ -68,7 +68,7 @@ const App = () => {
               <Route path="withdrawals" element={<AdminWithdrawals />} />
               <Route path="profits" element={<AdminProfits />} />
               <Route path="pins" element={<AdminPins />} />
-              <Route path="kyc" element={<AdminKYC />} />
+
               <Route path="referrals" element={<AdminReferrals />} />
               <Route path="logs" element={<AdminLogs />} />
             </Route>

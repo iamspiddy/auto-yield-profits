@@ -73,6 +73,22 @@ const AdminDeposits = () => {
     };
     
     testAdminPermissions();
+    
+    // Test storage bucket access
+    const testStorageAccess = async () => {
+      try {
+        console.log('Testing storage bucket access...');
+        const { data, error } = await supabase.storage
+          .from('deposit-proofs')
+          .list('', { limit: 1 });
+        
+        console.log('Storage bucket test:', { data, error });
+      } catch (error) {
+        console.error('Storage bucket test error:', error);
+      }
+    };
+    
+    testStorageAccess();
   }, [user]);
 
   useEffect(() => {
@@ -219,6 +235,8 @@ const AdminDeposits = () => {
 
       // Update user balance
       console.log('Updating user balance...');
+      console.log('User ID:', deposit.user_id);
+      console.log('Amount:', deposit.amount);
       const { data: balanceData, error: balanceError } = await supabase
         .rpc('increment_balance', {
           user_id_param: deposit.user_id,
@@ -231,26 +249,55 @@ const AdminDeposits = () => {
       }
       console.log('Balance updated successfully. New balance:', balanceData);
 
-      // Create transaction record
-      console.log('Creating transaction record...');
-      const { error: transactionError } = await supabase
+      // First, find the existing transaction record
+      console.log('Finding existing transaction record...');
+      const { data: existingTransaction, error: findError } = await supabase
         .from('transactions')
-        .upsert({
-          user_id: deposit.user_id,
-          amount: deposit.amount,
-          type: 'deposit',
-          status: 'completed',
-          description: `Deposit approved: ${approvalReason || 'No reason provided'}`,
-          reference_id: depositId
-        }, {
-          onConflict: 'reference_id,type,user_id'
-        });
+        .select('*')
+        .eq('reference_id', depositId)
+        .eq('type', 'deposit')
+        .eq('user_id', deposit.user_id)
+        .single();
 
-      if (transactionError) {
-        console.error('Transaction creation error:', transactionError);
-        throw transactionError;
+      if (findError) {
+        console.error('Error finding existing transaction:', findError);
+        // If no existing transaction found, create a new one
+        console.log('No existing transaction found, creating new one...');
+        const { error: createError } = await supabase
+          .from('transactions')
+          .insert({
+            user_id: deposit.user_id,
+            amount: deposit.amount,
+            type: 'deposit',
+            status: 'completed',
+            description: `Deposit approved: ${approvalReason || 'No reason provided'}`,
+            reference_id: depositId
+          });
+        
+        if (createError) {
+          console.error('Transaction creation error:', createError);
+          throw createError;
+        }
+        console.log('New transaction record created successfully');
+      } else {
+        // Update existing transaction record
+        console.log('Updating existing transaction record:', existingTransaction);
+        const { error: transactionError } = await supabase
+          .from('transactions')
+          .update({
+            status: 'completed',
+            description: `Deposit approved: ${approvalReason || 'No reason provided'}`
+          })
+          .eq('id', existingTransaction.id);
+        
+        if (transactionError) {
+          console.error('Transaction update error:', transactionError);
+          throw transactionError;
+        }
+        console.log('Transaction record updated successfully');
       }
-      console.log('Transaction record created successfully');
+
+
 
       // Handle referral commission if applicable
       console.log('Handling referral commission...');
@@ -264,6 +311,9 @@ const AdminDeposits = () => {
       setApprovalDialogOpen(false);
       setApprovalReason('');
       fetchDeposits(); // Refresh data
+      
+      // Trigger dashboard refresh for user
+      window.dispatchEvent(new CustomEvent('dashboard-refresh'));
     } catch (error) {
       console.error('Error approving deposit:', error);
       toast({
@@ -302,6 +352,9 @@ const AdminDeposits = () => {
       setRejectionDialogOpen(false);
       setRejectionReason('');
       fetchDeposits(); // Refresh data
+      
+      // Trigger dashboard refresh for user
+      window.dispatchEvent(new CustomEvent('dashboard-refresh'));
     } catch (error) {
       console.error('Error rejecting deposit:', error);
       toast({
@@ -399,6 +452,45 @@ const AdminDeposits = () => {
 
   const getPendingDepositsCount = () => {
     return deposits.filter(d => d.status === 'pending').length;
+  };
+
+  const getProofUrl = async (proofFileUrl: string | null) => {
+    if (!proofFileUrl) return null;
+    
+    // If it's already a full URL, return it as is
+    if (proofFileUrl.startsWith('http')) {
+      return proofFileUrl;
+    }
+    
+    try {
+      // Try to get the file directly first
+      const { data: fileData, error: fileError } = await supabase.storage
+        .from('deposit-proofs')
+        .download(proofFileUrl);
+      
+      if (fileError) {
+        console.error('Error downloading file:', fileError);
+        
+        // If download fails, try to get public URL
+        const { data, error } = supabase.storage
+          .from('deposit-proofs')
+          .getPublicUrl(proofFileUrl);
+        
+        if (error) {
+          console.error('Error getting public URL:', error);
+          return null;
+        }
+        
+        return data.publicUrl;
+      }
+      
+      // If download succeeds, create a blob URL
+      const blob = new Blob([fileData], { type: 'image/jpeg' });
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      console.error('Error in getProofUrl:', error);
+      return null;
+    }
   };
 
   if (loading) {
@@ -517,7 +609,20 @@ const AdminDeposits = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => window.open(deposit.proof_file_url, '_blank')}
+                        onClick={async () => {
+                          console.log('Original proof_file_url:', deposit.proof_file_url);
+                          const proofUrl = await getProofUrl(deposit.proof_file_url);
+                          console.log('Generated proof URL:', proofUrl);
+                          if (proofUrl) {
+                            window.open(proofUrl, '_blank');
+                          } else {
+                            toast({
+                              title: "Error",
+                              description: "Could not load proof file",
+                              variant: "destructive"
+                            });
+                          }
+                        }}
                       >
                         <Download className="h-4 w-4 mr-1" />
                         View
@@ -603,7 +708,20 @@ const AdminDeposits = () => {
                                   <Button
                                     variant="outline"
                                     className="mt-2"
-                                    onClick={() => window.open(deposit.proof_file_url, '_blank')}
+                                    onClick={async () => {
+                                      console.log('Dialog - Original proof_file_url:', deposit.proof_file_url);
+                                      const proofUrl = await getProofUrl(deposit.proof_file_url);
+                                      console.log('Dialog - Generated proof URL:', proofUrl);
+                                      if (proofUrl) {
+                                        window.open(proofUrl, '_blank');
+                                      } else {
+                                        toast({
+                                          title: "Error",
+                                          description: "Could not load proof file",
+                                          variant: "destructive"
+                                        });
+                                      }
+                                    }}
                                   >
                                     <Download className="h-4 w-4 mr-2" />
                                     View Proof

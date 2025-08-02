@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Copy, Check, Users, TrendingUp, DollarSign, Share2, Gift, UserPlus } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { getProductionUrl } from '@/lib/utils';
 
 interface ReferralStats {
   totalReferrals: number;
@@ -38,7 +39,7 @@ const Referrals = () => {
   const [loadingStats, setLoadingStats] = useState(true);
   const [copied, setCopied] = useState(false);
 
-  const referralLink = `${window.location.origin}/auth?ref=${user?.id}`;
+  const referralLink = `${getProductionUrl()}/auth?ref=${user?.id}`;
 
   useEffect(() => {
     if (!user) return;

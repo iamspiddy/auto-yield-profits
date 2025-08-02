@@ -6,6 +6,7 @@ import { Users, Copy, Share2, Check } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { getProductionUrl } from '@/lib/utils';
 
 interface ReferralData {
   referralCode: string;
@@ -74,7 +75,7 @@ const ReferralProgram = () => {
     };
   }, [user]);
 
-  const referralLink = `${window.location.origin}/auth?ref=${referralData.referralCode}`;
+  const referralLink = `${getProductionUrl()}/auth?ref=${referralData.referralCode}`;
 
   const handleCopyLink = async () => {
     try {

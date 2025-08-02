@@ -89,7 +89,7 @@ const DepositPanel = () => {
       if (uploadError) throw uploadError;
 
       // Create deposit record
-      const { error: depositError } = await supabase
+      const { data: depositData, error: depositError } = await supabase
         .from('deposits')
         .insert({
           user_id: user.id,
@@ -97,11 +97,12 @@ const DepositPanel = () => {
           transaction_hash: transactionHash || null,
           proof_file_url: uploadData.path,
           status: 'pending'
-        });
+        })
+        .select();
 
       if (depositError) throw depositError;
 
-      // Create transaction record
+      // Create transaction record with reference to deposit
       await supabase
         .from('transactions')
         .insert({
@@ -109,7 +110,8 @@ const DepositPanel = () => {
           type: 'deposit',
           amount: parseFloat(amount),
           status: 'pending',
-          description: `Deposit of ${amount} USDT`
+          description: `Deposit of ${amount} USDT`,
+          reference_id: depositData[0].id
         });
 
       toast({

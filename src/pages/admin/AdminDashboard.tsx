@@ -25,7 +25,6 @@ interface DashboardStats {
   totalDeposits: number;
   totalProfit: number;
   pendingWithdrawals: number;
-  pendingKYC: number;
   totalReferrals: number;
   monthlyGrowth: number;
 }
@@ -45,7 +44,6 @@ const AdminDashboard = () => {
     totalDeposits: 0,
     totalProfit: 0,
     pendingWithdrawals: 0,
-    pendingKYC: 0,
     totalReferrals: 0,
     monthlyGrowth: 0
   });
@@ -95,7 +93,6 @@ const AdminDashboard = () => {
       const totalDeposits = deposits?.filter(d => d.status === 'approved').reduce((sum, d) => sum + (d.amount || 0), 0) || 0;
       const totalProfit = earnings?.reduce((sum, e) => sum + (e.amount || 0), 0) || 0;
       const pendingWithdrawals = withdrawals?.filter(w => w.status === 'pending').length || 0;
-      const pendingKYC = 0; // KYC removed - no longer needed
       const totalReferrals = referrals?.length || 0;
 
       // Calculate monthly growth (simplified)
@@ -110,7 +107,6 @@ const AdminDashboard = () => {
         totalDeposits,
         totalProfit,
         pendingWithdrawals,
-        pendingKYC,
         totalReferrals,
         monthlyGrowth
       });

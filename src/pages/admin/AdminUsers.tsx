@@ -13,9 +13,6 @@ import {
   Search,
   Filter,
   Eye,
-  Shield,
-  UserCheck,
-  UserX,
   Mail,
   Calendar,
   DollarSign,
@@ -29,7 +26,6 @@ interface User {
   email: string;
   full_name: string;
   balance: number | null;
-  kyc_verified: boolean | null;
   referral_code: string;
   referred_by: string | null;
   created_at: string;
@@ -115,7 +111,7 @@ const AdminUsers = () => {
               referrals: referrals || []
             };
           } catch (error) {
-            console.error('Error fetching user details:', error);
+            console.error(`Error fetching details for user ${profile.user_id}:`, error);
             return {
               ...profile,
               deposits: [],
@@ -131,7 +127,7 @@ const AdminUsers = () => {
       console.error('Error fetching users:', error);
       toast({
         title: "Error",
-        description: "Failed to load users",
+        description: "Failed to load users.",
         variant: "destructive"
       });
     } finally {
@@ -146,57 +142,38 @@ const AdminUsers = () => {
     if (searchTerm) {
       filtered = filtered.filter(user =>
         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.referral_code.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(user => {
-        switch (statusFilter) {
-          case 'kyc_verified':
-            return user.kyc_verified === true;
-          case 'kyc_pending':
-            return user.kyc_verified === null;
-          case 'kyc_rejected':
-            return user.kyc_verified === false;
-          case 'has_balance':
-            return (user.balance || 0) > 0;
-          case 'no_balance':
-            return (user.balance || 0) === 0;
-          default:
-            return true;
-        }
-      });
+    switch (statusFilter) {
+      case 'active':
+        filtered = filtered.filter(user => 
+          user.deposits && user.deposits.length > 0
+        );
+        break;
+      case 'inactive':
+        filtered = filtered.filter(user => 
+          !user.deposits || user.deposits.length === 0
+        );
+        break;
+      case 'with_balance':
+        filtered = filtered.filter(user => 
+          user.balance && user.balance > 0
+        );
+        break;
+      case 'referrers':
+        filtered = filtered.filter(user => 
+          user.referrals && user.referrals.length > 0
+        );
+        break;
+      default:
+        break;
     }
 
     setFilteredUsers(filtered);
-  };
-
-  const handleKYCStatusChange = async (userId: string, status: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ kyc_verified: status })
-        .eq('user_id', userId);
-
-      if (error) throw error;
-
-      toast({
-        title: "KYC Status Updated",
-        description: `User KYC status changed to ${status ? 'verified' : 'rejected'}`,
-      });
-
-      fetchUsers(); // Refresh data
-    } catch (error) {
-      console.error('Error updating KYC status:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update KYC status",
-        variant: "destructive"
-      });
-    }
   };
 
   const formatCurrency = (amount: number) => {
@@ -210,51 +187,28 @@ const AdminUsers = () => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
-  const getKYCStatusBadge = (status: boolean | null) => {
-    if (status === null) {
-      return <Badge variant="secondary">Pending</Badge>;
-    }
-    return status ? (
-      <Badge variant="default" className="bg-green-600">Verified</Badge>
-    ) : (
-      <Badge variant="destructive">Rejected</Badge>
-    );
-  };
-
   const getTotalDeposits = (user: User) => {
-    return user.deposits?.reduce((sum, d) => sum + (d.amount || 0), 0) || 0;
+    return user.deposits?.reduce((sum, deposit) => sum + deposit.amount, 0) || 0;
   };
 
   const getTotalWithdrawals = (user: User) => {
-    return user.withdrawals?.reduce((sum, w) => sum + (w.amount || 0), 0) || 0;
+    return user.withdrawals?.reduce((sum, withdrawal) => sum + withdrawal.amount, 0) || 0;
   };
 
   const getReferralEarnings = (user: User) => {
-    return user.referrals?.reduce((sum, r) => sum + (r.total_earned || 0), 0) || 0;
+    return user.referrals?.reduce((sum, referral) => sum + (referral.total_earned || 0), 0) || 0;
   };
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-700 rounded w-48 mb-2"></div>
-            <div className="h-4 bg-gray-700 rounded w-32"></div>
-          </div>
-        </div>
-        <Card className="bg-gray-800 border-gray-700">
-          <CardContent className="p-6">
-            <div className="animate-pulse space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-12 bg-gray-700 rounded"></div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
       </div>
     );
   }
@@ -264,42 +218,45 @@ const AdminUsers = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">Users Management</h1>
-          <p className="text-gray-400 mt-2">Manage user accounts and KYC verification</p>
+          <h1 className="text-2xl font-bold text-white">User Management</h1>
+          <p className="text-gray-400 mt-2">Manage user accounts and platform activity</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Badge variant="secondary">{filteredUsers.length} users</Badge>
+        <div className="flex items-center gap-2">
+          <Users2 className="h-5 w-5 text-gray-400" />
+          <span className="text-sm text-gray-400">{filteredUsers.length} users</span>
         </div>
       </div>
 
       {/* Filters */}
       <Card className="bg-gray-800 border-gray-700">
         <CardContent className="p-6">
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Search by email, name, or referral code..."
+                  placeholder="Search users by email, name, or referral code..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                  className="pl-10 bg-gray-700 border-gray-600 text-white"
                 />
               </div>
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-48 bg-gray-700 border-gray-600 text-white">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-700">
-                <SelectItem value="all">All Users</SelectItem>
-                <SelectItem value="kyc_verified">KYC Verified</SelectItem>
-                <SelectItem value="kyc_pending">KYC Pending</SelectItem>
-                <SelectItem value="kyc_rejected">KYC Rejected</SelectItem>
-                <SelectItem value="has_balance">Has Balance</SelectItem>
-                <SelectItem value="no_balance">No Balance</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-48 bg-gray-700 border-gray-600 text-white">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-700">
+                  <SelectItem value="all">All Users</SelectItem>
+                  <SelectItem value="active">Active Users</SelectItem>
+                  <SelectItem value="inactive">Inactive Users</SelectItem>
+                  <SelectItem value="with_balance">With Balance</SelectItem>
+                  <SelectItem value="referrers">Referrers</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -307,153 +264,168 @@ const AdminUsers = () => {
       {/* Users Table */}
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
-          <CardTitle className="text-lg text-white">Users</CardTitle>
-          <CardDescription className="text-gray-400">
-            Manage user accounts and verification status
-          </CardDescription>
+          <CardTitle className="text-white">Users</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow className="border-gray-700">
-                <TableHead className="text-gray-300">User</TableHead>
-                <TableHead className="text-gray-300">Balance</TableHead>
-                <TableHead className="text-gray-300">KYC Status</TableHead>
-                <TableHead className="text-gray-300">Referrals</TableHead>
-                <TableHead className="text-gray-300">Joined</TableHead>
-                <TableHead className="text-gray-300">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.id} className="border-gray-700">
-                  <TableCell>
-                    <div>
-                      <div className="font-medium text-white">{user.full_name}</div>
-                      <div className="text-sm text-gray-400">{user.email}</div>
-                      <div className="text-xs text-gray-500">Code: {user.referral_code}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-white">
-                    {formatCurrency(user.balance || 0)}
-                  </TableCell>
-                  <TableCell>
-                    {getKYCStatusBadge(user.kyc_verified)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-1">
-                      <Users2 className="h-4 w-4 text-blue-500" />
-                      <span className="text-white">{user.referrals?.length || 0}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-gray-300">
-                    {formatDate(user.created_at)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setSelectedUser(user)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="bg-gray-800 border-gray-700 max-w-2xl">
-                          <DialogHeader>
-                            <DialogTitle className="text-white">User Details</DialogTitle>
-                            <DialogDescription className="text-gray-400">
-                              View detailed user information and transaction history
-                            </DialogDescription>
-                          </DialogHeader>
-                          {selectedUser && (
-                            <div className="space-y-6">
-                              {/* User Info */}
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <label className="text-sm font-medium text-gray-300">Name</label>
-                                  <p className="text-white">{selectedUser.full_name}</p>
-                                </div>
-                                <div>
-                                  <label className="text-sm font-medium text-gray-300">Email</label>
-                                  <p className="text-white">{selectedUser.email}</p>
-                                </div>
-                                <div>
-                                  <label className="text-sm font-medium text-gray-300">Balance</label>
-                                  <p className="text-white">{formatCurrency(selectedUser.balance || 0)}</p>
-                                </div>
-                                <div>
-                                  <label className="text-sm font-medium text-gray-300">Referral Code</label>
-                                  <p className="text-white">{selectedUser.referral_code}</p>
-                                </div>
-                              </div>
-
-                              {/* KYC Actions */}
-                              <div className="border-t border-gray-700 pt-4">
-                                <h4 className="text-sm font-medium text-gray-300 mb-3">KYC Verification</h4>
-                                <div className="flex items-center space-x-2">
-                                  {getKYCStatusBadge(selectedUser.kyc_verified)}
-                                  {selectedUser.kyc_verified === null && (
-                                    <>
-                                      <Button
-                                        size="sm"
-                                        onClick={() => handleKYCStatusChange(selectedUser.user_id, true)}
-                                        className="bg-green-600 hover:bg-green-700"
-                                      >
-                                        <UserCheck className="h-4 w-4 mr-1" />
-                                        Verify
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="destructive"
-                                        onClick={() => handleKYCStatusChange(selectedUser.user_id, false)}
-                                      >
-                                        <UserX className="h-4 w-4 mr-1" />
-                                        Reject
-                                      </Button>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Transaction Summary */}
-                              <div className="border-t border-gray-700 pt-4">
-                                <h4 className="text-sm font-medium text-gray-300 mb-3">Transaction Summary</h4>
-                                <div className="grid grid-cols-3 gap-4">
-                                  <div className="text-center">
-                                                    <div className="text-2xl font-bold text-blue-500">
-                  {formatCurrency(getTotalDeposits(selectedUser))}
-                </div>
-                                    <div className="text-xs text-gray-400">Total Deposits</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="text-2xl font-bold text-red-500">
-                                      {formatCurrency(getTotalWithdrawals(selectedUser))}
-                                    </div>
-                                    <div className="text-xs text-gray-400">Total Withdrawals</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="text-2xl font-bold text-blue-500">
-                                      {formatCurrency(getReferralEarnings(selectedUser))}
-                                    </div>
-                                    <div className="text-xs text-gray-400">Referral Earnings</div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-gray-700">
+                  <TableHead className="text-gray-300">User</TableHead>
+                  <TableHead className="text-gray-300">Balance</TableHead>
+                  <TableHead className="text-gray-300">Deposits</TableHead>
+                  <TableHead className="text-gray-300">Withdrawals</TableHead>
+                  <TableHead className="text-gray-300">Referrals</TableHead>
+                  <TableHead className="text-gray-300">Joined</TableHead>
+                  <TableHead className="text-gray-300">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.map((user) => (
+                  <TableRow key={user.id} className="border-gray-700 hover:bg-gray-700">
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-white">{user.full_name || 'N/A'}</span>
+                        <span className="text-sm text-gray-400">{user.email}</span>
+                        <span className="text-xs text-gray-500">ID: {user.user_id.slice(0, 8)}...</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="font-medium text-white">
+                        {formatCurrency(user.balance || 0)}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-green-400">
+                        {formatCurrency(getTotalDeposits(user))}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-red-400">
+                        {formatCurrency(getTotalWithdrawals(user))}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="text-white">{user.referrals?.length || 0}</span>
+                        <span className="text-xs text-gray-400">
+                          {formatCurrency(getReferralEarnings(user))}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-gray-400">
+                        {formatDate(user.created_at)}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setUserDetailsOpen(true);
+                        }}
+                        className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
+
+      {/* User Details Dialog */}
+      <Dialog open={userDetailsOpen} onOpenChange={setUserDetailsOpen}>
+        <DialogContent className="bg-gray-800 border-gray-700 max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-white">User Details</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Detailed information about {selectedUser?.full_name || selectedUser?.email}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedUser && (
+            <div className="space-y-6">
+              {/* Basic Info */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h4 className="text-sm font-medium text-gray-300 mb-2">Basic Information</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Name:</span>
+                      <span className="text-white">{selectedUser.full_name || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Email:</span>
+                      <span className="text-white">{selectedUser.email}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Referral Code:</span>
+                      <span className="text-white">{selectedUser.referral_code}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Balance:</span>
+                      <span className="text-white">{formatCurrency(selectedUser.balance || 0)}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-medium text-gray-300 mb-2">Activity Summary</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Total Deposits:</span>
+                      <span className="text-green-400">{formatCurrency(getTotalDeposits(selectedUser))}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Total Withdrawals:</span>
+                      <span className="text-red-400">{formatCurrency(getTotalWithdrawals(selectedUser))}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Referrals:</span>
+                      <span className="text-white">{selectedUser.referrals?.length || 0}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Referral Earnings:</span>
+                      <span className="text-blue-400">{formatCurrency(getReferralEarnings(selectedUser))}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Activity */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-300 mb-3">Recent Activity</h4>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {selectedUser.deposits?.slice(0, 5).map((deposit) => (
+                    <div key={deposit.id} className="flex justify-between text-sm p-2 bg-gray-700 rounded">
+                      <span className="text-green-400">+{formatCurrency(deposit.amount)}</span>
+                      <span className="text-gray-400">{formatDate(deposit.created_at)}</span>
+                    </div>
+                  ))}
+                  {selectedUser.withdrawals?.slice(0, 5).map((withdrawal) => (
+                    <div key={withdrawal.id} className="flex justify-between text-sm p-2 bg-gray-700 rounded">
+                      <span className="text-red-400">-{formatCurrency(withdrawal.amount)}</span>
+                      <span className="text-gray-400">{formatDate(withdrawal.created_at)}</span>
+                    </div>
+                  ))}
+                  {(!selectedUser.deposits || selectedUser.deposits.length === 0) && 
+                   (!selectedUser.withdrawals || selectedUser.withdrawals.length === 0) && (
+                    <div className="text-center text-gray-400 text-sm py-4">
+                      No recent activity
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

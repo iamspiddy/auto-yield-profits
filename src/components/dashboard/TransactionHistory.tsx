@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { History, ArrowUpRight, ArrowDownLeft, TrendingUp, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { History, ArrowUpRight, ArrowDownLeft, TrendingUp, Users, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -21,48 +22,73 @@ const TransactionHistory = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const { user } = useAuth();
+
+  const fetchTransactions = useCallback(async () => {
+    try {
+      let query = supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (filter !== 'all') {
+        query = query.eq('type', filter as 'deposit' | 'profit' | 'withdrawal' | 'referral_bonus');
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      setTransactions(data || []);
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user, filter]);
+
+  const refreshTransactions = useCallback(async () => {
+    setRefreshing(true);
+    await fetchTransactions();
+    setRefreshing(false);
+  }, [fetchTransactions]);
 
   useEffect(() => {
     if (!user) return;
 
-    const fetchTransactions = async () => {
-      try {
-        let query = supabase
-          .from('transactions')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
-
-        if (filter !== 'all') {
-          query = query.eq('type', filter as 'deposit' | 'profit' | 'withdrawal' | 'referral_bonus');
-        }
-
-        const { data, error } = await query;
-
-        if (error) throw error;
-
-        setTransactions(data || []);
-      } catch (error) {
-        console.error('Error fetching transactions:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchTransactions();
+    
+    // Set up real-time subscription for transaction changes
+    const channel = supabase
+      .channel('transaction-changes')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'transactions',
+          filter: `user_id=eq.${user.id}`
+        }, 
+        () => {
+          // Refresh data when transactions are updated
+          refreshTransactions();
+        }
+      )
+      .subscribe();
     
     // Listen for manual refresh events
     const handleRefresh = () => {
-      fetchTransactions();
+      refreshTransactions();
     };
 
     window.addEventListener('dashboard-refresh', handleRefresh);
 
     return () => {
+      supabase.removeChannel(channel);
       window.removeEventListener('dashboard-refresh', handleRefresh);
     };
-  }, [user, filter]);
+  }, [user, filter, fetchTransactions]);
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
@@ -129,18 +155,29 @@ const TransactionHistory = () => {
             <History className="h-5 w-5 mr-2" />
             Transaction History
           </CardTitle>
-          <Select value={filter} onValueChange={setFilter}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="deposit">Deposits</SelectItem>
-              <SelectItem value="profit">Profits</SelectItem>
-              <SelectItem value="withdrawal">Withdrawals</SelectItem>
-              <SelectItem value="referral_bonus">Referrals</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={refreshTransactions}
+              disabled={loading || refreshing}
+            >
+              <RefreshCw className={`h-4 w-4 mr-1 ${refreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+            <Select value={filter} onValueChange={setFilter}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="deposit">Deposits</SelectItem>
+                <SelectItem value="profit">Profits</SelectItem>
+                <SelectItem value="withdrawal">Withdrawals</SelectItem>
+                <SelectItem value="referral_bonus">Referrals</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
