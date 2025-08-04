@@ -21,7 +21,7 @@ const Deposit = () => {
   const [copied, setCopied] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const walletAddress = "TKzxdSv2FZKQrEqkKVgp5DcwEXBEKMg2Ax"; // Example USDT wallet
+  const walletAddress = "0xbad80c0d7d84adb576A052327F1bf3f07dD428e0"; // Example USDT wallet
 
   if (loading) {
     return (
