@@ -16,7 +16,7 @@ const DepositPanel = () => {
   const [copied, setCopied] = useState(false);
   const { user } = useAuth();
 
-  const walletAddress = "TKzxdSv2FZKQrEqkKVgp5DcwEXBEKMg2Ax"; // Example USDT wallet
+  const walletAddress = "0xbad80c0d7d84adb576A052327F1bf3f07dD428e0"; // Example USDT wallet
 
   const handleCopyAddress = async () => {
     try {
