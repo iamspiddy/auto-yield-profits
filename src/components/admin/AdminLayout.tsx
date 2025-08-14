@@ -49,55 +49,8 @@ const AdminLayout = () => {
   });
 
   useEffect(() => {
-    checkAdminAccess();
     fetchStats();
   }, []);
-
-  const checkAdminAccess = async () => {
-    if (!user) {
-      navigate('/admin/login');
-      return;
-    }
-
-    try {
-      const { data: hasRole, error } = await supabase
-        .rpc('has_role', {
-          _user_id: user.id,
-          _role: 'admin'
-        });
-
-      if (error) {
-        console.error('Error checking admin role:', error);
-        // If the function doesn't exist, allow access for development
-        if (error.message.includes('function') || error.message.includes('not found')) {
-          console.log('Admin function not found, allowing access for development');
-          return;
-        }
-        toast({
-          title: "Access Denied",
-          description: "Admin privileges required",
-          variant: "destructive"
-        });
-        await signOut();
-        navigate('/admin/login');
-        return;
-      }
-
-      if (!hasRole) {
-        toast({
-          title: "Access Denied",
-          description: "Admin privileges required",
-          variant: "destructive"
-        });
-        await signOut();
-        navigate('/admin/login');
-      }
-    } catch (error) {
-      console.error('Error checking admin access:', error);
-      // Allow access for development if there are connection issues
-      console.log('Allowing access for development due to connection issues');
-    }
-  };
 
   const fetchStats = async () => {
     try {

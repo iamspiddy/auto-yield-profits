@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import EarningsTable from '@/components/admin/EarningsTable';
 import {
   Users,
   CreditCard,
@@ -457,6 +458,9 @@ const AdminDashboard = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Earnings Table */}
+      <EarningsTable />
     </div>
   );
 };

@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 // Admin pages
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminLayout from "./components/admin/AdminLayout";
+import AdminRouteGuard from "./components/admin/AdminRouteGuard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminDeposits from "./pages/admin/AdminDeposits";
@@ -60,7 +61,14 @@ const App = () => {
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/setup" element={<AdminSetup />} />
-            <Route path="/admin" element={<AdminLayout />}>
+            <Route 
+              path="/admin" 
+              element={
+                <AdminRouteGuard>
+                  <AdminLayout />
+                </AdminRouteGuard>
+              }
+            >
               <Route index element={<AdminDashboard />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />

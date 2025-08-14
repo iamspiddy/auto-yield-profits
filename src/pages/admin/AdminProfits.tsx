@@ -204,6 +204,19 @@ const AdminProfits = () => {
           });
 
         if (transactionError) throw transactionError;
+
+        // UPDATE USER BALANCE - This was missing!
+        const { data: balanceData, error: balanceError } = await supabase
+          .rpc('increment_balance', {
+            user_id_param: userId,
+            amount_param: amount
+          });
+
+        if (balanceError) {
+          console.error('Balance update error:', balanceError);
+          throw balanceError;
+        }
+        console.log('Balance updated successfully. New balance:', balanceData);
       }
 
       toast({

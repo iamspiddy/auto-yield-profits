@@ -45,17 +45,7 @@ const AdminLogin = () => {
 
         if (roleError) {
           console.error('Error checking admin role:', roleError);
-          // If the function doesn't exist, allow access for development
-          if (roleError.message.includes('function') || roleError.message.includes('not found')) {
-            console.log('Admin function not found, allowing access for development');
-            toast({
-              title: "Login successful",
-              description: "Welcome to the admin panel (development mode)",
-            });
-            navigate('/admin/dashboard');
-            return;
-          }
-          setError('Access denied. Admin privileges required.');
+          setError('Access denied. Admin privileges required. Please contact system administrator.');
           await supabase.auth.signOut();
           return;
         }
