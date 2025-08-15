@@ -111,7 +111,7 @@ const Referrals = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Join AutoYield and earn crypto!',
+          title: 'Join Forexcomplex and earn crypto!',
           text: 'Use my referral link to get started:',
           url: referralLink
         });
@@ -161,9 +161,9 @@ const Referrals = () => {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold">Referral Program</h1>
-          <p className="text-muted-foreground">Earn rewards by inviting friends to AutoYield</p>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Referral Program</h1>
+          <p className="text-muted-foreground">Earn rewards by inviting friends to Forexcomplex</p>
         </div>
 
         {/* Stats Cards */}

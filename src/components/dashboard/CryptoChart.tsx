@@ -88,7 +88,7 @@ const CryptoChart: React.FC<CryptoChartProps> = ({ className }) => {
         watermark: {
           color: 'rgba(255, 255, 255, 0.1)',
           fontSize: 12,
-          text: 'AutoYield',
+          text: 'Forexcomplex',
           visible: true
         },
         loading_screen: {

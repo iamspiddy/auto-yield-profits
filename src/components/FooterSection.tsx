@@ -32,7 +32,7 @@ const FooterSection = () => {
         <div className="grid md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold text-foreground">AutoYield</h3>
+            <h3 className="text-2xl font-bold text-foreground">Forexcomplex</h3>
             <p className="text-muted-foreground text-sm">
               The trusted platform for passive crypto earnings. Managed by experts, designed for everyone.
             </p>
@@ -59,11 +59,11 @@ const FooterSection = () => {
 
           {/* Contact */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-foreground">Get in Touch</h4>
+            <h4 className="font-semibold text-foreground">Contact</h4>
             <div className="space-y-3">
               <a href="#" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm">
                 <Mail className="h-4 w-4" />
-                support@autoyield.com
+                support@forexcomplex.com
               </a>
               <a href="#" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm">
                 <MessageCircle className="h-4 w-4" />
@@ -75,7 +75,7 @@ const FooterSection = () => {
 
         <div className="border-t border-border mt-8 pt-8 text-center">
           <p className="text-muted-foreground text-sm">
-            © 2024 AutoYield. All rights reserved. | Not financial advice. Cryptocurrency investments carry risk.
+            © 2025 Forexcomplex. All rights reserved. | Not financial advice. Cryptocurrency investments carry risk.
           </p>
         </div>
       </div>

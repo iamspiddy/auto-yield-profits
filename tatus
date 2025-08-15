@@ -1,0 +1,3 @@
+[33m3be14e3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m 🎨 Complete platform rebranding: Auto Yield Profits → Forexcomplex with blue color scheme
+[33m1d59b04[m 🔒 Fix admin panel security: Remove unauthorized access fallbacks and implement strict role-based access control
+[33mf57c4b7[m wallet

@@ -53,7 +53,7 @@ Password: your-resend-api-key
 
 #### **Confirm Signup Template:**
 ```html
-<h2>Welcome to AutoYield!</h2>
+<h2>Welcome to Forexcomplex!</h2>
 <p>Please confirm your email address by clicking the link below:</p>
 <p><a href="{{ .ConfirmationURL }}" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;">Confirm Email Address</a></p>
 <p>If the button doesn't work, copy and paste this link into your browser:</p>

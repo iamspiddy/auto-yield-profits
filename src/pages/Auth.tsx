@@ -96,7 +96,7 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            {isLogin ? 'Welcome Back' : 'Join AutoYield'}
+            {isLogin ? 'Welcome Back' : 'Join Forexcomplex'}
           </CardTitle>
           <CardDescription className="text-lg font-medium text-muted-foreground">
             Earn Crypto While You Sleep

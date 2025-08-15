@@ -33,5 +33,5 @@ export function getBaseUrl(): string {
 // Alternative: Hardcode your production URL here for immediate fix
 export function getProductionUrl(): string {
   // Replace this with your actual Vercel domain
-  return 'https://autoyieldprofits.vercel.app';
+  return 'https://forexcomplex.vercel.app';
 }

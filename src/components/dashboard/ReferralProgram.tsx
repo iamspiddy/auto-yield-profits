@@ -99,8 +99,8 @@ const ReferralProgram = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Join AutoYield - Earn Crypto While You Sleep',
-          text: `Use my referral code ${referralData.referralCode} to start earning crypto with AutoYield!`,
+          title: 'Join Forexcomplex - Earn Crypto While You Sleep',
+          text: `Use my referral code ${referralData.referralCode} to start earning crypto with Forexcomplex!`,
           url: referralLink
         });
       } catch (error) {
