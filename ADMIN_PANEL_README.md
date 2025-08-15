@@ -1,6 +1,6 @@
-# Admin Panel - Crypto Earnings Platform
+# Admin Panel - Forexcomplex Crypto Trading Platform
 
-A comprehensive admin panel for managing a centralized crypto earnings platform. Built with React, TypeScript, Tailwind CSS, and Supabase.
+A comprehensive admin panel for managing the Forexcomplex crypto trading platform. Built with React, TypeScript, Tailwind CSS, and Supabase.
 
 ## 🚀 Features
 

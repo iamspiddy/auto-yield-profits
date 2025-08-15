@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Dark mode only - Green theme */
+    /* Dark mode only - Blue theme */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
@@ -18,21 +18,21 @@ All colors MUST be HSL.
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 142 76% 36%;
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 142 69% 58%;
+    --primary-glow: 217 91% 70%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
 
-    --success: 142 76% 36%;
+    --success: 217 91% 60%;
     --success-foreground: 0 0% 100%;
-    --success-glow: 142 69% 58%;
+    --success-glow: 217 91% 70%;
 
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 142 76% 36%;
+    --accent: 217 91% 60%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
@@ -40,19 +40,19 @@ All colors MUST be HSL.
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 142 76% 36%;
+    --ring: 217 91% 60%;
 
-    /* Custom gradients for crypto fintech - Green theme */
-    --gradient-primary: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 69% 58%));
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 69% 58%));
+    /* Custom gradients for crypto fintech - Blue theme */
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
+    --gradient-success: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
     --gradient-hero: linear-gradient(135deg, hsl(222.2 84% 4.9%), hsl(217.2 32.6% 17.5%));
     --gradient-card: linear-gradient(135deg, hsl(222.2 84% 4.9%), hsl(217.2 32.6% 17.5%));
     
-    /* Shadows - Green theme */
-    --shadow-primary: 0 10px 30px -10px hsl(142 76% 36% / 0.3);
-    --shadow-success: 0 10px 30px -10px hsl(142 76% 36% / 0.3);
+    /* Shadows - Blue theme */
+    --shadow-primary: 0 10px 30px -10px hsl(217 91% 60% / 0.3);
+    --shadow-success: 0 10px 30px -10px hsl(217 91% 60% / 0.3);
     --shadow-card: 0 4px 20px -4px hsl(210 40% 98% / 0.1);
-    --shadow-glow: 0 0 40px hsl(142 76% 36% / 0.2);
+    --shadow-glow: 0 0 40px hsl(217 91% 60% / 0.2);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -62,12 +62,12 @@ All colors MUST be HSL.
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 142 76% 36%;
+    --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 142 76% 36%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 

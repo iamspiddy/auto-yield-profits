@@ -46,7 +46,7 @@ const FeaturesSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
-            Why Choose AutoYield?
+            Why Choose Forexcomplex?
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             The easiest way to earn passive income from your crypto assets

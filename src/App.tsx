@@ -36,7 +36,7 @@ const queryClient = new QueryClient();
 
 const App = () => {
   useEffect(() => {
-    document.title = "Auto Yield Profits - Automated Crypto Trading Platform";
+    document.title = "Forexcomplex - Automated Crypto Trading Platform";
   }, []);
 
   return (

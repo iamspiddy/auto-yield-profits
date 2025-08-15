@@ -53,7 +53,7 @@ const Dashboard = () => {
             </Button>
             <Button 
               onClick={() => navigate('/deposit')}
-              className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 text-lg font-semibold"
+              className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 text-lg font-semibold"
               size="lg"
             >
               <DollarSign className="h-5 w-5" />
@@ -63,7 +63,7 @@ const Dashboard = () => {
             <Button 
               onClick={() => navigate('/withdraw')}
               variant="outline"
-              className="flex items-center gap-2 border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-6 py-3 text-lg font-semibold"
+              className="flex items-center gap-2 border-2 border-primary text-primary hover:bg-primary hover:text-white px-6 py-3 text-lg font-semibold"
               size="lg"
             >
               <ArrowDownLeft className="h-5 w-5" />

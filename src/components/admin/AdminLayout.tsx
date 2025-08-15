@@ -186,7 +186,7 @@ const AdminLayout = () => {
                   to={item.href}
                   className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                     isActive
-                      ? 'bg-green-600 text-white'
+                      ? 'bg-blue-600 text-white'
                       : 'text-gray-300 hover:bg-gray-700 hover:text-white'
                   }`}
                 >
@@ -205,7 +205,7 @@ const AdminLayout = () => {
           {/* Footer */}
           <div className="border-t border-gray-700 p-4">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="h-8 w-8 rounded-full bg-green-600 flex items-center justify-center">
+              <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
                 <span className="text-sm font-medium text-white">
                   {user?.email?.charAt(0).toUpperCase()}
                 </span>

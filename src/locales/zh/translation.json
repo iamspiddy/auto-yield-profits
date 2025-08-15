@@ -158,7 +158,7 @@
   "auth": {
     "login": {
       "title": "登录",
-      "subtitle": "欢迎回到Auto Yield Profits",
+      "subtitle": "欢迎回到Forexcomplex",
       "email": "邮箱",
       "password": "密码",
       "forgotPassword": "忘记密码？",
@@ -167,7 +167,7 @@
     },
     "register": {
       "title": "创建账户",
-      "subtitle": "立即加入Auto Yield Profits",
+      "subtitle": "立即加入Forexcomplex",
       "firstName": "名字",
       "lastName": "姓氏",
       "email": "邮箱",

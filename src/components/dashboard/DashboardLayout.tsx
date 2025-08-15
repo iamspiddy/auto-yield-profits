@@ -103,7 +103,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             </div>
             <div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                AutoYield
+                Forexcomplex
               </h1>
               <p className="text-sm text-muted-foreground">Earn Crypto While You Sleep</p>
             </div>

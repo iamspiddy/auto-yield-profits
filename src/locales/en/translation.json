@@ -161,7 +161,7 @@
   "auth": {
     "login": {
       "title": "Login",
-      "subtitle": "Welcome back to Auto Yield Profits",
+      "subtitle": "Welcome back to Forexcomplex",
       "email": "Email",
       "password": "Password",
       "forgotPassword": "Forgot Password?",
@@ -170,7 +170,7 @@
     },
     "register": {
       "title": "Create Account",
-      "subtitle": "Join Auto Yield Profits today",
+      "subtitle": "Join Forexcomplex today",
       "firstName": "First Name",
       "lastName": "Last Name",
       "email": "Email",

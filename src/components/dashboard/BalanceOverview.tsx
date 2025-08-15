@@ -155,14 +155,14 @@ const BalanceOverview = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 p-4 rounded-lg">
+          <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Earnings</p>
-                <p className="text-2xl font-bold text-green-600">${balanceData.totalEarnings.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-blue-600">${balanceData.totalEarnings.toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground">USDT</p>
               </div>
-              <TrendingUp className="h-8 w-8 text-green-600" />
+              <TrendingUp className="h-8 w-8 text-blue-600" />
             </div>
           </div>
 

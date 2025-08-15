@@ -158,7 +158,7 @@
   "auth": {
     "login": {
       "title": "로그인",
-      "subtitle": "Auto Yield Profits에 다시 오신 것을 환영합니다",
+      "subtitle": "Forexcomplex에 다시 오신 것을 환영합니다",
       "email": "이메일",
       "password": "비밀번호",
       "forgotPassword": "비밀번호를 잊으셨나요?",
@@ -167,7 +167,7 @@
     },
     "register": {
       "title": "계정 만들기",
-      "subtitle": "오늘 Auto Yield Profits에 가입하세요",
+      "subtitle": "오늘 Forexcomplex에 가입하세요",
       "firstName": "이름",
       "lastName": "성",
       "email": "이메일",

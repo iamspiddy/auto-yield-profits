@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# Forexcomplex - Automated Crypto Trading Platform
 
 ## Project info
 
