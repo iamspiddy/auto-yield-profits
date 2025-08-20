@@ -236,7 +236,7 @@ const AdminUsers = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">User Management</h1>
           <p className="text-gray-400 mt-2">Manage user accounts and platform activity</p>
@@ -250,7 +250,7 @@ const AdminUsers = () => {
       {/* Filters */}
       <Card className="bg-gray-800 border-gray-700">
         <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -264,7 +264,7 @@ const AdminUsers = () => {
             </div>
             <div className="flex gap-2">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-48 bg-gray-700 border-gray-600 text-white">
+                <SelectTrigger className="w-full sm:w-48 bg-gray-700 border-gray-600 text-white">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
@@ -299,11 +299,11 @@ const AdminUsers = () => {
                 <TableRow className="border-gray-700">
                   <TableHead className="text-gray-300">User</TableHead>
                   <TableHead className="text-gray-300">Balance</TableHead>
-                  <TableHead className="text-gray-300">Deposits</TableHead>
-                  <TableHead className="text-gray-300">Withdrawals</TableHead>
-                  <TableHead className="text-gray-300">Earnings</TableHead>
-                  <TableHead className="text-gray-300">Referrals</TableHead>
-                  <TableHead className="text-gray-300">Joined</TableHead>
+                  <TableHead className="text-gray-300 hidden sm:table-cell">Deposits</TableHead>
+                  <TableHead className="text-gray-300 hidden md:table-cell">Withdrawals</TableHead>
+                  <TableHead className="text-gray-300 hidden lg:table-cell">Earnings</TableHead>
+                  <TableHead className="text-gray-300 hidden lg:table-cell">Referrals</TableHead>
+                  <TableHead className="text-gray-300 hidden md:table-cell">Joined</TableHead>
                   <TableHead className="text-gray-300">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -322,22 +322,22 @@ const AdminUsers = () => {
                         {formatCurrency(user.balance || 0)}
                       </span>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <span className="text-green-400">
                         {formatCurrency(getTotalDeposits(user))}
                       </span>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden md:table-cell">
                       <span className="text-red-400">
                         {formatCurrency(getTotalWithdrawals(user))}
                       </span>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden lg:table-cell">
                       <span className="text-purple-400">
                         {formatCurrency(getTotalEarnings(user))}
                       </span>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden lg:table-cell">
                       <div className="flex flex-col">
                         <span className="text-white">{user.referrals?.length || 0}</span>
                         <span className="text-xs text-gray-400">
@@ -345,7 +345,7 @@ const AdminUsers = () => {
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden md:table-cell">
                       <span className="text-sm text-gray-400">
                         {formatDate(user.created_at)}
                       </span>

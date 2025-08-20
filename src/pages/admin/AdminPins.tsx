@@ -225,12 +225,12 @@ const AdminPins = () => {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Withdrawal PIN Management</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Withdrawal PIN Management</h1>
           <p className="text-gray-400">Generate 4-digit PINs for user withdrawals</p>
         </div>
-        <Badge variant="outline" className="text-sm">
+        <Badge variant="outline" className="text-sm w-full sm:w-auto text-center">
           {getActivePinsCount()} Active PINs
         </Badge>
       </div>

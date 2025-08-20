@@ -229,19 +229,19 @@ const AdminReferrals = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Referral Program</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Referral Program</h1>
           <p className="text-gray-400 mt-2">Monitor referral program performance and earnings</p>
         </div>
-        <Button onClick={exportReferrals} variant="outline">
+        <Button onClick={exportReferrals} variant="outline" className="w-full sm:w-auto">
           <Download className="h-4 w-4 mr-2" />
           Export CSV
         </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-300">Total Referrals</CardTitle>

@@ -277,9 +277,9 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Dashboard Overview</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Dashboard Overview</h1>
           <p className="text-gray-400 mt-2">Monitor platform activity and key metrics</p>
         </div>
         <Button 
@@ -287,13 +287,14 @@ const AdminDashboard = () => {
           variant="outline" 
           size="sm"
           disabled={loading}
+          className="w-full sm:w-auto"
         >
           {loading ? 'Refreshing...' : 'Refresh'}
         </Button>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-300">Total Users</CardTitle>
@@ -349,7 +350,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
             <CardTitle className="text-lg text-white">Quick Actions</CardTitle>
@@ -423,16 +424,17 @@ const AdminDashboard = () => {
           <CardDescription className="text-gray-400">Latest platform transactions</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow className="border-gray-700">
-                <TableHead className="text-gray-300">Action</TableHead>
-                <TableHead className="text-gray-300">User</TableHead>
-                <TableHead className="text-gray-300">Amount</TableHead>
-                <TableHead className="text-gray-300">Status</TableHead>
-                <TableHead className="text-gray-300">Date</TableHead>
-              </TableRow>
-            </TableHeader>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-gray-700">
+                  <TableHead className="text-gray-300">Action</TableHead>
+                  <TableHead className="text-gray-300">User</TableHead>
+                  <TableHead className="text-gray-300">Amount</TableHead>
+                  <TableHead className="text-gray-300 hidden sm:table-cell">Status</TableHead>
+                  <TableHead className="text-gray-300 hidden md:table-cell">Date</TableHead>
+                </TableRow>
+              </TableHeader>
             <TableBody>
               {recentActivity.map((activity) => (
                 <TableRow key={activity.id} className="border-gray-700">
@@ -446,16 +448,17 @@ const AdminDashboard = () => {
                   <TableCell className="text-white">
                     {activity.amount ? formatCurrency(activity.amount) : '-'}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden sm:table-cell">
                     {getStatusBadge(activity.status)}
                   </TableCell>
-                  <TableCell className="text-gray-300">
+                  <TableCell className="text-gray-300 hidden md:table-cell">
                     {formatDate(activity.timestamp)}
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
 

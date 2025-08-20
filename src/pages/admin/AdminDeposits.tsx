@@ -518,18 +518,19 @@ const AdminDeposits = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Deposit Management</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Deposit Management</h1>
           <p className="text-gray-400 mt-2">Review and approve pending deposits</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Badge variant="secondary">{getPendingDepositsCount()} pending</Badge>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-2">
+          <Badge variant="secondary" className="w-full sm:w-auto text-center">{getPendingDepositsCount()} pending</Badge>
           <Button 
             onClick={fetchDeposits} 
             variant="outline" 
             size="sm"
             disabled={loading}
+            className="w-full sm:w-auto"
           >
             {loading ? 'Refreshing...' : 'Refresh'}
           </Button>
@@ -575,17 +576,18 @@ const AdminDeposits = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow className="border-gray-700">
-                <TableHead className="text-gray-300">User</TableHead>
-                <TableHead className="text-gray-300">Amount</TableHead>
-                <TableHead className="text-gray-300">Status</TableHead>
-                <TableHead className="text-gray-300">Proof</TableHead>
-                <TableHead className="text-gray-300">Date</TableHead>
-                <TableHead className="text-gray-300">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-gray-700">
+                  <TableHead className="text-gray-300">User</TableHead>
+                  <TableHead className="text-gray-300">Amount</TableHead>
+                  <TableHead className="text-gray-300">Status</TableHead>
+                  <TableHead className="text-gray-300 hidden sm:table-cell">Proof</TableHead>
+                  <TableHead className="text-gray-300 hidden md:table-cell">Date</TableHead>
+                  <TableHead className="text-gray-300">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
             <TableBody>
               {filteredDeposits.map((deposit) => (
                 <TableRow key={deposit.id} className="border-gray-700">
@@ -604,7 +606,7 @@ const AdminDeposits = () => {
                   <TableCell>
                     {getStatusBadge(deposit.status)}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden sm:table-cell">
                     {deposit.proof_file_url ? (
                       <Button
                         variant="outline"
@@ -631,7 +633,7 @@ const AdminDeposits = () => {
                       <span className="text-gray-500 text-sm">No proof</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-gray-300">
+                  <TableCell className="text-gray-300 hidden md:table-cell">
                     {formatDate(deposit.created_at)}
                   </TableCell>
                   <TableCell>
@@ -738,6 +740,7 @@ const AdminDeposits = () => {
               ))}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
 
@@ -772,18 +775,19 @@ const AdminDeposits = () => {
                 className="mt-2 bg-gray-700 border-gray-600 text-white"
               />
             </div>
-            <div className="flex justify-end space-x-2">
+            <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-2">
               <Button
                 variant="outline"
                 onClick={() => setApprovalDialogOpen(false)}
                 disabled={processing}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
               <Button
                 onClick={() => selectedDeposit && handleApproveDeposit(selectedDeposit.id)}
                 disabled={processing}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
               >
                 {processing ? 'Processing...' : 'Approve Deposit'}
               </Button>

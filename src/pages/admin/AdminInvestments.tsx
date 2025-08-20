@@ -370,25 +370,25 @@ const AdminInvestments = () => {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Investment Management</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Investment Management</h1>
           <p className="text-gray-400 mt-2">Manage user investment amounts and track changes</p>
         </div>
-        <div className="flex space-x-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-2">
           <Button 
             onClick={() => {
               fetchUsers();
               fetchInvestmentUpdates();
             }}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
           >
             <Search className="h-4 w-4 mr-2" />
             Refresh Data
           </Button>
           <Button 
             onClick={syncUserBalances}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
           >
             <TrendingUp className="h-4 w-4 mr-2" />
             Sync Balances

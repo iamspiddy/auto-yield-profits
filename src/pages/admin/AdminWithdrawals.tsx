@@ -359,13 +359,13 @@ const AdminWithdrawals = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Withdrawal Management</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Withdrawal Management</h1>
           <p className="text-gray-400 mt-2">Process withdrawal requests and payments</p>
         </div>
         <div className="flex items-center space-x-2">
-          <Badge variant="secondary">{getPendingWithdrawalsCount()} pending</Badge>
+          <Badge variant="secondary" className="w-full sm:w-auto text-center">{getPendingWithdrawalsCount()} pending</Badge>
         </div>
       </div>
 
@@ -409,18 +409,19 @@ const AdminWithdrawals = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow className="border-gray-700">
-                <TableHead className="text-gray-300">User</TableHead>
-                <TableHead className="text-gray-300">Amount</TableHead>
-                <TableHead className="text-gray-300">Type</TableHead>
-                <TableHead className="text-gray-300">Destination</TableHead>
-                <TableHead className="text-gray-300">Status</TableHead>
-                <TableHead className="text-gray-300">Date</TableHead>
-                <TableHead className="text-gray-300">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-gray-700">
+                  <TableHead className="text-gray-300">User</TableHead>
+                  <TableHead className="text-gray-300">Amount</TableHead>
+                  <TableHead className="text-gray-300 hidden sm:table-cell">Type</TableHead>
+                  <TableHead className="text-gray-300 hidden md:table-cell">Destination</TableHead>
+                  <TableHead className="text-gray-300">Status</TableHead>
+                  <TableHead className="text-gray-300 hidden md:table-cell">Date</TableHead>
+                  <TableHead className="text-gray-300">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
             <TableBody>
               {filteredWithdrawals.map((withdrawal) => (
                 <TableRow key={withdrawal.id} className="border-gray-700">
