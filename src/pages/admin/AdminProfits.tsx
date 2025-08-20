@@ -295,12 +295,12 @@ const AdminProfits = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Profit Distribution</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Profit Distribution</h1>
           <p className="text-gray-400 mt-2">Distribute profits to verified users</p>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-2">
           <Button
             onClick={() => {
               fetchUsers();
@@ -309,12 +309,13 @@ const AdminProfits = () => {
             variant="outline"
             size="sm"
             disabled={loading}
+            className="w-full sm:w-auto"
           >
             {loading ? 'Refreshing...' : 'Refresh'}
           </Button>
           <Button
             onClick={() => setShowDistributionDialog(true)}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
           >
             <Plus className="h-4 w-4 mr-2" />
             Distribute Profits
@@ -323,7 +324,7 @@ const AdminProfits = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-300">Total Distributed</CardTitle>
@@ -413,15 +414,16 @@ const AdminProfits = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow className="border-gray-700">
-                <TableHead className="text-gray-300">User</TableHead>
-                <TableHead className="text-gray-300">Amount</TableHead>
-                <TableHead className="text-gray-300">Description</TableHead>
-                <TableHead className="text-gray-300">Date</TableHead>
-              </TableRow>
-            </TableHeader>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-gray-700">
+                  <TableHead className="text-gray-300">User</TableHead>
+                  <TableHead className="text-gray-300">Amount</TableHead>
+                  <TableHead className="text-gray-300 hidden sm:table-cell">Description</TableHead>
+                  <TableHead className="text-gray-300 hidden md:table-cell">Date</TableHead>
+                </TableRow>
+              </TableHeader>
             <TableBody>
               {distributions.map((distribution) => (
                 <TableRow key={distribution.id} className="border-gray-700">
@@ -437,22 +439,23 @@ const AdminProfits = () => {
                       {formatCurrency(distribution.amount)}
                     </div>
                   </TableCell>
-                  <TableCell className="text-gray-300">
+                  <TableCell className="text-gray-300 hidden sm:table-cell">
                     {distribution.description}
                   </TableCell>
-                  <TableCell className="text-gray-300">
+                  <TableCell className="text-gray-300 hidden md:table-cell">
                     {formatDate(distribution.created_at)}
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
 
       {/* Distribution Dialog */}
       <Dialog open={showDistributionDialog} onOpenChange={setShowDistributionDialog}>
-        <DialogContent className="bg-gray-800 border-gray-700">
+        <DialogContent className="bg-gray-800 border-gray-700 max-w-md mx-4">
           <DialogHeader>
             <DialogTitle className="text-white">Distribute Profits</DialogTitle>
             <DialogDescription className="text-gray-400">
@@ -511,18 +514,19 @@ const AdminProfits = () => {
               </div>
             </div>
 
-            <div className="flex justify-end space-x-2">
+            <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-2">
               <Button
                 variant="outline"
                 onClick={() => setShowDistributionDialog(false)}
                 disabled={processing}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleDistributeProfits}
                 disabled={processing || selectedUsers.length === 0 || !distributionAmount || !description}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
               >
                 {processing ? 'Processing...' : 'Distribute Profits'}
               </Button>
