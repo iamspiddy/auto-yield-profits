@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { fetchCryptoPrice, convertUSDToBTC, formatBTCAmount } from '@/lib/cryptoService';
 
 interface BalanceData {
-  walletBalance: number;
+  amountInvested: number;
   totalEarnings: number;
   pendingWithdrawals: number;
 }
@@ -19,7 +19,7 @@ interface CryptoPrices {
 
 const BalanceOverview = () => {
   const [balanceData, setBalanceData] = useState<BalanceData>({
-    walletBalance: 0,
+    amountInvested: 0,
     totalEarnings: 0,
     pendingWithdrawals: 0
   });
@@ -104,14 +104,14 @@ const BalanceOverview = () => {
         // Calculate wallet balance: deposited funds only (affected only by wallet withdrawals)
         const totalDeposits = deposits?.reduce((sum, deposit) => sum + Number(deposit.amount), 0) || 0;
         const totalCompletedWalletWithdrawals = completedWalletWithdrawals?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
-        const walletBalance = totalDeposits - totalCompletedWalletWithdrawals;
+        const amountInvested = totalDeposits - totalCompletedWalletWithdrawals;
         
         const totalEarnings = earnings?.reduce((sum, earning) => sum + Number(earning.amount), 0) || 0;
         const pendingWithdrawals = pendingWithdrawalsData?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
         const completedEarningsDeductions = completedEarningsWithdrawals?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
 
         setBalanceData({
-          walletBalance: walletBalance,  // Wallet balance should not be affected by pending withdrawals
+          amountInvested: amountInvested,  // Amount invested should not be affected by pending withdrawals
           totalEarnings: totalEarnings - pendingWithdrawals - completedEarningsDeductions,  // Subtract both pending and completed earnings withdrawals
           pendingWithdrawals
         });
@@ -155,7 +155,7 @@ const BalanceOverview = () => {
   }, [user]);
 
   // Calculate BTC equivalents
-  const walletBalanceBTC = cryptoPrices.BTC ? convertUSDToBTC(balanceData.walletBalance, cryptoPrices.BTC) : 0;
+  const amountInvestedBTC = cryptoPrices.BTC ? convertUSDToBTC(balanceData.amountInvested, cryptoPrices.BTC) : 0;
   const totalEarningsBTC = cryptoPrices.BTC ? convertUSDToBTC(balanceData.totalEarnings, cryptoPrices.BTC) : 0;
   const pendingWithdrawalsBTC = cryptoPrices.BTC ? convertUSDToBTC(balanceData.pendingWithdrawals, cryptoPrices.BTC) : 0;
 
@@ -198,12 +198,12 @@ const BalanceOverview = () => {
           <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Wallet Balance</p>
-                <p className="text-2xl font-bold">${balanceData.walletBalance.toFixed(2)}</p>
+                <p className="text-sm text-muted-foreground">Amount Invested</p>
+                <p className="text-2xl font-bold">${balanceData.amountInvested.toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground">USDT</p>
                 {cryptoPrices.BTC && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    ≈ {formatBTCAmount(walletBalanceBTC)} BTC
+                    ≈ {formatBTCAmount(amountInvestedBTC)} BTC
                   </p>
                 )}
               </div>

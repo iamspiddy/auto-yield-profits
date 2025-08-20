@@ -35,3 +35,13 @@ export function getProductionUrl(): string {
   // Replace this with your actual Vercel domain
   return 'https://forexcomplex.vercel.app';
 }
+
+// Format currency for display
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(amount);
+}

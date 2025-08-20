@@ -125,6 +125,12 @@ const AdminLayout = () => {
       badge: null
     },
     {
+      name: 'Investments',
+      href: '/admin/investments',
+      icon: Wallet,
+      badge: null
+    },
+    {
       name: 'PIN Management',
       href: '/admin/pins',
       icon: Key,

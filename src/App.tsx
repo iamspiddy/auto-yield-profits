@@ -26,6 +26,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminDeposits from "./pages/admin/AdminDeposits";
 import AdminWithdrawals from "./pages/admin/AdminWithdrawals";
 import AdminProfits from "./pages/admin/AdminProfits";
+import AdminInvestments from "./pages/admin/AdminInvestments";
 import AdminPins from "./pages/admin/AdminPins";
 
 import AdminReferrals from "./pages/admin/AdminReferrals";
@@ -78,6 +79,7 @@ const App = () => {
               <Route path="deposits" element={<AdminDeposits />} />
               <Route path="withdrawals" element={<AdminWithdrawals />} />
               <Route path="profits" element={<AdminProfits />} />
+              <Route path="investments" element={<AdminInvestments />} />
               <Route path="pins" element={<AdminPins />} />
 
               <Route path="referrals" element={<AdminReferrals />} />
