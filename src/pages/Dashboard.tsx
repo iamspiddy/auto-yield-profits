@@ -40,8 +40,8 @@ const Dashboard = () => {
     <RefreshContext.Provider value={{ refresh: handleRefresh }}>
       <DashboardLayout>
         <div className="space-y-6">
-          {/* Primary Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center sm:justify-end">
+          {/* Primary Action Buttons - Hidden on Mobile */}
+          <div className="hidden md:flex flex-col sm:flex-row gap-4 justify-center sm:justify-end">
             <Button 
               onClick={handleRefresh}
               variant="outline"
@@ -68,6 +68,19 @@ const Dashboard = () => {
             >
               <ArrowDownLeft className="h-5 w-5" />
               Withdraw Funds
+            </Button>
+          </div>
+
+          {/* Mobile Refresh Button - Positioned above balance overview */}
+          <div className="md:hidden flex justify-end">
+            <Button 
+              onClick={handleRefresh}
+              variant="outline"
+              className="flex items-center gap-2"
+              size="sm"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Refresh
             </Button>
           </div>
 

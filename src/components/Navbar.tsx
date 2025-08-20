@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -14,6 +14,16 @@ const Navbar = () => {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
       setIsMenuOpen(false);
+    }
+  };
+
+  const openChat = () => {
+    // Trigger JivoChat widget
+    if (window.jivo_open) {
+      window.jivo_open();
+    } else {
+      // Fallback: scroll to bottom where chat widget should be visible
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
   };
 
@@ -51,6 +61,15 @@ const Navbar = () => {
           {/* CTA Button - Desktop */}
           <div className="hidden md:flex items-center space-x-2">
             <LanguageSwitcher />
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={openChat}
+              className="flex items-center gap-2 text-blue-600 border-blue-600 hover:bg-blue-600 hover:text-white"
+            >
+              <MessageCircle className="h-4 w-4" />
+              {t("navigation.chat", "Chat")}
+            </Button>
             <Button variant="outline" size="sm" asChild>
               <Link to="/auth">{t("navigation.login", "Log In")}</Link>
             </Button>
@@ -92,6 +111,15 @@ const Navbar = () => {
                 <div className="px-3 py-2">
                   <LanguageSwitcher />
                 </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full flex items-center justify-center gap-2 text-blue-600 border-blue-600 hover:bg-blue-600 hover:text-white" 
+                  onClick={openChat}
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  {t("navigation.chat", "Chat")}
+                </Button>
                 <Button variant="outline" size="sm" className="w-full" asChild>
                   <Link to="/auth">{t("navigation.login", "Log In")}</Link>
                 </Button>

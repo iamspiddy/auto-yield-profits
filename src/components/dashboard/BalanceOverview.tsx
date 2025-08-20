@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Wallet, TrendingUp, Clock, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { Wallet, TrendingUp, Clock, ShieldCheck, ShieldAlert, Bitcoin } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { fetchCryptoPrice, convertUSDToBTC, formatBTCAmount } from '@/lib/cryptoService';
 
 interface BalanceData {
   walletBalance: number;
   totalEarnings: number;
   pendingWithdrawals: number;
+}
+
+interface CryptoPrices {
+  BTC: number | null;
+  ETH: number | null;
 }
 
 const BalanceOverview = () => {
@@ -17,8 +23,42 @@ const BalanceOverview = () => {
     totalEarnings: 0,
     pendingWithdrawals: 0
   });
+  const [cryptoPrices, setCryptoPrices] = useState<CryptoPrices>({
+    BTC: null,
+    ETH: null
+  });
   const [loading, setLoading] = useState(true);
+  const [cryptoLoading, setCryptoLoading] = useState(true);
   const { user } = useAuth();
+
+  // Fetch crypto prices
+  useEffect(() => {
+    const fetchPrices = async () => {
+      setCryptoLoading(true);
+      try {
+        const [btcPrice, ethPrice] = await Promise.all([
+          fetchCryptoPrice('bitcoin'),
+          fetchCryptoPrice('ethereum')
+        ]);
+        
+        setCryptoPrices({
+          BTC: btcPrice?.price || null,
+          ETH: ethPrice?.price || null
+        });
+      } catch (error) {
+        console.error('Error fetching crypto prices:', error);
+      } finally {
+        setCryptoLoading(false);
+      }
+    };
+
+    fetchPrices();
+    
+    // Refresh prices every 5 minutes
+    const interval = setInterval(fetchPrices, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -114,6 +154,11 @@ const BalanceOverview = () => {
     };
   }, [user]);
 
+  // Calculate BTC equivalents
+  const walletBalanceBTC = cryptoPrices.BTC ? convertUSDToBTC(balanceData.walletBalance, cryptoPrices.BTC) : 0;
+  const totalEarningsBTC = cryptoPrices.BTC ? convertUSDToBTC(balanceData.totalEarnings, cryptoPrices.BTC) : 0;
+  const pendingWithdrawalsBTC = cryptoPrices.BTC ? convertUSDToBTC(balanceData.pendingWithdrawals, cryptoPrices.BTC) : 0;
+
   if (loading) {
     return (
       <Card>
@@ -121,7 +166,8 @@ const BalanceOverview = () => {
           <div className="animate-pulse space-y-4">
             <div className="h-4 bg-muted rounded w-1/4"></div>
             <div className="h-8 bg-muted rounded w-1/2"></div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="h-16 bg-muted rounded"></div>
               <div className="h-16 bg-muted rounded"></div>
               <div className="h-16 bg-muted rounded"></div>
               <div className="h-16 bg-muted rounded"></div>
@@ -140,16 +186,26 @@ const BalanceOverview = () => {
             <Wallet className="h-5 w-5 mr-2" />
             Balance Overview
           </span>
+          {cryptoLoading && (
+            <Badge variant="secondary" className="text-xs">
+              Loading prices...
+            </Badge>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Wallet Balance</p>
                 <p className="text-2xl font-bold">${balanceData.walletBalance.toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground">USDT</p>
+                {cryptoPrices.BTC && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    ≈ {formatBTCAmount(walletBalanceBTC)} BTC
+                  </p>
+                )}
               </div>
               <Wallet className="h-8 w-8 text-primary" />
             </div>
@@ -161,8 +217,26 @@ const BalanceOverview = () => {
                 <p className="text-sm text-muted-foreground">Total Earnings</p>
                 <p className="text-2xl font-bold text-blue-600">${balanceData.totalEarnings.toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground">USDT</p>
+                {cryptoPrices.BTC && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    ≈ {formatBTCAmount(totalEarningsBTC)} BTC
+                  </p>
+                )}
               </div>
               <TrendingUp className="h-8 w-8 text-blue-600" />
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 p-4 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Earnings in BTC</p>
+                <p className="text-2xl font-bold text-amber-600">
+                  {cryptoPrices.BTC ? formatBTCAmount(totalEarningsBTC) : 'Loading...'}
+                </p>
+                <p className="text-xs text-muted-foreground">BTC</p>
+              </div>
+              <Bitcoin className="h-8 w-8 text-amber-600" />
             </div>
           </div>
 
@@ -172,6 +246,11 @@ const BalanceOverview = () => {
                 <p className="text-sm text-muted-foreground">Pending Withdrawals</p>
                 <p className="text-2xl font-bold text-orange-600">${balanceData.pendingWithdrawals.toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground">USDT</p>
+                {cryptoPrices.BTC && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    ≈ {formatBTCAmount(pendingWithdrawalsBTC)} BTC
+                  </p>
+                )}
               </div>
               <Clock className="h-8 w-8 text-orange-600" />
             </div>

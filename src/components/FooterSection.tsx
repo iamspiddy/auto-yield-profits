@@ -3,6 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Shield, Mail, MessageCircle } from "lucide-react";
 
 const FooterSection = () => {
+  const openChat = () => {
+    // Trigger JivoChat widget
+    if (window.jivo_open) {
+      window.jivo_open();
+    } else {
+      // Fallback: scroll to bottom where chat widget should be visible
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+  };
+
   return (
     <footer className="bg-background text-foreground">
       {/* Final CTA */}
@@ -23,6 +33,25 @@ const FooterSection = () => {
                 Learn More
               </Button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Chat Support Section */}
+      <div className="border-b border-border">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center space-y-4">
+            <h3 className="text-2xl font-bold text-foreground">Need Help?</h3>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              Our support team is here to help you 24/7. Get instant answers to your questions.
+            </p>
+            <Button 
+              onClick={openChat}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg flex items-center gap-2 mx-auto"
+            >
+              <MessageCircle className="h-5 w-5" />
+              Chat with Support
+            </Button>
           </div>
         </div>
       </div>

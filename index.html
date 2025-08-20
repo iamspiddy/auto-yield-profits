@@ -19,6 +19,42 @@
     
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- JivoChat Widget -->
+    <script src="//code.jivosite.com/widget/zt6C6vqYyN" async></script>
+    
+    <!-- Custom styles for JivoChat positioning -->
+    <style>
+      /* Ensure JivoChat widget is visible and properly positioned */
+      #jivo-iframe-container {
+        z-index: 9999 !important;
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+      }
+      
+      /* Make sure the chat button is always visible */
+      .jivo-widget {
+        z-index: 9999 !important;
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+      }
+      
+      /* Ensure chat widget appears above other elements */
+      .jivo-widget-container {
+        z-index: 9999 !important;
+      }
+      
+      /* Mobile responsiveness for chat widget */
+      @media (max-width: 768px) {
+        #jivo-iframe-container,
+        .jivo-widget {
+          bottom: 15px !important;
+          right: 15px !important;
+        }
+      }
+    </style>
   </head>
 
   <body>

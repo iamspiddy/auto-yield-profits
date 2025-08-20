@@ -32,6 +32,9 @@ import AdminReferrals from "./pages/admin/AdminReferrals";
 import AdminLogs from "./pages/admin/AdminLogs";
 import AdminSetup from "./pages/admin/AdminSetup";
 
+// Components
+import FloatingChatButton from "./components/FloatingChatButton";
+
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -84,6 +87,9 @@ const App = () => {
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          
+          {/* Floating Chat Button - Available on all pages */}
+          <FloatingChatButton />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
