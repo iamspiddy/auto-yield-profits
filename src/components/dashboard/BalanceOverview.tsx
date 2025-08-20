@@ -230,7 +230,7 @@ const BalanceOverview = () => {
           <div className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Earnings in BTC</p>
+                <p className="text-sm text-muted-foreground">BTC Equivalent</p>
                 <p className="text-2xl font-bold text-amber-600">
                   {cryptoPrices.BTC ? formatBTCAmount(totalEarningsBTC) : 'Loading...'}
                 </p>

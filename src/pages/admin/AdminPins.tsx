@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -58,7 +58,7 @@ const AdminPins = () => {
   useEffect(() => {
     fetchUsers();
     fetchPins();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchUsers = async () => {
     try {
@@ -217,37 +217,37 @@ const AdminPins = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+      <div className="flex flex-col gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Withdrawal PIN Management</h1>
-          <p className="text-gray-400">Generate 4-digit PINs for user withdrawals</p>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">Withdrawal PIN Management</h1>
+          <p className="text-gray-400 text-sm sm:text-base">Generate 4-digit PINs for user withdrawals</p>
         </div>
         <Badge variant="outline" className="text-sm w-full sm:w-auto text-center">
           {getActivePinsCount()} Active PINs
         </Badge>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Generate PIN Card */}
         <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-white">
-              <Key className="h-5 w-5" />
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-white text-base sm:text-lg">
+              <Key className="h-4 w-4 sm:h-5 sm:w-5" />
               Generate Withdrawal PIN
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-gray-400 text-sm">
               Create a 4-digit PIN for user withdrawals
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 p-4 sm:p-6 pt-0">
             <div className="space-y-2">
               <Label htmlFor="user">Select User</Label>
               <Select value={selectedUser} onValueChange={setSelectedUser}>

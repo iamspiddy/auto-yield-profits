@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -54,7 +54,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchDashboardData = async () => {
     try {
@@ -257,14 +257,14 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {[...Array(4)].map((_, i) => (
             <Card key={i} className="bg-gray-800 border-gray-700">
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="animate-pulse">
-                  <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
-                  <div className="h-8 bg-gray-700 rounded w-1/2"></div>
+                  <div className="h-3 sm:h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
+                  <div className="h-6 sm:h-8 bg-gray-700 rounded w-1/2"></div>
                 </div>
               </CardContent>
             </Card>
@@ -275,12 +275,12 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Dashboard Overview</h1>
-          <p className="text-gray-400 mt-2">Monitor platform activity and key metrics</p>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">Dashboard Overview</h1>
+          <p className="text-gray-400 mt-1 sm:mt-2 text-sm sm:text-base">Monitor platform activity and key metrics</p>
         </div>
         <Button 
           onClick={fetchDashboardData} 
@@ -294,14 +294,14 @@ const AdminDashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         <Card className="bg-gray-800 border-gray-700">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">Total Users</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-gray-300">Total Users</CardTitle>
             <Users className="h-4 w-4 text-blue-500" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats.totalUsers.toLocaleString()}</div>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-white">{stats.totalUsers.toLocaleString()}</div>
             <div className="flex items-center text-xs text-gray-400 mt-1">
               {stats.monthlyGrowth >= 0 ? (
                 <ArrowUpRight className="h-3 w-3 text-green-500 mr-1" />
@@ -314,34 +314,34 @@ const AdminDashboard = () => {
         </Card>
 
         <Card className="bg-gray-800 border-gray-700">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">Total Deposits</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-gray-300">Total Deposits</CardTitle>
             <CreditCard className="h-4 w-4 text-green-500" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{formatCurrency(stats.totalDeposits)}</div>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-white">{formatCurrency(stats.totalDeposits)}</div>
             <div className="text-xs text-gray-400 mt-1">All time deposits</div>
           </CardContent>
         </Card>
 
         <Card className="bg-gray-800 border-gray-700">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">Profit Distributed</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-gray-300">Profit Distributed</CardTitle>
             <TrendingUp className="h-4 w-4 text-purple-500" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{formatCurrency(stats.totalProfit)}</div>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-white">{formatCurrency(stats.totalProfit)}</div>
             <div className="text-xs text-gray-400 mt-1">Total earnings paid out</div>
           </CardContent>
         </Card>
 
         <Card className="bg-gray-800 border-gray-700">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">Pending Actions</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-gray-300">Pending Actions</CardTitle>
             <Activity className="h-4 w-4 text-yellow-500" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats.pendingWithdrawals}</div>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-white">{stats.pendingWithdrawals}</div>
             <div className="text-xs text-gray-400 mt-1">
               {stats.pendingWithdrawals} withdrawals
             </div>
@@ -350,22 +350,22 @@ const AdminDashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-lg text-white">Quick Actions</CardTitle>
-            <CardDescription className="text-gray-400">Common admin tasks</CardDescription>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-base sm:text-lg text-white">Quick Actions</CardTitle>
+            <CardDescription className="text-gray-400 text-sm">Common admin tasks</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <Button className="w-full justify-start" variant="outline">
+          <CardContent className="space-y-2 sm:space-y-3 p-4 sm:p-6 pt-0">
+            <Button className="w-full justify-start text-sm" variant="outline" size="sm">
               <Shield className="mr-2 h-4 w-4" />
               Review Users
             </Button>
-            <Button className="w-full justify-start" variant="outline">
+            <Button className="w-full justify-start text-sm" variant="outline" size="sm">
               <Wallet className="mr-2 h-4 w-4" />
               Process Withdrawals ({stats.pendingWithdrawals})
             </Button>
-            <Button className="w-full justify-start" variant="outline">
+            <Button className="w-full justify-start text-sm" variant="outline" size="sm">
               <CreditCard className="mr-2 h-4 w-4" />
               Approve Deposits
             </Button>
@@ -373,45 +373,45 @@ const AdminDashboard = () => {
         </Card>
 
         <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-lg text-white">Platform Stats</CardTitle>
-            <CardDescription className="text-gray-400">Key metrics</CardDescription>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-base sm:text-lg text-white">Platform Stats</CardTitle>
+            <CardDescription className="text-gray-400 text-sm">Key metrics</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-2 sm:space-y-3 p-4 sm:p-6 pt-0">
             <div className="flex justify-between items-center">
-              <span className="text-gray-300">Referral Program</span>
-              <Badge variant="secondary">{stats.totalReferrals}</Badge>
+              <span className="text-gray-300 text-sm">Referral Program</span>
+              <Badge variant="secondary" className="text-xs">{stats.totalReferrals}</Badge>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-300">Avg. Deposit</span>
-              <span className="text-white font-medium">
+              <span className="text-gray-300 text-sm">Avg. Deposit</span>
+              <span className="text-white font-medium text-sm">
                 {stats.totalUsers > 0 ? formatCurrency(stats.totalDeposits / stats.totalUsers) : '$0'}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-300">Success Rate</span>
-              <span className="text-green-500 font-medium">98.5%</span>
+              <span className="text-gray-300 text-sm">Success Rate</span>
+              <span className="text-green-500 font-medium text-sm">98.5%</span>
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-lg text-white">System Status</CardTitle>
-            <CardDescription className="text-gray-400">Platform health</CardDescription>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-base sm:text-lg text-white">System Status</CardTitle>
+            <CardDescription className="text-gray-400 text-sm">Platform health</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-2 sm:space-y-3 p-4 sm:p-6 pt-0">
             <div className="flex items-center justify-between">
-              <span className="text-gray-300">API Status</span>
-              <Badge variant="default" className="bg-green-600">Online</Badge>
+              <span className="text-gray-300 text-sm">API Status</span>
+              <Badge variant="default" className="bg-green-600 text-xs">Online</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300">Database</span>
-              <Badge variant="default" className="bg-green-600">Healthy</Badge>
+              <span className="text-gray-300 text-sm">Database</span>
+              <Badge variant="default" className="bg-green-600 text-xs">Healthy</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300">Payments</span>
-              <Badge variant="default" className="bg-green-600">Active</Badge>
+              <span className="text-gray-300 text-sm">Payments</span>
+              <Badge variant="default" className="bg-green-600 text-xs">Active</Badge>
             </div>
           </CardContent>
         </Card>
@@ -419,20 +419,55 @@ const AdminDashboard = () => {
 
       {/* Recent Activity */}
       <Card className="bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-lg text-white">Recent Activity</CardTitle>
-          <CardDescription className="text-gray-400">Latest platform transactions</CardDescription>
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-base sm:text-lg text-white">Recent Activity</CardTitle>
+          <CardDescription className="text-gray-400 text-sm">Latest platform transactions</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
+        <CardContent className="p-0 sm:p-6 sm:pt-0">
+          {/* Mobile Card Layout */}
+          <div className="block sm:hidden">
+            {recentActivity.length === 0 ? (
+              <div className="text-center text-gray-400 py-8 px-4">
+                No recent activity
+              </div>
+            ) : (
+              <div className="space-y-3 p-4">
+                {recentActivity.map((activity) => (
+                  <div key={activity.id} className="bg-gray-700 rounded-lg p-3 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center flex-1 min-w-0">
+                        {getStatusIcon(activity.status)}
+                        <span className="ml-2 text-white font-medium">{activity.action}</span>
+                      </div>
+                      <div className="ml-2 flex-shrink-0">
+                        {getStatusBadge(activity.status)}
+                      </div>
+                    </div>
+                    <div className="text-sm text-gray-300 truncate">{activity.user_email}</div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-white font-medium">
+                        {activity.amount ? formatCurrency(activity.amount) : '-'}
+                      </span>
+                      <span className="text-gray-400 text-xs">
+                        {formatDate(activity.timestamp)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Table Layout */}
+          <div className="hidden sm:block overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="border-gray-700">
                   <TableHead className="text-gray-300">Action</TableHead>
                   <TableHead className="text-gray-300">User</TableHead>
                   <TableHead className="text-gray-300">Amount</TableHead>
-                  <TableHead className="text-gray-300 hidden sm:table-cell">Status</TableHead>
-                  <TableHead className="text-gray-300 hidden md:table-cell">Date</TableHead>
+                  <TableHead className="text-gray-300 hidden md:table-cell">Status</TableHead>
+                  <TableHead className="text-gray-300 hidden lg:table-cell">Date</TableHead>
                 </TableRow>
               </TableHeader>
             <TableBody>
@@ -448,10 +483,10 @@ const AdminDashboard = () => {
                   <TableCell className="text-white">
                     {activity.amount ? formatCurrency(activity.amount) : '-'}
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell">
+                  <TableCell className="hidden md:table-cell">
                     {getStatusBadge(activity.status)}
                   </TableCell>
-                  <TableCell className="text-gray-300 hidden md:table-cell">
+                  <TableCell className="text-gray-300 hidden lg:table-cell">
                     {formatDate(activity.timestamp)}
                   </TableCell>
                 </TableRow>

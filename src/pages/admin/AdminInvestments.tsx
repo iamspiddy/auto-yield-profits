@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -67,7 +67,7 @@ const AdminInvestments = () => {
       fetchUsers();
       fetchInvestmentUpdates();
     }
-  }, [user]);
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchUsers = async () => {
     try {
@@ -85,7 +85,7 @@ const AdminInvestments = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      
+
       console.log('Users data received:', data);
       setUsers(data || []);
     } catch (error) {
@@ -116,7 +116,7 @@ const AdminInvestments = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      
+
       // Fetch user details for each investment update
       if (data) {
         const updatesWithUsers = await Promise.all(
@@ -126,14 +126,14 @@ const AdminInvestments = () => {
               .select('email, full_name')
               .eq('user_id', update.user_id)
               .single();
-            
+
             return {
               ...update,
               user: userData || { email: 'Unknown', full_name: 'Unknown User' }
             };
           })
         );
-        
+
         setInvestmentUpdates(updatesWithUsers);
       }
     } catch (error) {
@@ -168,7 +168,7 @@ const AdminInvestments = () => {
 
       // Update user's invested amount
       console.log('Updating balance for user:', selectedUser.user_id, 'Amount:', finalAmount);
-      
+
       const { data: balanceData, error: balanceError } = await supabase
         .rpc('increment_balance', {
           user_id_param: selectedUser.user_id,
@@ -250,7 +250,7 @@ const AdminInvestments = () => {
       setSelectedUser(null);
       setUpdateAmount('');
       setUpdateDescription('');
-      
+
       // Force refresh data with a small delay to ensure database updates are committed
       setTimeout(() => {
         fetchUsers();
@@ -313,7 +313,7 @@ const AdminInvestments = () => {
           // If there's a difference, create a deposit record
           if (balanceDiff > 0) {
             console.log(`User ${userData.user_id} has balance ${userData.balance} but deposits ${totalDeposits}. Creating deposit for ${balanceDiff}`);
-            
+
             const { error: depositError } = await supabase
               .from('deposits')
               .insert({
@@ -358,37 +358,39 @@ const AdminInvestments = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="space-y-4 p-4 sm:p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-muted rounded w-1/4"></div>
-          <div className="h-10 bg-muted rounded w-full"></div>
-          <div className="h-64 bg-muted rounded"></div>
+          <div className="h-6 sm:h-8 bg-gray-700 rounded w-1/2 sm:w-1/4"></div>
+          <div className="h-8 sm:h-10 bg-gray-700 rounded w-full"></div>
+          <div className="h-48 sm:h-64 bg-gray-700 rounded"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+      <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Investment Management</h1>
-          <p className="text-gray-400 mt-2">Manage user investment amounts and track changes</p>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">Investment Management</h1>
+          <p className="text-gray-400 mt-1 sm:mt-2 text-sm sm:text-base">Manage user investment amounts and track changes</p>
         </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-2">
-          <Button 
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button
             onClick={() => {
               fetchUsers();
               fetchInvestmentUpdates();
             }}
-            className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+            className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto text-sm"
+            size="sm"
           >
             <Search className="h-4 w-4 mr-2" />
             Refresh Data
           </Button>
-          <Button 
+          <Button
             onClick={syncUserBalances}
-            className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
+            className="bg-green-600 hover:bg-green-700 w-full sm:w-auto text-sm"
+            size="sm"
           >
             <TrendingUp className="h-4 w-4 mr-2" />
             Sync Balances
@@ -398,36 +400,71 @@ const AdminInvestments = () => {
 
       {/* Search and Filters */}
       <Card className="bg-gray-800 border-gray-700">
-        <CardContent className="p-6">
-          <div className="flex items-center space-x-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search users by email or name..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-gray-700 border-gray-600 text-white"
-                />
-              </div>
-            </div>
+        <CardContent className="p-4 sm:p-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Search users by email or name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 bg-gray-700 border-gray-600 text-white text-sm sm:text-base"
+            />
           </div>
         </CardContent>
       </Card>
 
       {/* Users Table */}
       <Card className="bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-white">Users & Investments</CardTitle>
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-white text-lg sm:text-xl">Users & Investments</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
+        <CardContent className="p-0 sm:p-6 sm:pt-0">
+          {/* Mobile Card Layout */}
+          <div className="block sm:hidden">
+            {filteredUsers.length === 0 ? (
+              <div className="text-center text-gray-400 py-8 px-4">
+                No users found
+              </div>
+            ) : (
+              <div className="space-y-3 p-4">
+                {filteredUsers.map((user) => (
+                  <div key={user.id} className="bg-gray-700 rounded-lg p-4 space-y-3">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-white truncate">{user.full_name}</div>
+                        <div className="text-sm text-gray-400 truncate">{user.email}</div>
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={() => openUpdateDialog(user)}
+                        className="bg-blue-600 hover:bg-blue-700 ml-2 flex-shrink-0"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <div className="flex items-center text-white">
+                        <DollarSign className="h-4 w-4 text-green-500 mr-1" />
+                        {formatCurrency(user.balance || 0)}
+                      </div>
+                      <div className="text-gray-300">
+                        {new Date(user.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Table Layout */}
+          <div className="hidden sm:block overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="border-gray-700">
                   <TableHead className="text-gray-300">User</TableHead>
                   <TableHead className="text-gray-300">Balance</TableHead>
-                  <TableHead className="text-gray-300">Joined</TableHead>
+                  <TableHead className="text-gray-300 hidden md:table-cell">Joined</TableHead>
                   <TableHead className="text-gray-300">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -453,7 +490,7 @@ const AdminInvestments = () => {
                           {formatCurrency(user.balance || 0)}
                         </div>
                       </TableCell>
-                      <TableCell className="text-gray-300">
+                      <TableCell className="text-gray-300 hidden md:table-cell">
                         {new Date(user.created_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
@@ -477,19 +514,70 @@ const AdminInvestments = () => {
 
       {/* Investment Updates History */}
       <Card className="bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-white">Investment Update History</CardTitle>
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-white text-lg sm:text-xl">Investment Update History</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
+        <CardContent className="p-0 sm:p-6 sm:pt-0">
+          {/* Mobile Card Layout */}
+          <div className="block sm:hidden">
+            {investmentUpdates.length === 0 ? (
+              <div className="text-center text-gray-400 py-8 px-4">
+                No investment updates yet
+              </div>
+            ) : (
+              <div className="space-y-3 p-4">
+                {investmentUpdates.map((update) => (
+                  <div key={update.id} className="bg-gray-700 rounded-lg p-4 space-y-3">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-white truncate">{update.user?.full_name}</div>
+                        <div className="text-sm text-gray-400 truncate">{update.user?.email}</div>
+                      </div>
+                      <Badge
+                        variant={update.type === 'increase' ? 'default' : 'destructive'}
+                        className={`${update.type === 'increase' ? 'bg-green-600' : 'bg-red-600'} ml-2 flex-shrink-0`}
+                      >
+                        {update.type === 'increase' ? (
+                          <>
+                            <Plus className="h-3 w-3 mr-1" />
+                            Increase
+                          </>
+                        ) : (
+                          <>
+                            <Minus className="h-3 w-3 mr-1" />
+                            Decrease
+                          </>
+                        )}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <div className="flex items-center text-white">
+                        <DollarSign className="h-4 w-4 text-green-500 mr-1" />
+                        {formatCurrency(update.amount)}
+                      </div>
+                      <div className="text-gray-300">
+                        {new Date(update.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="text-sm text-gray-300 bg-gray-600 rounded p-2">
+                      {update.description}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Table Layout */}
+          <div className="hidden sm:block overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="border-gray-700">
                   <TableHead className="text-gray-300">User</TableHead>
                   <TableHead className="text-gray-300">Type</TableHead>
                   <TableHead className="text-gray-300">Amount</TableHead>
-                  <TableHead className="text-gray-300">Description</TableHead>
-                  <TableHead className="text-gray-300">Date</TableHead>
+                  <TableHead className="text-gray-300 hidden lg:table-cell">Description</TableHead>
+                  <TableHead className="text-gray-300 hidden md:table-cell">Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -509,7 +597,7 @@ const AdminInvestments = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge 
+                        <Badge
                           variant={update.type === 'increase' ? 'default' : 'destructive'}
                           className={update.type === 'increase' ? 'bg-green-600' : 'bg-red-600'}
                         >
@@ -532,10 +620,10 @@ const AdminInvestments = () => {
                           {formatCurrency(update.amount)}
                         </div>
                       </TableCell>
-                      <TableCell className="text-gray-300 max-w-xs truncate">
+                      <TableCell className="text-gray-300 max-w-xs truncate hidden lg:table-cell">
                         {update.description}
                       </TableCell>
-                      <TableCell className="text-gray-300">
+                      <TableCell className="text-gray-300 hidden md:table-cell">
                         {new Date(update.created_at).toLocaleDateString()}
                       </TableCell>
                     </TableRow>
@@ -549,11 +637,11 @@ const AdminInvestments = () => {
 
       {/* Update Investment Dialog */}
       <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
-        <DialogContent className="bg-gray-800 border-gray-700 max-w-md">
+        <DialogContent className="bg-gray-800 border-gray-700 max-w-md mx-4 sm:mx-auto">
           <DialogHeader>
-            <DialogTitle className="text-white">Update Investment Amount</DialogTitle>
+            <DialogTitle className="text-white text-lg sm:text-xl">Update Investment Amount</DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div>
               <Label className="text-gray-300">User</Label>
@@ -605,23 +693,24 @@ const AdminInvestments = () => {
               />
             </div>
 
-            <div className="flex justify-end space-x-2 pt-4">
+            <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-2 pt-4">
               <Button
                 variant="outline"
                 onClick={() => setShowUpdateDialog(false)}
                 disabled={processing}
-                className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                className="border-gray-600 text-gray-300 hover:bg-gray-700 w-full sm:w-auto"
+                size="sm"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleUpdateInvestment}
                 disabled={processing || !updateAmount || !updateDescription}
-                className={`${
-                  updateType === 'increase' 
-                    ? 'bg-green-600 hover:bg-green-700' 
-                    : 'bg-red-600 hover:bg-red-700'
-                }`}
+                className={`${updateType === 'increase'
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-red-600 hover:bg-red-700'
+                  } w-full sm:w-auto`}
+                size="sm"
               >
                 {processing ? 'Processing...' : `${updateType === 'increase' ? 'Increase' : 'Decrease'} Investment`}
               </Button>

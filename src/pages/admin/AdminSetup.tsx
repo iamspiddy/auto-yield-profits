@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,8 +27,8 @@ const AdminSetup = () => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [setupStatus, setSetupStatus] = useState<any>(null);
-  const [adminUsers, setAdminUsers] = useState<any[]>([]);
+  const [setupStatus, setSetupStatus] = useState<{ success: boolean; error?: string; details?: string } | null>(null);
+  const [adminUsers, setAdminUsers] = useState<Array<{ id: string; email: string; full_name: string; created_at: string }>>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -134,22 +134,22 @@ const AdminSetup = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl space-y-6">
+      <div className="w-full max-w-4xl space-y-4 sm:space-y-6">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-white mb-2">Admin Setup</h1>
-          <p className="text-gray-400">Configure admin access for your platform</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Admin Setup</h1>
+          <p className="text-gray-400 text-sm sm:text-base">Configure admin access for your platform</p>
         </div>
 
         {/* Setup Status */}
         <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <Settings className="h-5 w-5 mr-2" />
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-white flex items-center text-base sm:text-lg">
+              <Settings className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               System Status
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6 pt-0">
             {setupStatus ? (
               setupStatus.success ? (
                 <Alert className="border-green-600 bg-green-900/20">
@@ -179,22 +179,23 @@ const AdminSetup = () => {
 
         {/* Admin Users List */}
         <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center justify-between">
-              <div className="flex items-center">
-                <Users className="h-5 w-5 mr-2" />
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+              <div className="flex items-center text-base sm:text-lg">
+                <Users className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 Admin Users ({adminUsers.length})
               </div>
               <Button
                 onClick={() => setShowCreateForm(!showCreateForm)}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+                size="sm"
               >
                 <UserPlus className="h-4 w-4 mr-2" />
                 Add Admin
               </Button>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6 pt-0">
             {adminUsers.length === 0 ? (
               <div className="text-center py-8">
                 <Shield className="h-12 w-12 text-gray-500 mx-auto mb-4" />

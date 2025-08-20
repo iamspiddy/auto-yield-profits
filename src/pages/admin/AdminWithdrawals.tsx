@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -32,7 +32,7 @@ interface Withdrawal {
   currency: string;
   status: string;
   wallet_address: string;
-  bank_info: any;
+  bank_info: Record<string, unknown> | null;
   notes: string | null;
   withdrawal_type: string;
   created_at: string;
@@ -62,11 +62,11 @@ const AdminWithdrawals = () => {
 
   useEffect(() => {
     fetchWithdrawals();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     filterWithdrawals();
-  }, [withdrawals, searchTerm, statusFilter]);
+  }, [withdrawals, searchTerm, statusFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchWithdrawals = async () => {
     try {
@@ -135,7 +135,7 @@ const AdminWithdrawals = () => {
       setProcessing(true);
 
       console.log('Updating withdrawal:', withdrawalId, 'to completed status');
-      
+
       const { data: updateData, error } = await supabase
         .from('withdrawals')
         .update({
@@ -152,7 +152,7 @@ const AdminWithdrawals = () => {
         console.error('Update error:', error);
         throw error;
       }
-      
+
       console.log('Update result:', updateData);
 
       // Get withdrawal details for balance update
@@ -177,7 +177,7 @@ const AdminWithdrawals = () => {
       } else if (withdrawal.withdrawal_type === 'earnings') {
         // For earnings withdrawals, we need to track the deduction
         console.log('Processing earnings withdrawal - creating deduction record...');
-        
+
         // Create a withdrawal deduction record
         const { error: deductionError } = await supabase
           .from('withdrawal_deductions')
@@ -191,7 +191,7 @@ const AdminWithdrawals = () => {
           console.error('Deduction record error:', deductionError);
           throw deductionError;
         }
-        
+
         console.log('Withdrawal deduction record created successfully');
       }
 
@@ -422,154 +422,155 @@ const AdminWithdrawals = () => {
                   <TableHead className="text-gray-300">Actions</TableHead>
                 </TableRow>
               </TableHeader>
-            <TableBody>
-              {filteredWithdrawals.map((withdrawal) => (
-                <TableRow key={withdrawal.id} className="border-gray-700">
-                  <TableCell>
-                    <div>
-                      <div className="font-medium text-white">{withdrawal.user?.full_name}</div>
-                      <div className="text-sm text-gray-400">{withdrawal.user?.email}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-white">
-                    <div className="flex items-center">
-                      <DollarSign className="h-4 w-4 text-red-500 mr-1" />
-                      {formatCurrency(withdrawal.amount)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={withdrawal.withdrawal_type === 'wallet' ? 'default' : 'secondary'}>
-                      {withdrawal.withdrawal_type === 'wallet' ? 'Wallet' : 'Earnings'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="max-w-xs">
-                      <div className="flex items-center space-x-1">
-                        <span className="text-gray-300 text-sm truncate">
-                          {withdrawal.wallet_address}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyToClipboard(withdrawal.wallet_address)}
-                        >
-                          <Copy className="h-3 w-3" />
-                        </Button>
+              <TableBody>
+                {filteredWithdrawals.map((withdrawal) => (
+                  <TableRow key={withdrawal.id} className="border-gray-700">
+                    <TableCell>
+                      <div>
+                        <div className="font-medium text-white">{withdrawal.user?.full_name}</div>
+                        <div className="text-sm text-gray-400">{withdrawal.user?.email}</div>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(withdrawal.status)}
-                  </TableCell>
-                  <TableCell className="text-gray-300">
-                    {formatDate(withdrawal.created_at)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      {withdrawal.status === 'pending' && (
-                        <>
+                    </TableCell>
+                    <TableCell className="text-white">
+                      <div className="flex items-center">
+                        <DollarSign className="h-4 w-4 text-red-500 mr-1" />
+                        {formatCurrency(withdrawal.amount)}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={withdrawal.withdrawal_type === 'wallet' ? 'default' : 'secondary'}>
+                        {withdrawal.withdrawal_type === 'wallet' ? 'Wallet' : 'Earnings'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="max-w-xs">
+                        <div className="flex items-center space-x-1">
+                          <span className="text-gray-300 text-sm truncate">
+                            {withdrawal.wallet_address}
+                          </span>
                           <Button
+                            variant="ghost"
                             size="sm"
-                            onClick={() => {
-                              setSelectedWithdrawal(withdrawal);
-                              setPaymentDialogOpen(true);
-                            }}
-                            className="bg-green-600 hover:bg-green-700"
+                            onClick={() => copyToClipboard(withdrawal.wallet_address)}
                           >
-                            <CheckCircle className="h-4 w-4 mr-1" />
-                            Mark Paid
+                            <Copy className="h-3 w-3" />
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => {
-                              setSelectedWithdrawal(withdrawal);
-                              setRejectionDialogOpen(true);
-                            }}
-                          >
-                            <XCircle className="h-4 w-4 mr-1" />
-                            Reject
-                          </Button>
-                        </>
-                      )}
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="bg-gray-800 border-gray-700">
-                          <DialogHeader>
-                            <DialogTitle className="text-white">Withdrawal Details</DialogTitle>
-                            <DialogDescription className="text-gray-400">
-                              View detailed withdrawal information
-                            </DialogDescription>
-                          </DialogHeader>
-                          {withdrawal && (
-                            <div className="space-y-4">
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <label className="text-sm font-medium text-gray-300">User</label>
-                                  <p className="text-white">{withdrawal.user?.full_name}</p>
-                                  <p className="text-gray-400 text-sm">{withdrawal.user?.email}</p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {getStatusBadge(withdrawal.status)}
+                    </TableCell>
+                    <TableCell className="text-gray-300">
+                      {formatDate(withdrawal.created_at)}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        {withdrawal.status === 'pending' && (
+                          <>
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                setSelectedWithdrawal(withdrawal);
+                                setPaymentDialogOpen(true);
+                              }}
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              <CheckCircle className="h-4 w-4 mr-1" />
+                              Mark Paid
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => {
+                                setSelectedWithdrawal(withdrawal);
+                                setRejectionDialogOpen(true);
+                              }}
+                            >
+                              <XCircle className="h-4 w-4 mr-1" />
+                              Reject
+                            </Button>
+                          </>
+                        )}
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="bg-gray-800 border-gray-700">
+                            <DialogHeader>
+                              <DialogTitle className="text-white">Withdrawal Details</DialogTitle>
+                              <DialogDescription className="text-gray-400">
+                                View detailed withdrawal information
+                              </DialogDescription>
+                            </DialogHeader>
+                            {withdrawal && (
+                              <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div>
+                                    <label className="text-sm font-medium text-gray-300">User</label>
+                                    <p className="text-white">{withdrawal.user?.full_name}</p>
+                                    <p className="text-gray-400 text-sm">{withdrawal.user?.email}</p>
+                                  </div>
+                                  <div>
+                                    <label className="text-sm font-medium text-gray-300">Amount</label>
+                                    <p className="text-white">{formatCurrency(withdrawal.amount)}</p>
+                                  </div>
+                                  <div>
+                                    <label className="text-sm font-medium text-gray-300">Status</label>
+                                    <div className="mt-1">{getStatusBadge(withdrawal.status)}</div>
+                                  </div>
+                                  <div>
+                                    <label className="text-sm font-medium text-gray-300">Date</label>
+                                    <p className="text-white">{formatDate(withdrawal.created_at)}</p>
+                                  </div>
                                 </div>
                                 <div>
-                                  <label className="text-sm font-medium text-gray-300">Amount</label>
-                                  <p className="text-white">{formatCurrency(withdrawal.amount)}</p>
-                                </div>
-                                <div>
-                                  <label className="text-sm font-medium text-gray-300">Status</label>
-                                  <div className="mt-1">{getStatusBadge(withdrawal.status)}</div>
-                                </div>
-                                <div>
-                                  <label className="text-sm font-medium text-gray-300">Date</label>
-                                  <p className="text-white">{formatDate(withdrawal.created_at)}</p>
-                                </div>
-                              </div>
-                              <div>
-                                <label className="text-sm font-medium text-gray-300">Destination Address</label>
-                                <div className="flex items-center space-x-2 mt-1">
-                                  <p className="text-white font-mono text-sm">{withdrawal.wallet_address}</p>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => copyToClipboard(withdrawal.wallet_address)}
-                                  >
-                                    <Copy className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              </div>
-                              {withdrawal.notes && (
-                                <div>
-                                  <label className="text-sm font-medium text-gray-300">Notes</label>
-                                  <p className="text-white mt-1">{withdrawal.notes}</p>
-                                </div>
-                              )}
-                              {withdrawal.transaction_hash && (
-                                <div>
-                                  <label className="text-sm font-medium text-gray-300">Transaction Hash</label>
+                                  <label className="text-sm font-medium text-gray-300">Destination Address</label>
                                   <div className="flex items-center space-x-2 mt-1">
-                                    <p className="text-white font-mono text-sm">{withdrawal.transaction_hash}</p>
+                                    <p className="text-white font-mono text-sm">{withdrawal.wallet_address}</p>
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      onClick={() => copyToClipboard(withdrawal.transaction_hash!)}
+                                      onClick={() => copyToClipboard(withdrawal.wallet_address)}
                                     >
                                       <Copy className="h-4 w-4" />
                                     </Button>
                                   </div>
                                 </div>
-                              )}
-                            </div>
-                          )}
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                                {withdrawal.notes && (
+                                  <div>
+                                    <label className="text-sm font-medium text-gray-300">Notes</label>
+                                    <p className="text-white mt-1">{withdrawal.notes}</p>
+                                  </div>
+                                )}
+                                {withdrawal.transaction_hash && (
+                                  <div>
+                                    <label className="text-sm font-medium text-gray-300">Transaction Hash</label>
+                                    <div className="flex items-center space-x-2 mt-1">
+                                      <p className="text-white font-mono text-sm">{withdrawal.transaction_hash}</p>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => copyToClipboard(withdrawal.transaction_hash!)}
+                                      >
+                                        <Copy className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 

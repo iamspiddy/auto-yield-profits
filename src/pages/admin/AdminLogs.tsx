@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,7 @@ import {
   Calendar,
   Download
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface AdminLog {
   id: string;
@@ -59,7 +60,7 @@ const AdminLogs = () => {
 
   useEffect(() => {
     filterLogs();
-  }, [logs, searchTerm, actionFilter, dateFilter]);
+  }, [logs, searchTerm, actionFilter, dateFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchLogs = async () => {
     try {
@@ -277,56 +278,51 @@ const AdminLogs = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-700 rounded w-48 mb-2"></div>
-            <div className="h-4 bg-gray-700 rounded w-32"></div>
+      <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 sm:h-8 bg-gray-700 rounded w-1/2 sm:w-48"></div>
+          <div className="h-4 bg-gray-700 rounded w-1/3 sm:w-32"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-24 bg-gray-700 rounded"></div>
+            ))}
           </div>
+          <div className="h-48 bg-gray-700 rounded"></div>
         </div>
-        <Card className="bg-gray-800 border-gray-700">
-          <CardContent className="p-6">
-            <div className="animate-pulse space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-12 bg-gray-700 rounded"></div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Activity Log</h1>
-          <p className="text-gray-400 mt-2">Track all admin actions and system events</p>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">Activity Log</h1>
+          <p className="text-gray-400 mt-1 sm:mt-2 text-sm sm:text-base">Track all admin actions and system events</p>
         </div>
-        <Button onClick={exportLogs} variant="outline" className="w-full sm:w-auto">
+        <Button onClick={exportLogs} variant="outline" className="w-full sm:w-auto" size="sm">
           <Download className="h-4 w-4 mr-2" />
           Export CSV
         </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
         <Card className="bg-gray-800 border-gray-700">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">Total Actions</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-gray-300">Total Actions</CardTitle>
             <Activity className="h-4 w-4 text-blue-500" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats.totalLogs}</div>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="text-xl sm:text-2xl font-bold text-white">{stats.totalLogs}</div>
             <div className="text-xs text-gray-400 mt-1">All time actions</div>
           </CardContent>
         </Card>
 
         <Card className="bg-gray-800 border-gray-700">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">Today</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6 sm:pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-gray-300">Today</CardTitle>
             <Calendar className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>

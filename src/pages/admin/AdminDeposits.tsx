@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -89,11 +89,11 @@ const AdminDeposits = () => {
     };
     
     testStorageAccess();
-  }, [user]);
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     filterDeposits();
-  }, [deposits, searchTerm, statusFilter]);
+  }, [deposits, searchTerm, statusFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchDeposits = async () => {
     try {
@@ -495,36 +495,31 @@ const AdminDeposits = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-700 rounded w-48 mb-2"></div>
-            <div className="h-4 bg-gray-700 rounded w-32"></div>
+      <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 sm:h-8 bg-gray-700 rounded w-1/2 sm:w-48"></div>
+          <div className="h-4 bg-gray-700 rounded w-1/3 sm:w-32"></div>
+          <div className="h-8 sm:h-10 bg-gray-700 rounded w-full"></div>
+          <div className="space-y-3">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-16 sm:h-12 bg-gray-700 rounded"></div>
+            ))}
           </div>
         </div>
-        <Card className="bg-gray-800 border-gray-700">
-          <CardContent className="p-6">
-            <div className="animate-pulse space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-12 bg-gray-700 rounded"></div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Deposit Management</h1>
-          <p className="text-gray-400 mt-2">Review and approve pending deposits</p>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">Deposit Management</h1>
+          <p className="text-gray-400 mt-1 sm:mt-2 text-sm sm:text-base">Review and approve pending deposits</p>
         </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-2">
-          <Badge variant="secondary" className="w-full sm:w-auto text-center">{getPendingDepositsCount()} pending</Badge>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Badge variant="secondary" className="w-full sm:w-auto text-center text-sm">{getPendingDepositsCount()} pending</Badge>
           <Button 
             onClick={fetchDeposits} 
             variant="outline" 
@@ -539,21 +534,19 @@ const AdminDeposits = () => {
 
       {/* Filters */}
       <Card className="bg-gray-800 border-gray-700">
-        <CardContent className="p-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search by user email, name, or deposit ID..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
-                />
-              </div>
+        <CardContent className="p-4 sm:p-6">
+          <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search by user email, name, or deposit ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 text-sm sm:text-base"
+              />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-48 bg-gray-700 border-gray-600 text-white">
+              <SelectTrigger className="w-full bg-gray-700 border-gray-600 text-white">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent className="bg-gray-800 border-gray-700">
@@ -569,22 +562,157 @@ const AdminDeposits = () => {
 
       {/* Deposits Table */}
       <Card className="bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-lg text-white">Deposits</CardTitle>
-          <CardDescription className="text-gray-400">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-lg sm:text-xl text-white">Deposits</CardTitle>
+          <CardDescription className="text-gray-400 text-sm sm:text-base">
             Review and manage deposit requests
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
+        <CardContent className="p-0 sm:p-6 sm:pt-0">
+          {/* Mobile Card Layout */}
+          <div className="block sm:hidden">
+            {filteredDeposits.length === 0 ? (
+              <div className="text-center text-gray-400 py-8 px-4">
+                No deposits found
+              </div>
+            ) : (
+              <div className="space-y-3 p-4">
+                {filteredDeposits.map((deposit) => (
+                  <div key={deposit.id} className="bg-gray-700 rounded-lg p-4 space-y-3">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-white truncate">{deposit.user?.full_name}</div>
+                        <div className="text-sm text-gray-400 truncate">{deposit.user?.email}</div>
+                      </div>
+                      <div className="ml-2 flex-shrink-0">
+                        {getStatusBadge(deposit.status)}
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center text-white">
+                        <DollarSign className="h-4 w-4 text-green-500 mr-1" />
+                        {formatCurrency(deposit.amount)}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {new Date(deposit.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {deposit.status === 'pending' && (
+                        <>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              setSelectedDeposit(deposit);
+                              setApprovalDialogOpen(true);
+                            }}
+                            className="bg-green-600 hover:bg-green-700 flex-1"
+                          >
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => {
+                              setSelectedDeposit(deposit);
+                              setRejectionDialogOpen(true);
+                            }}
+                            className="flex-1"
+                          >
+                            <XCircle className="h-4 w-4 mr-1" />
+                            Reject
+                          </Button>
+                        </>
+                      )}
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm" className="flex-1">
+                            <Eye className="h-4 w-4 mr-1" />
+                            View
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-gray-800 border-gray-700 mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto">
+                          <DialogHeader>
+                            <DialogTitle className="text-white">Deposit Details</DialogTitle>
+                            <DialogDescription className="text-gray-400">
+                              View detailed deposit information
+                            </DialogDescription>
+                          </DialogHeader>
+                          {deposit && (
+                            <div className="space-y-4">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                  <label className="text-sm font-medium text-gray-300">User</label>
+                                  <p className="text-white break-words">{deposit.user?.full_name}</p>
+                                  <p className="text-gray-400 text-sm break-all">{deposit.user?.email}</p>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-gray-300">Amount</label>
+                                  <p className="text-white">{formatCurrency(deposit.amount)}</p>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-gray-300">Status</label>
+                                  <div className="mt-1">{getStatusBadge(deposit.status)}</div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-gray-300">Date</label>
+                                  <p className="text-white">{formatDate(deposit.created_at)}</p>
+                                </div>
+                              </div>
+                              {deposit.notes && (
+                                <div>
+                                  <label className="text-sm font-medium text-gray-300">Notes</label>
+                                  <p className="text-white mt-1 break-words">{deposit.notes}</p>
+                                </div>
+                              )}
+                              {deposit.proof_file_url && (
+                                <div>
+                                  <label className="text-sm font-medium text-gray-300">Proof of Payment</label>
+                                  <Button
+                                    variant="outline"
+                                    className="mt-2 w-full sm:w-auto"
+                                    onClick={async () => {
+                                      console.log('Dialog - Original proof_file_url:', deposit.proof_file_url);
+                                      const proofUrl = await getProofUrl(deposit.proof_file_url);
+                                      console.log('Dialog - Generated proof URL:', proofUrl);
+                                      if (proofUrl) {
+                                        window.open(proofUrl, '_blank');
+                                      } else {
+                                        toast({
+                                          title: "Error",
+                                          description: "Could not load proof file",
+                                          variant: "destructive"
+                                        });
+                                      }
+                                    }}
+                                  >
+                                    <Download className="h-4 w-4 mr-2" />
+                                    View Proof
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Table Layout */}
+          <div className="hidden sm:block overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="border-gray-700">
                   <TableHead className="text-gray-300">User</TableHead>
                   <TableHead className="text-gray-300">Amount</TableHead>
                   <TableHead className="text-gray-300">Status</TableHead>
-                  <TableHead className="text-gray-300 hidden sm:table-cell">Proof</TableHead>
-                  <TableHead className="text-gray-300 hidden md:table-cell">Date</TableHead>
+                  <TableHead className="text-gray-300 hidden md:table-cell">Proof</TableHead>
+                  <TableHead className="text-gray-300 hidden lg:table-cell">Date</TableHead>
                   <TableHead className="text-gray-300">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -606,7 +734,7 @@ const AdminDeposits = () => {
                   <TableCell>
                     {getStatusBadge(deposit.status)}
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell">
+                  <TableCell className="hidden md:table-cell">
                     {deposit.proof_file_url ? (
                       <Button
                         variant="outline"
@@ -633,7 +761,7 @@ const AdminDeposits = () => {
                       <span className="text-gray-500 text-sm">No proof</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-gray-300 hidden md:table-cell">
+                  <TableCell className="text-gray-300 hidden lg:table-cell">
                     {formatDate(deposit.created_at)}
                   </TableCell>
                   <TableCell>
@@ -746,23 +874,23 @@ const AdminDeposits = () => {
 
       {/* Approval Dialog */}
       <Dialog open={approvalDialogOpen} onOpenChange={setApprovalDialogOpen}>
-        <DialogContent className="bg-gray-800 border-gray-700">
+        <DialogContent className="bg-gray-800 border-gray-700 mx-4 sm:mx-auto">
           <DialogHeader>
-            <DialogTitle className="text-white">Approve Deposit</DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogTitle className="text-white text-lg sm:text-xl">Approve Deposit</DialogTitle>
+            <DialogDescription className="text-gray-400 text-sm sm:text-base">
               Are you sure you want to approve this deposit?
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             {selectedDeposit && (
               <div className="p-4 bg-gray-700 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-1 sm:gap-0">
                   <span className="text-gray-300">Amount:</span>
                   <span className="text-white font-medium">{formatCurrency(selectedDeposit.amount)}</span>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
                   <span className="text-gray-300">User:</span>
-                  <span className="text-white">{selectedDeposit.user?.email}</span>
+                  <span className="text-white break-all">{selectedDeposit.user?.email}</span>
                 </div>
               </div>
             )}
@@ -775,12 +903,13 @@ const AdminDeposits = () => {
                 className="mt-2 bg-gray-700 border-gray-600 text-white"
               />
             </div>
-            <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-2">
+            <div className="flex flex-col sm:flex-row justify-end gap-2">
               <Button
                 variant="outline"
                 onClick={() => setApprovalDialogOpen(false)}
                 disabled={processing}
                 className="w-full sm:w-auto"
+                size="sm"
               >
                 Cancel
               </Button>
@@ -788,6 +917,7 @@ const AdminDeposits = () => {
                 onClick={() => selectedDeposit && handleApproveDeposit(selectedDeposit.id)}
                 disabled={processing}
                 className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
+                size="sm"
               >
                 {processing ? 'Processing...' : 'Approve Deposit'}
               </Button>
@@ -798,23 +928,23 @@ const AdminDeposits = () => {
 
       {/* Rejection Dialog */}
       <Dialog open={rejectionDialogOpen} onOpenChange={setRejectionDialogOpen}>
-        <DialogContent className="bg-gray-800 border-gray-700">
+        <DialogContent className="bg-gray-800 border-gray-700 mx-4 sm:mx-auto">
           <DialogHeader>
-            <DialogTitle className="text-white">Reject Deposit</DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogTitle className="text-white text-lg sm:text-xl">Reject Deposit</DialogTitle>
+            <DialogDescription className="text-gray-400 text-sm sm:text-base">
               Are you sure you want to reject this deposit?
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             {selectedDeposit && (
               <div className="p-4 bg-gray-700 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-1 sm:gap-0">
                   <span className="text-gray-300">Amount:</span>
                   <span className="text-white font-medium">{formatCurrency(selectedDeposit.amount)}</span>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
                   <span className="text-gray-300">User:</span>
-                  <span className="text-white">{selectedDeposit.user?.email}</span>
+                  <span className="text-white break-all">{selectedDeposit.user?.email}</span>
                 </div>
               </div>
             )}
@@ -828,11 +958,13 @@ const AdminDeposits = () => {
                 required
               />
             </div>
-            <div className="flex justify-end space-x-2">
+            <div className="flex flex-col sm:flex-row justify-end gap-2">
               <Button
                 variant="outline"
                 onClick={() => setRejectionDialogOpen(false)}
                 disabled={processing}
+                className="w-full sm:w-auto"
+                size="sm"
               >
                 Cancel
               </Button>
@@ -840,6 +972,8 @@ const AdminDeposits = () => {
                 onClick={() => selectedDeposit && handleRejectDeposit(selectedDeposit.id)}
                 disabled={processing || !rejectionReason.trim()}
                 variant="destructive"
+                className="w-full sm:w-auto"
+                size="sm"
               >
                 {processing ? 'Processing...' : 'Reject Deposit'}
               </Button>
