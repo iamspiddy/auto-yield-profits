@@ -5,6 +5,7 @@ import { Wallet, TrendingUp, Clock, ShieldCheck, ShieldAlert, Bitcoin } from 'lu
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchCryptoPrice, convertUSDToBTC, formatBTCAmount } from '@/lib/cryptoService';
+import { formatCurrency } from '@/lib/utils';
 
 interface BalanceData {
   amountInvested: number;
@@ -199,7 +200,7 @@ const BalanceOverview = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Amount Invested</p>
-                <p className="text-2xl font-bold">${balanceData.amountInvested.toFixed(2)}</p>
+                <p className="text-2xl font-bold">{formatCurrency(balanceData.amountInvested)}</p>
                 <p className="text-xs text-muted-foreground">USDT</p>
                 {cryptoPrices.BTC && (
                   <p className="text-xs text-muted-foreground mt-1">
@@ -215,7 +216,7 @@ const BalanceOverview = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Earnings</p>
-                <p className="text-2xl font-bold text-blue-600">${balanceData.totalEarnings.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-blue-600">{formatCurrency(balanceData.totalEarnings)}</p>
                 <p className="text-xs text-muted-foreground">USDT</p>
                 {cryptoPrices.BTC && (
                   <p className="text-xs text-muted-foreground mt-1">
@@ -244,7 +245,7 @@ const BalanceOverview = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Pending Withdrawals</p>
-                <p className="text-2xl font-bold text-orange-600">${balanceData.pendingWithdrawals.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-orange-600">{formatCurrency(balanceData.pendingWithdrawals)}</p>
                 <p className="text-xs text-muted-foreground">USDT</p>
                 {cryptoPrices.BTC && (
                   <p className="text-xs text-muted-foreground mt-1">

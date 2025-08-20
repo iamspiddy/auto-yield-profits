@@ -116,13 +116,9 @@ export async function createAdminUser(email: string, password: string, fullName:
       return { success: false, error: 'Failed to create user account' };
     }
 
-    // Add admin role to the user
-    const { error: roleError } = await supabase
-      .from('user_roles')
-      .insert({
-        user_id: authData.user.id,
-        role: 'admin'
-      });
+    // Add admin role to the user using the database function
+    const { data: roleData, error: roleError } = await supabase
+      .rpc('add_admin_role', { _email: email });
 
     if (roleError) {
       console.error('Error adding admin role:', roleError);
