@@ -125,7 +125,7 @@ const LiveNotifications: React.FC = () => {
   const messageParts = currentMessage.message.split(/(\$[\d,]+\.?\d*)/);
   
   return (
-    <div className="fixed bottom-4 left-4 z-50 max-w-sm">
+    <div className="fixed bottom-4 left-2 right-2 sm:left-4 sm:right-auto z-50 max-w-xs sm:max-w-sm">
       <AnimatePresence mode="wait">
         {isVisible && (
           <motion.div
@@ -133,20 +133,20 @@ const LiveNotifications: React.FC = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="bg-black/80 backdrop-blur-sm border border-white/10 rounded-lg p-4 shadow-lg"
+            className="bg-black/80 backdrop-blur-sm border border-white/10 rounded-lg p-3 sm:p-4 shadow-lg"
           >
-            <div className="flex items-start space-x-3">
+            <div className="flex items-start space-x-2 sm:space-x-3">
               <div className={`flex-shrink-0 ${getTypeColor(currentMessage.type)}`}>
                 {getTypeIcon(currentMessage.type)}
               </div>
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-center space-x-2 mb-1">
-                  <span className="text-lg">{currentMessage.emoji}</span>
+                  <span className="text-base sm:text-lg">{currentMessage.emoji}</span>
                   <div className="h-1 w-1 bg-green-400 rounded-full animate-pulse"></div>
                 </div>
                 
-                <p className="text-sm text-white/90 leading-relaxed">
+                <p className="text-xs sm:text-sm text-white/90 leading-relaxed">
                   {messageParts.map((part, index) => {
                     if (part.match(/^\$[\d,]+\.?\d*$/)) {
                       return (
@@ -162,7 +162,7 @@ const LiveNotifications: React.FC = () => {
             </div>
             
             {/* Progress bar */}
-            <div className="mt-3 h-0.5 bg-white/10 rounded-full overflow-hidden">
+            <div className="mt-2 sm:mt-3 h-0.5 bg-white/10 rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-to-r from-green-500 to-blue-500"
                 initial={{ width: "0%" }}
