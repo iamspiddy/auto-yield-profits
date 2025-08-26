@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { User, Session, Provider } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
@@ -8,6 +8,7 @@ interface AuthContextType {
   loading: boolean;
   signUp: (email: string, password: string, fullName: string, referralCode?: string) => Promise<{ error: any; message?: string }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signInWithGoogle: (referralCode?: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   resendConfirmation: (email: string) => Promise<{ error: any }>;
 }
@@ -79,6 +80,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
+  const signInWithGoogle = async (referralCode?: string) => {
+    const redirectUri = import.meta.env.PROD 
+      ? 'https://forexcomplex.vercel.app/auth/callback'
+      : 'http://localhost:5173/auth/callback';
+
+    // Add this console.log to debug
+    console.log('Redirect URI being sent:', redirectUri);
+    console.log('Environment:', import.meta.env.PROD ? 'production' : 'development');
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectUri,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+        // Pass referral code in state if provided
+        ...(referralCode && { state: referralCode })
+      }
+    });
+    return { error };
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -97,6 +122,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     signUp,
     signIn,
+    signInWithGoogle,
     signOut,
     resendConfirmation
   };
