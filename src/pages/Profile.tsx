@@ -117,26 +117,9 @@ const Profile = () => {
 
       if (error) throw error;
 
-      // Get referral count
-      const { count: referralCount } = await supabase
-        .from('referrals')
-        .select('*', { count: 'exact', head: true })
-        .eq('referrer_id', user.id);
-
-      // Get total earnings from referral_earnings
-      const { data: earningsData, error: earningsError } = await supabase
-        .from('referral_earnings')
-        .select('amount')
-        .eq('referrer_id', user.id)
-        .eq('status', 'completed');
-
-      if (earningsError) throw earningsError;
-
-      const totalEarnings = earningsData?.reduce((sum, earning) => sum + parseFloat(earning.amount), 0) || 0;
-
       setReferralStats({
-        totalReferrals: referralCount || 0,
-        totalEarnings,
+        totalReferrals: 0,
+        totalEarnings: 0,
         referralCode: data.referral_code || ''
       });
     } catch (error) {
@@ -166,36 +149,62 @@ const Profile = () => {
     
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: fullName,
-          username: username
-        })
-        .eq('user_id', user.id);
+      // First, check if username is being changed and if it's already taken
+      if (username && username !== profileData?.username) {
+        const { data: existingUser, error: checkError } = await supabase
+          .from('profiles')
+          .select('user_id')
+          .eq('username', username)
+          .neq('user_id', user.id)
+          .single();
 
-      if (error) throw error;
+        if (existingUser) {
+          toast({
+            title: "Username Taken",
+            description: "This username is already taken. Please choose a different one.",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
 
-      // Handle avatar upload if file is selected
+      // Handle avatar upload first if file is selected
+      let avatarUrl = profileData?.avatar_url;
       if (avatarFile) {
         const fileExt = avatarFile.name.split('.').pop();
         const fileName = `${user.id}/avatar.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
           .from('avatars')
-          .upload(fileName, avatarFile);
+          .upload(fileName, avatarFile, {
+            upsert: true // This will overwrite existing avatar
+          });
 
         if (uploadError) throw uploadError;
+        avatarUrl = fileName;
+      }
 
-        // Update profile with avatar URL
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({
-            avatar_url: fileName
-          })
-          .eq('user_id', user.id);
+      // Update profile with all fields in a single operation
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: fullName,
+          username: username || null, // Allow null username
+          avatar_url: avatarUrl
+        })
+        .eq('user_id', user.id);
 
-        if (updateError) throw updateError;
+      if (error) {
+        // Handle specific database errors
+        if (error.code === '23505' && error.message.includes('profiles_username_key')) {
+          toast({
+            title: "Username Conflict",
+            description: "This username is already taken. Please choose a different one.",
+            variant: "destructive"
+          });
+          return;
+        }
+        throw error;
       }
 
       toast({

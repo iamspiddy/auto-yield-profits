@@ -14,29 +14,64 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        console.log('AuthCallback: Starting authentication process...');
+        
+        // Wait a bit for the session to be established
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Get the current session
         const { data, error } = await supabase.auth.getSession();
         
+        console.log('AuthCallback: Session data:', data);
+        console.log('AuthCallback: Session error:', error);
+        
         if (error) {
+          console.error('AuthCallback: Session error:', error);
           setError(error.message);
           setLoading(false);
           return;
         }
 
-        if (data.session) {
+        if (data.session && data.session.user) {
+          console.log('AuthCallback: User authenticated:', data.session.user.email);
+          
           // Check if we have a referral code in the state
           const state = searchParams.get('state');
           if (state) {
+            console.log('AuthCallback: Referral code from OAuth:', state);
             // Handle referral code logic here if needed
-            console.log('Referral code from OAuth:', state);
           }
           
           // Redirect to dashboard
-          navigate('/dashboard');
+          console.log('AuthCallback: Redirecting to dashboard...');
+          navigate('/dashboard', { replace: true });
         } else {
+          console.log('AuthCallback: No session found, checking for OAuth response...');
+          
+          // Check if this is an OAuth callback
+          const accessToken = searchParams.get('access_token');
+          const refreshToken = searchParams.get('refresh_token');
+          
+          if (accessToken) {
+            console.log('AuthCallback: OAuth tokens found, setting session...');
+            // Set the session manually if needed
+            const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken || ''
+            });
+            
+            if (sessionData.session) {
+              console.log('AuthCallback: Session established, redirecting to dashboard...');
+              navigate('/dashboard', { replace: true });
+              return;
+            }
+          }
+          
           setError('Authentication failed. Please try again.');
           setLoading(false);
         }
       } catch (err) {
+        console.error('AuthCallback: Unexpected error:', err);
         setError('An unexpected error occurred.');
         setLoading(false);
       }
