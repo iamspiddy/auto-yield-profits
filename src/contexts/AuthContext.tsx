@@ -81,18 +81,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithGoogle = async (referralCode?: string) => {
-    const redirectUri = import.meta.env.PROD 
-      ? 'https://forexcomplex.vercel.app/auth/callback'
-      : 'http://localhost:5173/auth/callback';
-
-    // Add this console.log to debug
-    console.log('Redirect URI being sent:', redirectUri);
-    console.log('Environment:', import.meta.env.PROD ? 'production' : 'development');
-
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: redirectUri,
+        redirectTo: `${window.location.origin}/auth/callback`, // This will redirect to your app after Supabase processes it
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
