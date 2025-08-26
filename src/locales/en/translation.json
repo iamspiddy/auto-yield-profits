@@ -51,43 +51,38 @@
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome back",
-    "balance": {
-      "title": "Total Balance",
-      "available": "Available",
-      "invested": "Invested",
-      "profit": "Profit"
-    },
-    "earnings": {
-      "title": "Earnings Overview",
-      "today": "Today",
-      "week": "This Week",
-      "month": "This Month",
-      "total": "Total"
-    },
-    "quickActions": {
-      "title": "Quick Actions",
-      "deposit": "Deposit Funds",
-      "withdraw": "Withdraw",
-      "invest": "Invest Now"
-    },
-    "recentActivity": {
-      "title": "Recent Activity",
-      "noActivity": "No recent activity"
-    }
+    "balance": "Balance",
+    "earnings": "Earnings",
+    "deposits": "Deposits",
+    "withdrawals": "Withdrawals",
+    "contactSupportForFunding": "Contact Support for Funding",
+    "refresh": "Refresh",
+    "withdrawFunds": "Withdraw Funds"
   },
   "deposit": {
-    "title": "Deposit Funds",
-    "subtitle": "Add funds to your account to start earning",
-    "amount": "Amount",
-    "currency": "Currency",
-    "method": "Payment Method",
-    "processing": "Processing...",
-    "success": "Deposit successful!",
-    "error": "Deposit failed. Please try again.",
-    "minAmount": "Minimum amount: $10",
-    "maxAmount": "Maximum amount: $100,000",
-    "fee": "Processing fee: 2.5%",
-    "confirm": "Confirm Deposit"
+    "title": "Contact Support for Funding",
+    "subtitle": "Our support team will help you fund your account securely",
+    "contactSupport": "Contact Customer Support for Funding",
+    "needFunding": "Need to Fund Your Account?",
+    "supportMessage": "Our dedicated support team is here to help you with all funding requests. Contact us for personalized assistance and secure account funding.",
+    "benefits": {
+      "support247": "24/7 Support",
+      "secureProcess": "Secure Process",
+      "instantHelp": "Instant Help"
+    },
+    "chatButton": "Chat with Support Now",
+    "chatButtonShort": "Chat with Support",
+    "supportGuidance": "Our support team will guide you through the funding process",
+    "whatToExpect": "What to expect:",
+    "expectations": [
+      "Provide your account details and funding amount",
+      "Receive secure payment instructions",
+      "Get confirmation once funds are received",
+      "Start earning with your funded account"
+    ],
+    "availableRoundClock": "Available round the clock",
+    "safeVerifiedFunding": "Safe and verified funding",
+    "quickResponseTimes": "Quick response times"
   },
   "withdraw": {
     "title": "Withdraw Funds",

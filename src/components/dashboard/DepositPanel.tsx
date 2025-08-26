@@ -1,218 +1,116 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Upload, Copy, Check } from 'lucide-react';
+import { MessageCircle, Headphones, Clock, Shield } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
 
 const DepositPanel = () => {
-  const [amount, setAmount] = useState('');
-  const [transactionHash, setTransactionHash] = useState('');
-  const [file, setFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const { user } = useAuth();
+  const openChat = () => {
+    // Show toast notification
+    toast({
+      title: "Opening Chat",
+      description: "Connecting you to our support team for funding assistance...",
+    });
 
-  const walletAddress = "0xbad80c0d7d84adb576A052327F1bf3f07dD428e0"; // Example USDT wallet
-
-  const handleCopyAddress = async () => {
-    try {
-      await navigator.clipboard.writeText(walletAddress);
-      setCopied(true);
-      toast({
-        title: "Address Copied",
-        description: "Wallet address has been copied to clipboard."
-      });
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      toast({
-        title: "Copy Failed",
-        description: "Failed to copy address. Please copy manually.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      // Validate file type and size
-      if (!selectedFile.type.startsWith('image/')) {
-        toast({
-          title: "Invalid File",
-          description: "Please select an image file.",
-          variant: "destructive"
-        });
+    // Try multiple methods to open JivoChat
+    if (window.jivo_open && typeof window.jivo_open === 'function') {
+      try {
+        window.jivo_open();
         return;
+      } catch (error) {
+        console.log('JivoChat open failed, trying alternative method');
       }
-      
-      if (selectedFile.size > 5 * 1024 * 1024) { // 5MB
-        toast({
-          title: "File Too Large",
-          description: "Please select a file smaller than 5MB.",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      setFile(selectedFile);
     }
-  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-
-    if (!amount || !file) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields and upload proof.",
-        variant: "destructive"
-      });
+    // Alternative method: try to find and click the JivoChat button
+    const jivoButton = document.querySelector('.jivo-widget') as HTMLElement;
+    if (jivoButton) {
+      jivoButton.click();
       return;
     }
 
-    setUploading(true);
+    // Another alternative: try to find JivoChat iframe and show it
+    const jivoIframe = document.querySelector('#jivo-iframe-container iframe') as HTMLIFrameElement;
+    if (jivoIframe) {
+      jivoIframe.style.display = 'block';
+      jivoIframe.style.zIndex = '9999';
+      return;
+    }
 
+    // Fallback: try to trigger JivoChat through postMessage
     try {
-      // Upload file to Supabase storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-      
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('deposit-proofs')
-        .upload(fileName, file);
+      const jivoWidget = document.querySelector('.jivo-widget') as HTMLElement;
+      if (jivoWidget) {
+        jivoWidget.dispatchEvent(new Event('click'));
+        return;
+      }
+    } catch (error) {
+      console.log('PostMessage method failed');
+    }
 
-      if (uploadError) throw uploadError;
-
-      // Create deposit record
-      const { data: depositData, error: depositError } = await supabase
-        .from('deposits')
-        .insert({
-          user_id: user.id,
-          amount: parseFloat(amount),
-          transaction_hash: transactionHash || null,
-          proof_file_url: uploadData.path,
-          status: 'pending'
-        })
-        .select();
-
-      if (depositError) throw depositError;
-
-      // Create transaction record with reference to deposit
-      await supabase
-        .from('transactions')
-        .insert({
-          user_id: user.id,
-          type: 'deposit',
-          amount: parseFloat(amount),
-          status: 'pending',
-          description: `Deposit of ${amount} USDT`,
-          reference_id: depositData[0].id
-        });
-
+    // Final fallback: scroll to bottom and show a message
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    
+    // Show a toast message to guide the user
+    setTimeout(() => {
       toast({
-        title: "Deposit Submitted",
-        description: "Your deposit has been submitted for verification."
-      });
-
-      // Reset form
-      setAmount('');
-      setTransactionHash('');
-      setFile(null);
-      
-    } catch (error: any) {
-      toast({
-        title: "Deposit Failed",
-        description: error.message || "Failed to submit deposit.",
+        title: "Chat Widget Not Found",
+        description: "Please look for the chat widget in the bottom-right corner. If you don't see it, please refresh the page.",
         variant: "destructive"
       });
-    } finally {
-      setUploading(false);
-    }
+    }, 1000);
   };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center">
-          <Upload className="h-5 w-5 mr-2" />
-          Deposit Funds
+          <MessageCircle className="h-5 w-5 mr-2 text-blue-600" />
+          Contact Support for Funding
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Wallet Address */}
-        <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-          <Label className="text-sm font-medium">USDT (TRC20) Wallet Address</Label>
-          <div className="flex items-center space-x-2">
-            <code className="flex-1 bg-background p-2 rounded text-xs break-all">
-              {walletAddress}
-            </code>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleCopyAddress}
-              className="shrink-0"
-            >
-              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-            </Button>
+        {/* Main Message */}
+        <div className="text-center space-y-3">
+          <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-3">
+            <Headphones className="h-8 w-8 text-blue-600" />
+          </div>
+          <h3 className="font-semibold text-gray-900 dark:text-white">
+            Need to Fund Your Account?
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Our support team is here to help you with all funding requests. 
+            Contact us for personalized assistance.
+          </p>
+        </div>
+
+        {/* Benefits */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="text-center p-3 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg">
+            <Clock className="h-6 w-6 text-blue-600 mx-auto mb-1" />
+            <h4 className="text-xs font-semibold text-gray-900 dark:text-white">24/7 Support</h4>
+          </div>
+          <div className="text-center p-3 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-lg">
+            <Shield className="h-6 w-6 text-green-600 mx-auto mb-1" />
+            <h4 className="text-xs font-semibold text-gray-900 dark:text-white">Secure Process</h4>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="amount">Deposit Amount (USDT)</Label>
-            <Input
-              id="amount"
-              type="number"
-              placeholder="Enter amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              min="1"
-              step="0.01"
-              required
-            />
-          </div>
+        {/* Contact Support Button */}
+        <Button 
+          onClick={openChat}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          <MessageCircle className="h-4 w-4 mr-2" />
+          Chat with Support
+        </Button>
 
-          <div className="space-y-2">
-            <Label htmlFor="txHash">Transaction Hash (Optional)</Label>
-            <Input
-              id="txHash"
-              type="text"
-              placeholder="Enter transaction hash"
-              value={transactionHash}
-              onChange={(e) => setTransactionHash(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="proof">Upload Payment Proof *</Label>
-            <Input
-              id="proof"
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              required
-            />
-            {file && (
-              <p className="text-sm text-muted-foreground">
-                Selected: {file.name}
-              </p>
-            )}
-          </div>
-
-          <Button type="submit" className="w-full" disabled={uploading}>
-            {uploading ? 'Uploading...' : 'Upload Proof'}
-          </Button>
-        </form>
-
-        <p className="text-xs text-muted-foreground text-center">
-          Deposits are manually verified within 24 hours.
-        </p>
+        {/* Additional Info */}
+        <div className="bg-muted/50 p-3 rounded-lg">
+          <p className="text-xs text-muted-foreground text-center">
+            Our team will guide you through the secure funding process
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
