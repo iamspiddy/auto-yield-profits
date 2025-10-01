@@ -1,5 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Quote } from "lucide-react";
+import sarahImage from "@/assets/sarah.jpg";
+import mikeImage from "@/assets/mike.jpg";
+import ollyImage from "@/assets/olly.jpg";
 
 const testimonials = [
   {
@@ -7,21 +10,24 @@ const testimonials = [
     role: "Small Business Owner",
     content: "I started with $100 and now earn every week — no stress. The platform is incredibly easy to use and the returns are consistent.",
     rating: 5,
-    earnings: "+$340 in 3 months"
+    earnings: "+$340 in 3 months",
+    image: sarahImage
   },
   {
     name: "Mike T.",
     role: "Software Developer", 
     content: "The referral system helped me turn $50 into $500. My friends love it too, and we're all earning passively now.",
     rating: 5,
-    earnings: "+$450 from referrals"
+    earnings: "+$450 from referrals",
+    image: mikeImage
   },
   {
     name: "Jennifer L.",
     role: "Marketing Manager",
     content: "It's the easiest crypto platform I've used. No complex DeFi protocols or staking — just deposit and earn. Exactly what I needed.",
     rating: 5,
-    earnings: "+$220 monthly average"
+    earnings: "+$220 monthly average",
+    image: ollyImage
   }
 ];
 
@@ -66,28 +72,21 @@ const TestimonialsSection = () => {
 
                 {/* Author */}
                 <div className="border-t border-border pt-4">
-                  <p className="font-semibold text-foreground">{testimonial.name}</p>
-                  <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={testimonial.image} 
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                    <div>
+                      <p className="font-semibold text-foreground">{testimonial.name}</p>
+                      <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           ))}
-        </div>
-
-        {/* Social Proof Numbers */}
-        <div className="mt-16 grid md:grid-cols-3 gap-8 text-center">
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-primary">500+</div>
-            <p className="text-muted-foreground">Active Users</p>
-          </div>
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-success">$2.3M+</div>
-            <p className="text-muted-foreground">Total Deposits</p>
-          </div>
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-primary">$180K+</div>
-            <p className="text-muted-foreground">Profits Distributed</p>
-          </div>
         </div>
       </div>
     </section>

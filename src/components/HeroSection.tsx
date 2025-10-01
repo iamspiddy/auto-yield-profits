@@ -1,14 +1,17 @@
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { TrendingUp, Shield, Coins } from "lucide-react";
 import { Link } from "react-router-dom";
-import heroImage from "@/assets/hero-crypto.jpg";
+import bannerImage from "@/assets/banner.jpg";
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen bg-gradient-hero overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(68,68,68,.1)_25%,rgba(68,68,68,.1)_50%,transparent_50%,transparent_75%,rgba(68,68,68,.1)_75%,rgba(68,68,68,.1))] bg-[length:20px_20px] opacity-30"></div>
+    <section className="relative min-h-screen overflow-hidden">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${bannerImage})` }}
+      ></div>
+      <div className="absolute inset-0 bg-black/50"></div>
       
       <div className="container mx-auto px-4 pt-32 pb-12 relative z-10">
         <div className="flex flex-col items-center text-center space-y-12 min-h-[calc(100vh-144px)] justify-center">
@@ -66,31 +69,6 @@ const HeroSection = () => {
             </p>
           </div>
 
-          {/* Hero Image/Visual - Centered below content */}
-          <div className="relative max-w-2xl mx-auto">
-            <div className="relative">
-              <img 
-                src={heroImage} 
-                alt="Crypto earnings platform dashboard" 
-                className="rounded-2xl shadow-2xl w-full h-auto"
-              />
-              
-              {/* Floating Cards */}
-              <Card className="absolute -top-4 -left-4 p-4 bg-gradient-card shadow-card animate-float">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 bg-success rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium">Weekly Profit: +$127</span>
-                </div>
-              </Card>
-              
-              <Card className="absolute -bottom-4 -right-4 p-4 bg-gradient-card shadow-card animate-float" style={{animationDelay: '1s'}}>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-success">+18.5%</div>
-                  <div className="text-xs text-muted-foreground">Monthly Return</div>
-                </div>
-              </Card>
-            </div>
-          </div>
         </div>
       </div>
     </section>
