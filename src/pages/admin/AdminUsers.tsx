@@ -26,7 +26,7 @@ interface User {
   user_id: string;
   email: string;
   full_name: string;
-  balance: number | null;
+  balance: number; // Calculated from user_balances table
   referral_code: string;
   referred_by: string | null;
   created_at: string;
@@ -118,8 +118,16 @@ const AdminUsers = () => {
               .select('id, amount, description, created_at')
               .eq('user_id', profile.user_id);
 
+            // Get current balance from user_balances table
+            const { data: userBalance } = await supabase
+              .from('user_balances')
+              .select('available_balance, invested_balance')
+              .eq('user_id', profile.user_id)
+              .single();
+
             return {
               ...profile,
+              balance: userBalance ? (userBalance.available_balance + userBalance.invested_balance) : 0,
               deposits: deposits || [],
               withdrawals: withdrawals || [],
               referrals: referrals || [],
@@ -129,6 +137,7 @@ const AdminUsers = () => {
             console.error(`Error fetching details for user ${profile.user_id}:`, error);
             return {
               ...profile,
+              balance: 0,
               deposits: [],
               withdrawals: [],
               referrals: [],
@@ -177,7 +186,7 @@ const AdminUsers = () => {
         break;
       case 'with_balance':
         filtered = filtered.filter(user => 
-          user.balance && user.balance > 0
+          user.balance > 0
         );
         break;
       case 'referrers':
@@ -320,7 +329,7 @@ const AdminUsers = () => {
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div>
                         <div className="text-gray-400">Balance</div>
-                        <div className="font-medium text-white">{formatCurrency(user.balance || 0)}</div>
+                        <div className="font-medium text-white">{formatCurrency(user.balance)}</div>
                       </div>
                       <div>
                         <div className="text-gray-400">Deposits</div>
@@ -368,7 +377,7 @@ const AdminUsers = () => {
                     </TableCell>
                     <TableCell>
                       <span className="font-medium text-white">
-                        {formatCurrency(user.balance || 0)}
+                        {formatCurrency(user.balance)}
                       </span>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
@@ -451,7 +460,7 @@ const AdminUsers = () => {
                     </div>
                     <div className="flex flex-col sm:flex-row sm:justify-between">
                       <span className="text-gray-400">Balance:</span>
-                      <span className="text-white">{formatCurrency(selectedUser.balance || 0)}</span>
+                      <span className="text-white">{formatCurrency(selectedUser.balance)}</span>
                     </div>
                   </div>
                 </div>

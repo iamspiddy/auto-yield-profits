@@ -14,6 +14,7 @@ import Withdraw from "./pages/Withdraw";
 import History from "./pages/History";
 import Referrals from "./pages/Referrals";
 import Profile from "./pages/Profile";
+import Investments from "./pages/Investments";
 
 import NotFound from "./pages/NotFound";
 
@@ -32,6 +33,8 @@ import AdminPins from "./pages/admin/AdminPins";
 import AdminReferrals from "./pages/admin/AdminReferrals";
 import AdminLogs from "./pages/admin/AdminLogs";
 import AdminSetup from "./pages/admin/AdminSetup";
+import AdminInvestmentPlans from "./pages/admin/AdminInvestmentPlans";
+import AdminUserInvestments from "./pages/admin/AdminUserInvestments";
 
 // Components
 import FloatingChatButton from "./components/FloatingChatButton";
@@ -47,9 +50,9 @@ const App = () => {
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -60,6 +63,7 @@ const App = () => {
             <Route path="/history" element={<History />} />
             <Route path="/referrals" element={<Referrals />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/investments" element={<Investments />} />
 
             
             {/* Admin Routes */}
@@ -79,6 +83,8 @@ const App = () => {
               <Route path="deposits" element={<AdminDeposits />} />
               <Route path="withdrawals" element={<AdminWithdrawals />} />
               <Route path="profits" element={<AdminProfits />} />
+              <Route path="investment-plans" element={<AdminInvestmentPlans />} />
+              <Route path="user-investments" element={<AdminUserInvestments />} />
               <Route path="investments" element={<AdminInvestments />} />
               <Route path="pins" element={<AdminPins />} />
 
@@ -93,7 +99,7 @@ const App = () => {
           {/* Floating Chat Button - Available on all pages */}
           <FloatingChatButton />
         </BrowserRouter>
-      </TooltipProvider>
+        </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
   );

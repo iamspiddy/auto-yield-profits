@@ -1,10 +1,13 @@
-// Global type declarations for JivoChat
+// Global type declarations for Smartsupp
 declare global {
   interface Window {
-    jivo_open?: () => void;
-    jivo_close?: () => void;
-    jivo_hide?: () => void;
-    jivo_show?: () => void;
+    smartsupp?: {
+      (action: string, ...args: any[]): void;
+      _: any[];
+    };
+    _smartsupp?: {
+      key: string;
+    };
   }
 }
 

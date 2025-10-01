@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowDownLeft, ArrowLeft, TrendingUp, Lock, Check, CreditCard, Wallet, Banknote, Smartphone } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { BalanceService } from '@/lib/balanceService';
 
 // Withdrawal method types
 type WithdrawalMethod = 'Bank Transfer' | 'PayPal' | 'Crypto Wallet' | 'Mobile Money';
@@ -37,7 +38,7 @@ const Withdraw = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [availableEarnings, setAvailableEarnings] = useState(0);
+  const [availableBalance, setAvailableBalance] = useState(0);
   const [showPinDialog, setShowPinDialog] = useState(false);
   const [pin, setPin] = useState('');
 
@@ -47,41 +48,18 @@ const Withdraw = () => {
   useEffect(() => {
     if (!user) return;
 
-    const fetchAvailableEarnings = async () => {
+    const fetchAvailableBalance = async () => {
       try {
-        // Fetch total earnings
-        const { data: earnings } = await supabase
-          .from('earnings')
-          .select('amount')
-          .eq('user_id', user.id);
-
-        // Get pending earnings withdrawals
-        const { data: pendingEarningsWithdrawals } = await supabase
-          .from('withdrawals')
-          .select('amount')
-          .eq('user_id', user.id)
-          .eq('withdrawal_type', 'earnings')
-          .in('status', ['pending', 'processing']);
-
-        // Get completed earnings withdrawals (deductions)
-        const { data: completedEarningsWithdrawals } = await supabase
-          .from('withdrawals')
-          .select('amount')
-          .eq('user_id', user.id)
-          .eq('withdrawal_type', 'earnings')
-          .eq('status', 'completed');
-
-        const totalEarnings = earnings?.reduce((sum, earning) => sum + Number(earning.amount), 0) || 0;
-        const pendingEarningsAmount = pendingEarningsWithdrawals?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
-        const completedEarningsDeductions = completedEarningsWithdrawals?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
-        
-        setAvailableEarnings(totalEarnings - pendingEarningsAmount - completedEarningsDeductions);
+        const balance = await BalanceService.getUserBalance(user.id);
+        if (balance) {
+          setAvailableBalance(balance.available);
+        }
       } catch (error) {
-        console.error('Error fetching earnings:', error);
+        console.error('Error fetching balance:', error);
       }
     };
 
-    fetchAvailableEarnings();
+    fetchAvailableBalance();
   }, [user]);
 
   // Update form data when method changes
@@ -133,10 +111,10 @@ const Withdraw = () => {
       return false;
     }
 
-    if (parseFloat(amount) > availableEarnings) {
+    if (parseFloat(amount) > availableBalance) {
       toast({
-        title: "Insufficient Earnings",
-        description: `Available earnings: $${availableEarnings.toFixed(2)} USDT`,
+        title: "Insufficient Balance",
+        description: `Available balance: $${availableBalance.toFixed(2)} USDT`,
         variant: "destructive"
       });
       return false;
@@ -253,7 +231,7 @@ const Withdraw = () => {
           p_user_id: user.id,
           p_amount: withdrawalAmount,
           p_wallet_address: JSON.stringify(withdrawalPayload), // Store the full payload
-          p_withdrawal_type: 'earnings'
+          p_withdrawal_type: 'wallet'
         });
 
       if (withdrawalError) {
@@ -262,8 +240,15 @@ const Withdraw = () => {
       }
       console.log('Withdrawal created successfully:', withdrawalData);
 
-      // Transaction is automatically created by the trigger handle_withdrawal_transaction()
-      console.log('Withdrawal created successfully, transaction will be created by trigger');
+      // Process withdrawal using balance service
+      await BalanceService.processWithdrawal(
+        user.id,
+        withdrawalAmount,
+        withdrawalData.id,
+        `${formData.method} withdrawal of ${amount} USDT`
+      );
+
+      console.log('Withdrawal processed successfully with balance service');
 
       toast({
         title: "Withdrawal Requested",
@@ -481,18 +466,18 @@ const Withdraw = () => {
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <ArrowDownLeft className="h-5 w-5" />
-                Withdraw Earnings
+                Withdraw Balance
               </span>
               <Badge variant="outline">Min: $10</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Earnings Display */}
+            {/* Balance Display */}
             <div className="bg-gradient-to-r from-green-500/10 to-green-600/5 p-4 rounded-lg border border-green-500/20">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Available Earnings</p>
-                  <p className="text-2xl font-bold text-green-600">${availableEarnings.toFixed(2)}</p>
+                  <p className="text-sm text-muted-foreground">Available Balance</p>
+                  <p className="text-2xl font-bold text-green-600">${availableBalance.toFixed(2)}</p>
                   <p className="text-xs text-muted-foreground">USDT</p>
                 </div>
                 <TrendingUp className="h-8 w-8 text-green-600" />
@@ -557,13 +542,13 @@ const Withdraw = () => {
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   min="10"
-                  max={availableEarnings}
+                  max={availableBalance}
                   step="0.01"
                   required
                   className="text-lg"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Minimum withdrawal: $10 USDT • Maximum: ${availableEarnings.toFixed(2)} USDT
+                  Minimum withdrawal: $10 USDT • Maximum: ${availableBalance.toFixed(2)} USDT
                 </p>
               </div>
 

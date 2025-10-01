@@ -22,7 +22,9 @@ import {
   Calendar,
   Wallet,
   Award,
-  FileText
+  FileText,
+  PlayCircle,
+  HelpCircle
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -376,10 +378,11 @@ const Profile = () => {
           {/* Main Content */}
           <div className="lg:col-span-2">
             <Tabs defaultValue="profile" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-3 bg-gray-800">
+              <TabsList className="grid w-full grid-cols-4 bg-gray-800">
                 <TabsTrigger value="profile">Profile</TabsTrigger>
                 <TabsTrigger value="security">Security</TabsTrigger>
                 <TabsTrigger value="referrals">Referrals</TabsTrigger>
+                <TabsTrigger value="help">Help</TabsTrigger>
               </TabsList>
 
               {/* Profile Tab */}
@@ -580,6 +583,76 @@ const Profile = () => {
                           className="border-gray-600 text-gray-300 hover:bg-gray-700"
                         >
                           <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Help Tab */}
+              <TabsContent value="help" className="space-y-6">
+                <Card className="bg-gray-800 border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <HelpCircle className="h-5 w-5" />
+                      Help & Support
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+
+                    {/* Quick Tips */}
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-medium text-gray-300">Quick Tips</h4>
+                      <div className="space-y-3">
+                        <div className="p-3 bg-gray-700 rounded-lg">
+                          <h5 className="text-white font-medium mb-1">💡 Minimum Investment</h5>
+                          <p className="text-sm text-gray-400">
+                            You need at least $200 to start investing in any plan
+                          </p>
+                        </div>
+                        <div className="p-3 bg-gray-700 rounded-lg">
+                          <h5 className="text-white font-medium mb-1">📈 Compound Growth</h5>
+                          <p className="text-sm text-gray-400">
+                            Weekly profits are automatically reinvested for maximum growth
+                          </p>
+                        </div>
+                        <div className="p-3 bg-gray-700 rounded-lg">
+                          <h5 className="text-white font-medium mb-1">⏰ Investment Duration</h5>
+                          <p className="text-sm text-gray-400">
+                            Choose from 1 month to 12 months - longer durations mean bigger returns
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Support Contact */}
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-medium text-gray-300">Need Help?</h4>
+                      <div className="p-4 bg-gray-700 rounded-lg">
+                        <p className="text-sm text-gray-400 mb-3">
+                          If you have any questions or need assistance, our support team is here to help.
+                        </p>
+                        <Button
+                          onClick={() => {
+                            // Try to open chat widget
+                            if (window.smartsupp && typeof window.smartsupp === 'function') {
+                              try {
+                                window.smartsupp('chat:open');
+                              } catch (error) {
+                                console.log('Chat widget not available');
+                              }
+                            }
+                            toast({
+                              title: "Opening Support",
+                              description: "Connecting you to our support team...",
+                            });
+                          }}
+                          variant="outline"
+                          className="border-gray-600 text-gray-300 hover:bg-gray-600"
+                        >
+                          <HelpCircle className="h-4 w-4 mr-2" />
+                          Contact Support
                         </Button>
                       </div>
                     </div>

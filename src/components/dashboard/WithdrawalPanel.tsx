@@ -10,6 +10,7 @@ import { ArrowDownLeft, Lock, CreditCard, Wallet, Banknote, Smartphone } from 'l
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { BalanceService } from '@/lib/balanceService';
 
 // Withdrawal method types
 type WithdrawalMethod = 'Bank Transfer' | 'PayPal' | 'Crypto Wallet' | 'Mobile Money';
@@ -34,42 +35,28 @@ const WithdrawalPanel = () => {
   const [loading, setLoading] = useState(false);
   const [showPinDialog, setShowPinDialog] = useState(false);
   const [pin, setPin] = useState('');
-  const [availableEarnings, setAvailableEarnings] = useState(0);
+  const [availableBalance, setAvailableBalance] = useState(0);
   const { user } = useAuth();
 
   // Crypto options
   const cryptoOptions = ['BTC', 'ETH', 'USDT'];
 
-  // Fetch available earnings on component mount
+  // Fetch available balance on component mount
   React.useEffect(() => {
-    const fetchAvailableEarnings = async () => {
+    const fetchAvailableBalance = async () => {
       if (!user) return;
       
       try {
-        // Fetch total earnings
-        const { data: earnings } = await supabase
-          .from('earnings')
-          .select('amount')
-          .eq('user_id', user.id);
-
-        // Get pending earnings withdrawals
-        const { data: pendingEarningsWithdrawals } = await supabase
-          .from('withdrawals')
-          .select('amount')
-          .eq('user_id', user.id)
-          .eq('withdrawal_type', 'earnings')
-          .in('status', ['pending', 'processing']);
-
-        const totalEarnings = earnings?.reduce((sum, earning) => sum + Number(earning.amount), 0) || 0;
-        const pendingEarningsAmount = pendingEarningsWithdrawals?.reduce((sum, withdrawal) => sum + Number(withdrawal.amount), 0) || 0;
-        
-        setAvailableEarnings(totalEarnings - pendingEarningsAmount);
+        const balance = await BalanceService.getUserBalance(user.id);
+        if (balance) {
+          setAvailableBalance(balance.available);
+        }
       } catch (error) {
-        console.error('Error fetching earnings:', error);
+        console.error('Error fetching balance:', error);
       }
     };
 
-    fetchAvailableEarnings();
+    fetchAvailableBalance();
   }, [user]);
 
   // Update form data when method changes
@@ -121,10 +108,10 @@ const WithdrawalPanel = () => {
       return false;
     }
 
-    if (parseFloat(amount) > availableEarnings) {
+    if (parseFloat(amount) > availableBalance) {
       toast({
-        title: "Insufficient Earnings",
-        description: `Available earnings: $${availableEarnings.toFixed(2)} USDT`,
+        title: "Insufficient Balance",
+        description: `Available balance: $${availableBalance.toFixed(2)} USDT`,
         variant: "destructive"
       });
       return false;
@@ -235,17 +222,27 @@ const WithdrawalPanel = () => {
       console.log('Withdrawal payload:', withdrawalPayload);
 
       // Create withdrawal record
-      const { error: withdrawalError } = await supabase
+      const { data: withdrawalData, error: withdrawalError } = await supabase
         .from('withdrawals')
         .insert({
           user_id: user.id,
           amount: withdrawalAmount,
           wallet_address: JSON.stringify(withdrawalPayload), // Store the full payload
           status: 'pending',
-          withdrawal_type: 'earnings'
-        });
+          withdrawal_type: 'wallet'
+        })
+        .select()
+        .single();
 
       if (withdrawalError) throw withdrawalError;
+
+      // Process withdrawal using balance service
+      await BalanceService.processWithdrawal(
+        user.id,
+        withdrawalAmount,
+        withdrawalData.id,
+        `${formData.method} withdrawal of ${amount} USDT`
+      );
 
       // Create transaction record
       await supabase
@@ -427,7 +424,7 @@ const WithdrawalPanel = () => {
         <CardTitle className="flex items-center justify-between">
           <span className="flex items-center">
             <ArrowDownLeft className="h-5 w-5 mr-2" />
-            Withdraw Earnings
+            Withdraw Balance
           </span>
           <Badge variant="outline">Min: $10</Badge>
         </CardTitle>
@@ -435,8 +432,8 @@ const WithdrawalPanel = () => {
       <CardContent>
         <div className="mb-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-green-600 font-medium">Available Earnings</span>
-            <span className="text-lg font-bold text-green-600">${availableEarnings.toFixed(2)} USDT</span>
+            <span className="text-sm text-green-600 font-medium">Available Balance</span>
+            <span className="text-lg font-bold text-green-600">${availableBalance.toFixed(2)} USDT</span>
           </div>
         </div>
 
@@ -498,7 +495,7 @@ const WithdrawalPanel = () => {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               min="10"
-              max={availableEarnings}
+              max={availableBalance}
               step="0.01"
               required
             />

@@ -18,9 +18,9 @@ const Navbar = () => {
   };
 
   const openChat = () => {
-    // Trigger JivoChat widget
-    if (window.jivo_open) {
-      window.jivo_open();
+    // Trigger Smartsupp widget
+    if (window.smartsupp && typeof window.smartsupp === 'function') {
+      window.smartsupp('chat:open');
     } else {
       // Fallback: scroll to bottom where chat widget should be visible
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });

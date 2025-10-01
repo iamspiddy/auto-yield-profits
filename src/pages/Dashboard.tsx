@@ -2,13 +2,14 @@ import React, { useState, useCallback, createContext, useContext, useEffect } fr
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
-import BalanceOverview from '@/components/dashboard/BalanceOverview';
-import EarningsOverview from '@/components/dashboard/EarningsOverview';
+import BalanceManagement from '@/components/dashboard/BalanceManagement';
+import ActiveInvestmentPlan from '@/components/dashboard/ActiveInvestmentPlan';
+import EarningsTracker from '@/components/dashboard/EarningsTracker';
 import TransactionHistory from '@/components/dashboard/TransactionHistory';
-import ReferralProgram from '@/components/dashboard/ReferralProgram';
 import LiveNotifications from '@/components/dashboard/LiveNotifications';
 import { Button } from '@/components/ui/button';
-import { DollarSign, ArrowUpRight, ArrowDownLeft, RefreshCw, MessageCircle } from 'lucide-react';
+import QuickInvestButton from '@/components/dashboard/QuickInvestButton';
+import { DollarSign, ArrowUpRight, ArrowDownLeft, RefreshCw, Plus } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 // Create a refresh context
@@ -32,36 +33,36 @@ const Dashboard = () => {
       description: "Connecting you to our support team...",
     });
 
-    // Try multiple methods to open JivoChat
-    if (window.jivo_open && typeof window.jivo_open === 'function') {
+    // Try to open Smartsupp chat
+    if (window.smartsupp && typeof window.smartsupp === 'function') {
       try {
-        window.jivo_open();
+        window.smartsupp('chat:open');
         return;
       } catch (error) {
-        console.log('JivoChat open failed, trying alternative method');
+        console.log('Smartsupp open failed, trying alternative method');
       }
     }
 
-    // Alternative method: try to find and click the JivoChat button
-    const jivoButton = document.querySelector('.jivo-widget') as HTMLElement;
-    if (jivoButton) {
-      jivoButton.click();
+    // Alternative method: try to find and click the Smartsupp button
+    const smartsuppButton = document.querySelector('.smartsupp-widget') as HTMLElement;
+    if (smartsuppButton) {
+      smartsuppButton.click();
       return;
     }
 
-    // Another alternative: try to find JivoChat iframe and show it
-    const jivoIframe = document.querySelector('#jivo-iframe-container iframe') as HTMLIFrameElement;
-    if (jivoIframe) {
-      jivoIframe.style.display = 'block';
-      jivoIframe.style.zIndex = '9999';
+    // Another alternative: try to find Smartsupp iframe and show it
+    const smartsuppIframe = document.querySelector('iframe[src*="smartsuppchat.com"]') as HTMLIFrameElement;
+    if (smartsuppIframe) {
+      smartsuppIframe.style.display = 'block';
+      smartsuppIframe.style.zIndex = '9999';
       return;
     }
 
-    // Fallback: try to trigger JivoChat through postMessage
+    // Fallback: try to trigger Smartsupp through postMessage
     try {
-      const jivoWidget = document.querySelector('.jivo-widget') as HTMLElement;
-      if (jivoWidget) {
-        jivoWidget.dispatchEvent(new Event('click'));
+      const smartsuppWidget = document.querySelector('.smartsupp-widget') as HTMLElement;
+      if (smartsuppWidget) {
+        smartsuppWidget.dispatchEvent(new Event('click'));
         return;
       }
     } catch (error) {
@@ -97,8 +98,8 @@ const Dashboard = () => {
     <RefreshContext.Provider value={{ refresh: handleRefresh }}>
       <DashboardLayout>
         <div className="space-y-6">
-          {/* Primary Action Buttons - Hidden on Mobile */}
-          <div className="hidden md:flex flex-col sm:flex-row gap-4 justify-center sm:justify-end">
+          {/* Primary Action Buttons - Desktop */}
+          <div className="hidden md:flex flex-col sm:flex-row gap-4 justify-center sm:justify-end mb-6">
             <Button 
               onClick={handleRefresh}
               variant="outline"
@@ -108,13 +109,14 @@ const Dashboard = () => {
               <RefreshCw className="h-4 w-4" />
               Refresh
             </Button>
+            <QuickInvestButton variant="default" />
             <Button 
-              onClick={openChat}
-              className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 text-lg font-semibold"
+              onClick={() => navigate('/deposit')}
+              className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 text-lg font-semibold"
               size="lg"
             >
-              <MessageCircle className="h-5 w-5" />
-              Contact Support for Funding
+              <Plus className="h-5 w-5" />
+              Deposit Funds
             </Button>
             <Button 
               onClick={() => navigate('/withdraw')}
@@ -127,34 +129,63 @@ const Dashboard = () => {
             </Button>
           </div>
 
-          {/* Mobile Refresh Button - Positioned above balance overview */}
-          <div className="md:hidden flex justify-end">
-            <Button 
-              onClick={handleRefresh}
-              variant="outline"
-              className="flex items-center gap-2"
-              size="sm"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Refresh
-            </Button>
+          {/* Mobile Action Buttons */}
+          <div className="md:hidden space-y-4 mb-6">
+            <div className="flex justify-between items-center">
+              <Button 
+                onClick={handleRefresh}
+                variant="outline"
+                className="flex items-center gap-2"
+                size="sm"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Refresh
+              </Button>
+              <QuickInvestButton variant="compact" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Button 
+                onClick={() => navigate('/deposit')}
+                className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 text-sm font-semibold"
+              >
+                <Plus className="h-4 w-4" />
+                Deposit
+              </Button>
+              <Button 
+                onClick={() => navigate('/withdraw')}
+                variant="outline"
+                className="flex items-center gap-2 border-2 border-primary text-primary hover:bg-primary hover:text-white py-3 text-sm font-semibold"
+              >
+                <ArrowDownLeft className="h-4 w-4" />
+                Withdraw
+              </Button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <BalanceOverview />
-              <EarningsOverview />
-              <TransactionHistory />
+          {/* Enhanced Top Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div className="lg:col-span-2">
+              <BalanceManagement 
+                onDepositClick={() => navigate('/deposit')}
+                onWithdrawClick={() => navigate('/withdraw')}
+                onInvestClick={() => navigate('/investments')}
+              />
             </div>
-            
-            <div className="space-y-6">
-              <ReferralProgram />
+            <div>
+              <ActiveInvestmentPlan />
             </div>
+          </div>
+
+          {/* Rest of Dashboard */}
+          <div className="grid grid-cols-1 gap-6">
+            <EarningsTracker />
+            <TransactionHistory />
           </div>
 
           {/* Live Notifications */}
           <LiveNotifications />
         </div>
+
       </DashboardLayout>
     </RefreshContext.Provider>
   );

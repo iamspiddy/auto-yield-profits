@@ -20,36 +20,39 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
 
-    <!-- JivoChat Widget -->
-    <script src="//code.jivosite.com/widget/zt6C6vqYyN" async></script>
+    <!-- Smartsupp Live Chat script -->
+    <script type="text/javascript">
+      try {
+        var _smartsupp = _smartsupp || {};
+        _smartsupp.key = 'd4b87cdf5f79b7477c66afc5f59aaeb8172a4067';
+        window.smartsupp||(function(d) {
+          var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
+          s=d.getElementsByTagName('script')[0];c=d.createElement('script');
+          c.type='text/javascript';c.charset='utf-8';c.async=true;
+          c.src='https://www.smartsuppchat.com/loader.js?d='+encodeURIComponent(d.URL);
+          c.onerror = function() {
+            console.warn('Smartsupp chat widget failed to load');
+          };
+          s.parentNode.insertBefore(c,s);
+        })(document);
+      } catch (error) {
+        console.warn('Smartsupp chat widget initialization failed:', error);
+      }
+    </script>
     
-    <!-- Custom styles for JivoChat positioning -->
+    <!-- Custom styles for Smartsupp positioning -->
     <style>
-      /* Ensure JivoChat widget is visible and properly positioned */
-      #jivo-iframe-container {
+      /* Ensure Smartsupp widget is visible and properly positioned */
+      .smartsupp-widget {
         z-index: 9999 !important;
         position: fixed !important;
         bottom: 20px !important;
         right: 20px !important;
-      }
-      
-      /* Make sure the chat button is always visible */
-      .jivo-widget {
-        z-index: 9999 !important;
-        position: fixed !important;
-        bottom: 20px !important;
-        right: 20px !important;
-      }
-      
-      /* Ensure chat widget appears above other elements */
-      .jivo-widget-container {
-        z-index: 9999 !important;
       }
       
       /* Mobile responsiveness for chat widget */
       @media (max-width: 768px) {
-        #jivo-iframe-container,
-        .jivo-widget {
+        .smartsupp-widget {
           bottom: 15px !important;
           right: 15px !important;
         }
@@ -60,5 +63,6 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <noscript>Powered by <a href="https://www.smartsupp.com" target="_blank">Smartsupp</a></noscript>
   </body>
 </html>

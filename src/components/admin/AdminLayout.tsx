@@ -23,7 +23,9 @@ import {
   BarChart3,
   FileText,
   AlertCircle,
-  Key
+  Key,
+  PieChart,
+  Target
 } from 'lucide-react';
 
 interface AdminStats {
@@ -125,7 +127,19 @@ const AdminLayout = () => {
       badge: null
     },
     {
-      name: 'Investments',
+      name: 'Investment Plans',
+      href: '/admin/investment-plans',
+      icon: Target,
+      badge: null
+    },
+    {
+      name: 'User Investments',
+      href: '/admin/user-investments',
+      icon: PieChart,
+      badge: null
+    },
+    {
+      name: 'Legacy Investments',
       href: '/admin/investments',
       icon: Wallet,
       badge: null

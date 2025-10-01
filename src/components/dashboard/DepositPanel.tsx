@@ -12,36 +12,36 @@ const DepositPanel = () => {
       description: "Connecting you to our support team for funding assistance...",
     });
 
-    // Try multiple methods to open JivoChat
-    if (window.jivo_open && typeof window.jivo_open === 'function') {
+    // Try to open Smartsupp chat
+    if (window.smartsupp && typeof window.smartsupp === 'function') {
       try {
-        window.jivo_open();
+        window.smartsupp('chat:open');
         return;
       } catch (error) {
-        console.log('JivoChat open failed, trying alternative method');
+        console.log('Smartsupp open failed, trying alternative method');
       }
     }
 
-    // Alternative method: try to find and click the JivoChat button
-    const jivoButton = document.querySelector('.jivo-widget') as HTMLElement;
-    if (jivoButton) {
-      jivoButton.click();
+    // Alternative method: try to find and click the Smartsupp button
+    const smartsuppButton = document.querySelector('.smartsupp-widget') as HTMLElement;
+    if (smartsuppButton) {
+      smartsuppButton.click();
       return;
     }
 
-    // Another alternative: try to find JivoChat iframe and show it
-    const jivoIframe = document.querySelector('#jivo-iframe-container iframe') as HTMLIFrameElement;
-    if (jivoIframe) {
-      jivoIframe.style.display = 'block';
-      jivoIframe.style.zIndex = '9999';
+    // Another alternative: try to find Smartsupp iframe and show it
+    const smartsuppIframe = document.querySelector('iframe[src*="smartsuppchat.com"]') as HTMLIFrameElement;
+    if (smartsuppIframe) {
+      smartsuppIframe.style.display = 'block';
+      smartsuppIframe.style.zIndex = '9999';
       return;
     }
 
-    // Fallback: try to trigger JivoChat through postMessage
+    // Fallback: try to trigger Smartsupp through postMessage
     try {
-      const jivoWidget = document.querySelector('.jivo-widget') as HTMLElement;
-      if (jivoWidget) {
-        jivoWidget.dispatchEvent(new Event('click'));
+      const smartsuppWidget = document.querySelector('.smartsupp-widget') as HTMLElement;
+      if (smartsuppWidget) {
+        smartsuppWidget.dispatchEvent(new Event('click'));
         return;
       }
     } catch (error) {

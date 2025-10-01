@@ -539,6 +539,155 @@ export type Database = {
           }
         ]
       }
+      investment_plans: {
+        Row: {
+          id: string
+          plan_name: string
+          min_amount: number
+          weekly_profit_percent: number
+          duration_weeks: number | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          plan_name: string
+          min_amount: number
+          weekly_profit_percent: number
+          duration_weeks?: number | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          plan_name?: string
+          min_amount?: number
+          weekly_profit_percent?: number
+          duration_weeks?: number | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      investments: {
+        Row: {
+          id: string
+          user_id: string
+          plan_id: string
+          invested_amount: number
+          current_balance: number
+          total_profit_earned: number
+          status: string
+          start_date: string
+          last_compound_date: string
+          next_compound_date: string
+          end_date: string | null
+          user_selected_duration_weeks: number | null
+          maturity_date: string | null
+          early_withdrawal_penalty_percent: number
+          is_matured: boolean
+          projected_maturity_value: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          plan_id: string
+          invested_amount: number
+          current_balance: number
+          total_profit_earned?: number
+          status?: string
+          start_date?: string
+          last_compound_date?: string
+          next_compound_date: string
+          end_date?: string | null
+          user_selected_duration_weeks?: number | null
+          maturity_date?: string | null
+          early_withdrawal_penalty_percent?: number
+          is_matured?: boolean
+          projected_maturity_value?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          plan_id?: string
+          invested_amount?: number
+          current_balance?: number
+          total_profit_earned?: number
+          status?: string
+          start_date?: string
+          last_compound_date?: string
+          next_compound_date?: string
+          end_date?: string | null
+          user_selected_duration_weeks?: number | null
+          maturity_date?: string | null
+          early_withdrawal_penalty_percent?: number
+          is_matured?: boolean
+          projected_maturity_value?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investments_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "investment_plans"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      investment_compounds: {
+        Row: {
+          id: string
+          investment_id: string
+          compound_date: string
+          balance_before: number
+          profit_amount: number
+          balance_after: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          investment_id: string
+          compound_date: string
+          balance_before: number
+          profit_amount: number
+          balance_after: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          investment_id?: string
+          compound_date?: string
+          balance_before?: number
+          profit_amount?: number
+          balance_after?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_compounds_investment_id_fkey"
+            columns: ["investment_id"]
+            isOneToOne: false
+            referencedRelation: "investments"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never

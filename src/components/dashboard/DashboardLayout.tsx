@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { LogOut, User, Wallet, TrendingUp, History, Users, Settings, Menu, X, DollarSign, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { LogOut, User, Wallet, TrendingUp, History, Users, Settings, Menu, X, DollarSign, ArrowUpRight, ArrowDownLeft, BarChart3 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -246,6 +246,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                   <Users className="h-4 w-4 mr-3" />
                   Referrals
                 </div>
+                <div 
+                  className={`flex items-center px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer ${getNavItemStyle('/investments')}`}
+                  onClick={() => { navigate('/investments'); closeMobileMenu(); }}
+                >
+                  <BarChart3 className="h-4 w-4 mr-3" />
+                  Investments
+                </div>
               </div>
 
               {/* User Controls */}
@@ -296,6 +303,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           >
             <Users className="h-4 w-4 mr-2" />
             Referrals
+          </div>
+          <div 
+            className={`flex items-center px-3 py-1 rounded-full text-sm transition-colors ${getNavItemStyle('/investments')}`}
+            onClick={() => navigate('/investments')}
+          >
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Investments
           </div>
         </div>
       </div>
