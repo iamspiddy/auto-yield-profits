@@ -20,12 +20,9 @@ import {
 } from 'recharts';
 import { 
   TrendingUp, 
-  Calculator, 
   Target, 
-  Calendar,
   DollarSign,
-  BarChart3,
-  Play
+  BarChart3
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -52,17 +49,6 @@ interface ChartDataPoint {
   plan?: string;
 }
 
-interface ProjectionInput {
-  amount: number;
-  plan: string;
-  weeks: number;
-}
-
-interface ProjectionResult {
-  finalBalance: number;
-  totalProfit: number;
-  weeklyProfit: number;
-}
 
 const EarningsTracker = () => {
   const { user } = useAuth();
@@ -70,16 +56,6 @@ const EarningsTracker = () => {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'weekly' | 'monthly'>('weekly');
-  const [showProjection, setShowProjection] = useState(false);
-  
-  // Projection calculator state
-  const [projectionInput, setProjectionInput] = useState<ProjectionInput>({
-    amount: 1000,
-    plan: 'Gold',
-    weeks: 12
-  });
-  const [projectionResult, setProjectionResult] = useState<ProjectionResult | null>(null);
-  const [calculating, setCalculating] = useState(false);
 
   // Investment plans data
   const investmentPlans = [
@@ -189,34 +165,6 @@ const EarningsTracker = () => {
     setChartData(sampleData);
   };
 
-  // Calculate projection
-  const calculateProjection = () => {
-    setCalculating(true);
-    
-    const selectedPlan = investmentPlans.find(plan => plan.name === projectionInput.plan);
-    if (!selectedPlan) return;
-
-    const weeklyRate = selectedPlan.weeklyRate / 100;
-    const finalBalance = projectionInput.amount * Math.pow(1 + weeklyRate, projectionInput.weeks);
-    const totalProfit = finalBalance - projectionInput.amount;
-    const weeklyProfit = projectionInput.amount * weeklyRate;
-
-    setProjectionResult({
-      finalBalance: Math.round(finalBalance * 100) / 100,
-      totalProfit: Math.round(totalProfit * 100) / 100,
-      weeklyProfit: Math.round(weeklyProfit * 100) / 100
-    });
-
-    setCalculating(false);
-  };
-
-  // Handle projection input changes
-  const handleProjectionChange = (field: keyof ProjectionInput, value: string | number) => {
-    setProjectionInput(prev => ({
-      ...prev,
-      [field]: field === 'amount' || field === 'weeks' ? Number(value) : value
-    }));
-  };
 
   // Get plan color
   const getPlanColor = (planName: string) => {
@@ -277,15 +225,6 @@ const EarningsTracker = () => {
               </SelectContent>
             </Select>
           </div>
-          
-          <Button
-            variant="outline"
-            onClick={() => setShowProjection(!showProjection)}
-            className="flex items-center gap-2"
-          >
-            <Calculator className="h-4 w-4" />
-            {showProjection ? 'Hide' : 'Show'} Calculator
-          </Button>
         </div>
       </div>
 
@@ -356,137 +295,6 @@ const EarningsTracker = () => {
         </CardContent>
       </Card>
 
-      {/* Projection Calculator */}
-      {showProjection && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calculator className="h-5 w-5 text-primary" />
-              Earnings Projection Calculator
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Input Form */}
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="amount">Investment Amount ($)</Label>
-                  <Input
-                    id="amount"
-                    type="number"
-                    value={projectionInput.amount}
-                    onChange={(e) => handleProjectionChange('amount', e.target.value)}
-                    placeholder="Enter amount"
-                    min="0"
-                    step="100"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="plan">Investment Plan</Label>
-                  <Select 
-                    value={projectionInput.plan} 
-                    onValueChange={(value) => handleProjectionChange('plan', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {investmentPlans.map(plan => (
-                        <SelectItem key={plan.name} value={plan.name}>
-                          <div className="flex items-center gap-2">
-                            <div 
-                              className="w-3 h-3 rounded-full" 
-                              style={{ backgroundColor: plan.color }}
-                            />
-                            {plan.name} ({plan.weeklyRate}% weekly)
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <Label htmlFor="weeks">Investment Duration (weeks)</Label>
-                  <Input
-                    id="weeks"
-                    type="number"
-                    value={projectionInput.weeks}
-                    onChange={(e) => handleProjectionChange('weeks', e.target.value)}
-                    placeholder="Enter weeks"
-                    min="1"
-                    max="52"
-                  />
-                </div>
-                
-                <Button 
-                  onClick={calculateProjection}
-                  disabled={calculating}
-                  className="w-full"
-                >
-                  {calculating ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  ) : (
-                    <Play className="h-4 w-4 mr-2" />
-                  )}
-                  Calculate Projection
-                </Button>
-              </div>
-
-              {/* Results */}
-              <div className="space-y-4">
-                {projectionResult ? (
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-lg">Projection Results</h4>
-                    
-                    <div className="bg-gradient-to-r from-green-500/10 to-green-600/10 p-4 rounded-lg border border-green-500/20">
-                      <div className="flex items-center justify-between">
-                        <span className="text-green-200">Final Balance</span>
-                        <span className="text-2xl font-bold text-green-400">
-                          {formatCurrency(projectionResult.finalBalance)}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 p-4 rounded-lg border border-blue-500/20">
-                      <div className="flex items-center justify-between">
-                        <span className="text-blue-200">Total Profit</span>
-                        <span className="text-xl font-bold text-blue-400">
-                          {formatCurrency(projectionResult.totalProfit)}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-gradient-to-r from-purple-500/10 to-purple-600/10 p-4 rounded-lg border border-purple-500/20">
-                      <div className="flex items-center justify-between">
-                        <span className="text-purple-200">Weekly Profit</span>
-                        <span className="text-lg font-bold text-purple-400">
-                          {formatCurrency(projectionResult.weeklyProfit)}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="text-center pt-2">
-                      <p className="text-sm text-muted-foreground">
-                        If you invest {formatCurrency(projectionInput.amount)} in {projectionInput.plan}, 
-                        after {projectionInput.weeks} weeks your balance will be ≈ {formatCurrency(projectionResult.finalBalance)}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Calculator className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">
-                      Enter your investment details and click "Calculate Projection" to see your potential earnings.
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Call to Action for users without investments */}
       {!hasActiveInvestments && (

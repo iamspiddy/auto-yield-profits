@@ -4,6 +4,7 @@ import { Menu, X, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
+import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -60,6 +61,7 @@ const Navbar = () => {
 
           {/* CTA Button - Desktop */}
           <div className="hidden md:flex items-center space-x-2">
+            <ThemeToggle />
             <LanguageSwitcher />
             <Button 
               variant="outline" 
@@ -108,7 +110,8 @@ const Navbar = () => {
                 </button>
               ))}
               <div className="pt-2 space-y-2">
-                <div className="px-3 py-2">
+                <div className="px-3 py-2 flex items-center justify-between">
+                  <ThemeToggle />
                   <LanguageSwitcher />
                 </div>
                 <Button 

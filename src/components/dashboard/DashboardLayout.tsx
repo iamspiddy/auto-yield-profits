@@ -3,9 +3,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { LogOut, User, Wallet, TrendingUp, History, Users, Settings, Menu, X, DollarSign, ArrowUpRight, ArrowDownLeft, BarChart3 } from 'lucide-react';
+import { LogOut, User, Wallet, TrendingUp, History, Users, Settings, Menu, X, DollarSign, ArrowUpRight, ArrowDownLeft, BarChart3, Calculator } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import ThemeToggle from '@/components/ThemeToggle';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -117,6 +118,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
           {/* Desktop Header Controls */}
           <div className="hidden md:flex items-center space-x-4">
+            <ThemeToggle />
             <div className="flex items-center space-x-3">
               <Avatar className="h-8 w-8">
                 <AvatarImage 
@@ -179,26 +181,29 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           <div className="absolute right-0 top-0 h-full w-80 bg-background border-l border-border shadow-xl" onClick={(e) => e.stopPropagation()}>
             <div className="p-6 space-y-6">
               {/* User Profile Section */}
-              <div className="flex items-center space-x-3 pb-4 border-b border-border">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage 
-                    src={profileData?.avatar_url ? 
-                      `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/avatars/${profileData.avatar_url}` : 
-                      undefined
-                    } 
-                  />
-                  <AvatarFallback className="bg-primary/10 text-primary">
-                    {getAvatarFallback()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-foreground">
-                    {getDisplayName()}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {user?.email}
-                  </span>
+              <div className="flex items-center justify-between pb-4 border-b border-border">
+                <div className="flex items-center space-x-3">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage 
+                      src={profileData?.avatar_url ? 
+                        `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/avatars/${profileData.avatar_url}` : 
+                        undefined
+                      } 
+                    />
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      {getAvatarFallback()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-foreground">
+                      {getDisplayName()}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {user?.email}
+                    </span>
+                  </div>
                 </div>
+                <ThemeToggle />
               </div>
 
               {/* Action Buttons */}
@@ -252,6 +257,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 >
                   <BarChart3 className="h-4 w-4 mr-3" />
                   Investments
+                </div>
+                <div 
+                  className={`flex items-center px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer ${getNavItemStyle('/calculator')}`}
+                  onClick={() => { navigate('/calculator'); closeMobileMenu(); }}
+                >
+                  <Calculator className="h-4 w-4 mr-3" />
+                  Calculator
                 </div>
               </div>
 
@@ -310,6 +322,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           >
             <BarChart3 className="h-4 w-4 mr-2" />
             Investments
+          </div>
+          <div 
+            className={`flex items-center px-3 py-1 rounded-full text-sm transition-colors ${getNavItemStyle('/calculator')}`}
+            onClick={() => navigate('/calculator')}
+          >
+            <Calculator className="h-4 w-4 mr-2" />
+            Calculator
           </div>
         </div>
       </div>

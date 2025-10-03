@@ -5,11 +5,8 @@ import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import BalanceManagement from '@/components/dashboard/BalanceManagement';
 import ActiveInvestmentPlan from '@/components/dashboard/ActiveInvestmentPlan';
 import EarningsTracker from '@/components/dashboard/EarningsTracker';
-import TransactionHistory from '@/components/dashboard/TransactionHistory';
 import LiveNotifications from '@/components/dashboard/LiveNotifications';
-import { Button } from '@/components/ui/button';
-import QuickInvestButton from '@/components/dashboard/QuickInvestButton';
-import { DollarSign, ArrowUpRight, ArrowDownLeft, RefreshCw, Plus } from 'lucide-react';
+import { DollarSign, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 // Create a refresh context
@@ -98,70 +95,6 @@ const Dashboard = () => {
     <RefreshContext.Provider value={{ refresh: handleRefresh }}>
       <DashboardLayout>
         <div className="space-y-6">
-          {/* Primary Action Buttons - Desktop */}
-          <div className="hidden md:flex flex-col sm:flex-row gap-4 justify-center sm:justify-end mb-6">
-            <Button 
-              onClick={handleRefresh}
-              variant="outline"
-              className="flex items-center gap-2"
-              size="sm"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Refresh
-            </Button>
-            <QuickInvestButton variant="default" />
-            <Button 
-              onClick={() => navigate('/deposit')}
-              className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 text-lg font-semibold"
-              size="lg"
-            >
-              <Plus className="h-5 w-5" />
-              Deposit Funds
-            </Button>
-            <Button 
-              onClick={() => navigate('/withdraw')}
-              variant="outline"
-              className="flex items-center gap-2 border-2 border-primary text-primary hover:bg-primary hover:text-white px-6 py-3 text-lg font-semibold"
-              size="lg"
-            >
-              <ArrowDownLeft className="h-5 w-5" />
-              Withdraw Funds
-            </Button>
-          </div>
-
-          {/* Mobile Action Buttons */}
-          <div className="md:hidden space-y-4 mb-6">
-            <div className="flex justify-between items-center">
-              <Button 
-                onClick={handleRefresh}
-                variant="outline"
-                className="flex items-center gap-2"
-                size="sm"
-              >
-                <RefreshCw className="h-4 w-4" />
-                Refresh
-              </Button>
-              <QuickInvestButton variant="compact" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <Button 
-                onClick={() => navigate('/deposit')}
-                className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 text-sm font-semibold"
-              >
-                <Plus className="h-4 w-4" />
-                Deposit
-              </Button>
-              <Button 
-                onClick={() => navigate('/withdraw')}
-                variant="outline"
-                className="flex items-center gap-2 border-2 border-primary text-primary hover:bg-primary hover:text-white py-3 text-sm font-semibold"
-              >
-                <ArrowDownLeft className="h-4 w-4" />
-                Withdraw
-              </Button>
-            </div>
-          </div>
-
           {/* Enhanced Top Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div className="lg:col-span-2">
@@ -179,7 +112,6 @@ const Dashboard = () => {
           {/* Rest of Dashboard */}
           <div className="grid grid-cols-1 gap-6">
             <EarningsTracker />
-            <TransactionHistory />
           </div>
 
           {/* Live Notifications */}

@@ -11,7 +11,7 @@ const HeroSection = () => {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${bannerImage})` }}
       ></div>
-      <div className="absolute inset-0 bg-black/50"></div>
+      <div className="absolute inset-0 bg-black/50 dark:bg-black/50 bg-white/20"></div>
       
       <div className="container mx-auto px-4 pt-32 pb-12 relative z-10">
         <div className="flex flex-col items-center text-center space-y-12 min-h-[calc(100vh-144px)] justify-center">

@@ -8,7 +8,70 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Dark mode only - Blue theme */
+    /* Light mode - Off-white theme (#FAF9F6) */
+    --background: 45 20% 98%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 45 20% 98%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 45 20% 98%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 217 91% 70%;
+
+    --secondary: 45 15% 95%;
+    --secondary-foreground: 222.2 84% 4.9%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --success-glow: 142 76% 46%;
+
+    --muted: 45 15% 95%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 45 10% 90%;
+    --input: 45 10% 90%;
+    --ring: 217 91% 60%;
+
+    /* Custom gradients for crypto fintech - Light theme */
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
+    --gradient-hero: linear-gradient(135deg, hsl(45 20% 98%), hsl(45 15% 95%));
+    --gradient-card: linear-gradient(135deg, hsl(45 20% 98%), hsl(45 15% 96%));
+    
+    /* Shadows - Light theme */
+    --shadow-primary: 0 10px 30px -10px hsl(217 91% 60% / 0.2);
+    --shadow-success: 0 10px 30px -10px hsl(142 76% 36% / 0.2);
+    --shadow-card: 0 4px 20px -4px hsl(222.2 84% 4.9% / 0.1);
+    --shadow-glow: 0 0 40px hsl(217 91% 60% / 0.1);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 45 15% 97%;
+    --sidebar-foreground: 240 5.9% 10%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 45 10% 94%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 45 10% 88%;
+    --sidebar-ring: 217 91% 60%;
+  }
+
+  .dark {
+    /* Dark mode - Blue theme */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
@@ -42,23 +105,17 @@ All colors MUST be HSL.
     --input: 217.2 32.6% 17.5%;
     --ring: 217 91% 60%;
 
-    /* Custom gradients for crypto fintech - Blue theme */
+    /* Custom gradients for crypto fintech - Dark theme */
     --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
     --gradient-success: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
     --gradient-hero: linear-gradient(135deg, hsl(222.2 84% 4.9%), hsl(217.2 32.6% 17.5%));
     --gradient-card: linear-gradient(135deg, hsl(222.2 84% 4.9%), hsl(217.2 32.6% 17.5%));
     
-    /* Shadows - Blue theme */
+    /* Shadows - Dark theme */
     --shadow-primary: 0 10px 30px -10px hsl(217 91% 60% / 0.3);
     --shadow-success: 0 10px 30px -10px hsl(217 91% 60% / 0.3);
     --shadow-card: 0 4px 20px -4px hsl(210 40% 98% / 0.1);
     --shadow-glow: 0 0 40px hsl(217 91% 60% / 0.2);
-
-    /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
-    --radius: 0.5rem;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;

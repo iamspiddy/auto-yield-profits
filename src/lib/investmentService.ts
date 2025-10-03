@@ -205,21 +205,48 @@ export class InvestmentService {
 
   // Get user's investments
   static async getUserInvestments(userId: string): Promise<InvestmentWithPlan[]> {
-    const { data, error } = await supabase
-      .from('investments')
-      .select(`
-        *,
-        plan:investment_plans(*)
-      `)
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    while (retryCount < maxRetries) {
+      try {
+        const { data, error } = await supabase
+          .from('investments')
+          .select(`
+            *,
+            plan:investment_plans(*)
+          `)
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching user investments:', error);
-      throw new Error('Failed to fetch investments');
+        if (error) {
+          console.error('Error fetching user investments:', error);
+          throw new Error('Failed to fetch investments');
+        }
+
+        return data || [];
+      } catch (error) {
+        retryCount++;
+        if (retryCount < maxRetries) {
+          console.warn(`Investment fetch attempt ${retryCount} failed, retrying...`, error);
+          await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)); // Exponential backoff
+          continue;
+        }
+        
+        // If it's a network error, return empty array as fallback
+        if (error instanceof Error && (
+          error.message.includes('Failed to fetch') || 
+          error.message.includes('ERR_NAME_NOT_RESOLVED')
+        )) {
+          console.warn('Network error detected, returning empty investments array');
+          return [];
+        }
+        
+        throw error;
+      }
     }
-
-    return data || [];
+    
+    return []; // Fallback return
   }
 
   // Get investment by ID

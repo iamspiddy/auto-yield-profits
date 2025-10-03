@@ -50,48 +50,118 @@ export class BalanceService {
   // Get user balance summary
   static async getUserBalanceSummary(userId: string): Promise<BalanceSummary | null> {
     try {
-      // First try to get from user_balances table
-      const { data: balanceData, error: balanceError } = await supabase
-        .from('user_balances')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
-
-      if (balanceError && balanceError.code !== 'PGRST116') {
-        console.error('Error fetching user balance:', balanceError);
-        throw new Error('Failed to fetch user balance');
+      // Ensure we have a valid session before making requests
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        console.error('No valid session found:', sessionError);
+        throw new Error('User not authenticated');
       }
 
-      // Get investment stats
-      const { data: investments, error: investmentError } = await supabase
-        .from('investments')
-        .select('invested_amount, total_profit_earned, status')
-        .eq('user_id', userId);
+      console.log('Session found for user:', session.user.id);
+      
+      // Add timeout and retry logic
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timeout')), 10000); // 10 second timeout
+      });
 
-      if (investmentError) {
-        console.error('Error fetching investments:', investmentError);
-        throw new Error('Failed to fetch investment data');
-      }
-
-      // Calculate stats
-      const activeInvestments = investments?.filter(inv => inv.status === 'active') || [];
-      const totalInvested = activeInvestments.reduce((sum, inv) => sum + Number(inv.invested_amount), 0);
-      const totalProfitEarned = activeInvestments.reduce((sum, inv) => sum + Number(inv.total_profit_earned), 0);
-
-      const summary: BalanceSummary = {
-        available_balance: balanceData?.available_balance || 0,
-        invested_balance: balanceData?.invested_balance || 0,
-        total_balance: (balanceData?.available_balance || 0) + (balanceData?.invested_balance || 0),
-        active_investments_count: activeInvestments.length,
-        total_invested: totalInvested,
-        total_profit_earned: totalProfitEarned
-      };
-
-      return summary;
+      const fetchPromise = this.fetchBalanceData(userId);
+      
+      const result = await Promise.race([fetchPromise, timeoutPromise]) as BalanceSummary;
+      return result;
     } catch (error) {
       console.error('Error in getUserBalanceSummary:', error);
+      
+      // If it's a network error, try fallback calculation
+      if (error instanceof Error && (
+        error.message.includes('Failed to fetch') || 
+        error.message.includes('timeout') ||
+        error.message.includes('ERR_NAME_NOT_RESOLVED')
+      )) {
+        console.log('Network error detected, trying fallback calculation...');
+        try {
+          return await this.recalculateUserBalance(userId);
+        } catch (fallbackError) {
+          console.error('Fallback calculation also failed:', fallbackError);
+          // Return default values as last resort
+          return {
+            available_balance: 0,
+            invested_balance: 0,
+            total_balance: 0,
+            active_investments_count: 0,
+            total_invested: 0,
+            total_profit_earned: 0
+          };
+        }
+      }
+      
       throw error;
     }
+  }
+
+  // Separate method for fetching balance data with retry logic
+  private static async fetchBalanceData(userId: string): Promise<BalanceSummary> {
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    while (retryCount < maxRetries) {
+      try {
+        // Ensure we have a valid session before making requests
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !session) {
+          console.error('No valid session found in fetchBalanceData:', sessionError);
+          throw new Error('User not authenticated');
+        }
+
+        // First try to get from user_balances table
+        const { data: balanceData, error: balanceError } = await supabase
+          .from('user_balances')
+          .select('*')
+          .eq('user_id', userId)
+          .single();
+
+        if (balanceError && balanceError.code !== 'PGRST116') {
+          console.error('Error fetching user balance:', balanceError);
+          throw new Error('Failed to fetch user balance');
+        }
+
+        // Get investment stats
+        const { data: investments, error: investmentError } = await supabase
+          .from('investments')
+          .select('invested_amount, total_profit_earned, status')
+          .eq('user_id', userId);
+
+        if (investmentError) {
+          console.error('Error fetching investments:', investmentError);
+          throw new Error('Failed to fetch investment data');
+        }
+
+        // Calculate stats
+        const activeInvestments = investments?.filter(inv => inv.status === 'active') || [];
+        const totalInvested = activeInvestments.reduce((sum, inv) => sum + Number(inv.invested_amount), 0);
+        const totalProfitEarned = activeInvestments.reduce((sum, inv) => sum + Number(inv.total_profit_earned), 0);
+
+        const summary: BalanceSummary = {
+          available_balance: balanceData?.available_balance || 0,
+          invested_balance: balanceData?.invested_balance || 0,
+          total_balance: (balanceData?.available_balance || 0) + (balanceData?.invested_balance || 0),
+          active_investments_count: activeInvestments.length,
+          total_invested: totalInvested,
+          total_profit_earned: totalProfitEarned
+        };
+
+        return summary;
+      } catch (error) {
+        retryCount++;
+        if (retryCount < maxRetries) {
+          console.warn(`Balance fetch attempt ${retryCount} failed, retrying...`, error);
+          await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)); // Exponential backoff
+          continue;
+        }
+        throw error;
+      }
+    }
+    
+    throw new Error('Failed to fetch balance data after maximum retries');
   }
 
   // Get user balance (simple version)
@@ -682,6 +752,15 @@ export class BalanceService {
   // Recalculate user balance using fallback method (for fixing balance issues)
   static async recalculateUserBalance(userId: string): Promise<BalanceSummary | null> {
     try {
+      // Ensure we have a valid session before making requests
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        console.error('No valid session found:', sessionError);
+        throw new Error('User not authenticated');
+      }
+
+      console.log('Session found for user:', session.user.id);
+      
       // Fetch approved deposits only (wallet balance = deposited funds only)
       const { data: deposits } = await supabase
         .from('deposits')

@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import EarningsTable from '@/components/admin/EarningsTable';
@@ -18,7 +20,10 @@ import {
   Calendar,
   DollarSign,
   TrendingUp,
-  Users2
+  Users2,
+  Edit,
+  Plus,
+  Minus
 } from 'lucide-react';
 
 interface User {
@@ -73,6 +78,14 @@ const AdminUsers = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [userDetailsOpen, setUserDetailsOpen] = useState(false);
+  
+  // Balance update states
+  const [balanceUpdateOpen, setBalanceUpdateOpen] = useState(false);
+  const [updateAmount, setUpdateAmount] = useState('');
+  const [updateDescription, setUpdateDescription] = useState('');
+  const [updateType, setUpdateType] = useState<'add' | 'subtract'>('add');
+  const [processing, setProcessing] = useState(false);
+  
   const { toast } = useToast();
 
   useEffect(() => {
@@ -234,6 +247,103 @@ const AdminUsers = () => {
     return user.earnings?.reduce((sum, earning) => sum + earning.amount, 0) || 0;
   };
 
+  const handleBalanceUpdate = async () => {
+    if (!selectedUser || !updateAmount || !updateDescription) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setProcessing(true);
+
+      const amount = parseFloat(updateAmount);
+      if (isNaN(amount) || amount <= 0) {
+        toast({
+          title: "Error",
+          description: "Please enter a valid amount",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const finalAmount = updateType === 'add' ? amount : -amount;
+
+      // Update user's available balance
+      console.log('Updating balance for user:', selectedUser.user_id, 'Amount:', finalAmount);
+
+      const { data: balanceData, error: balanceError } = await supabase
+        .rpc('increment_balance', {
+          user_id_param: selectedUser.user_id,
+          amount_param: finalAmount
+        });
+
+      if (balanceError) {
+        console.error('Balance update error:', balanceError);
+        throw balanceError;
+      }
+
+      console.log('Balance updated successfully. New balance:', balanceData);
+
+      // Create transaction record
+      const { error: transactionError } = await supabase
+        .from('transactions')
+        .insert({
+          user_id: selectedUser.user_id,
+          amount: amount,
+          type: updateType === 'add' ? 'deposit' : 'withdrawal',
+          status: 'completed',
+          description: updateDescription
+        });
+
+      if (transactionError) throw transactionError;
+
+      // Create balance transaction record
+      const { error: balanceTransactionError } = await supabase
+        .from('balance_transactions')
+        .insert({
+          user_id: selectedUser.user_id,
+          transaction_type: 'admin_adjustment',
+          amount: finalAmount,
+          balance_before: selectedUser.balance,
+          balance_after: selectedUser.balance + finalAmount,
+          description: updateDescription,
+          metadata: {
+            admin_action: true,
+            update_type: updateType
+          }
+        });
+
+      if (balanceTransactionError) throw balanceTransactionError;
+
+      toast({
+        title: "Balance Updated",
+        description: `Successfully ${updateType === 'add' ? 'added' : 'subtracted'} ${formatCurrency(amount)} from ${selectedUser.full_name || selectedUser.email}'s balance`,
+      });
+
+      // Reset form and close dialog
+      setUpdateAmount('');
+      setUpdateDescription('');
+      setUpdateType('add');
+      setBalanceUpdateOpen(false);
+      
+      // Refresh users data
+      await fetchUsers();
+    } catch (error) {
+      console.error('Error updating balance:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update balance. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen p-4">
@@ -314,17 +424,30 @@ const AdminUsers = () => {
                         <div className="text-sm text-gray-400 truncate">{user.email}</div>
                         <div className="text-xs text-gray-500">ID: {user.user_id.slice(0, 8)}...</div>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setUserDetailsOpen(true);
-                        }}
-                        className="border-gray-600 text-gray-300 hover:bg-gray-700 ml-2 flex-shrink-0"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                      <div className="flex gap-2 ml-2 flex-shrink-0">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setUserDetailsOpen(true);
+                          }}
+                          className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setBalanceUpdateOpen(true);
+                          }}
+                          className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div>
@@ -409,17 +532,30 @@ const AdminUsers = () => {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setUserDetailsOpen(true);
-                        }}
-                        className="border-gray-600 text-gray-300 hover:bg-gray-700"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setUserDetailsOpen(true);
+                          }}
+                          className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setBalanceUpdateOpen(true);
+                          }}
+                          className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -460,7 +596,17 @@ const AdminUsers = () => {
                     </div>
                     <div className="flex flex-col sm:flex-row sm:justify-between">
                       <span className="text-gray-400">Balance:</span>
-                      <span className="text-white">{formatCurrency(selectedUser.balance)}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-white">{formatCurrency(selectedUser.balance)}</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setBalanceUpdateOpen(true)}
+                          className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -525,6 +671,93 @@ const AdminUsers = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Balance Update Dialog */}
+      <Dialog open={balanceUpdateOpen} onOpenChange={setBalanceUpdateOpen}>
+        <DialogContent className="bg-gray-800 border-gray-700 max-w-md mx-4 sm:mx-auto">
+          <DialogHeader>
+            <DialogTitle className="text-white text-lg sm:text-xl">Update User Balance</DialogTitle>
+            <DialogDescription className="text-gray-400 text-sm sm:text-base">
+              {selectedUser && `Update balance for ${selectedUser.full_name || selectedUser.email}`}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="updateType" className="text-gray-300 text-sm font-medium">
+                Update Type
+              </Label>
+              <Select value={updateType} onValueChange={(value: 'add' | 'subtract') => setUpdateType(value)}>
+                <SelectTrigger className="w-full bg-gray-700 border-gray-600 text-white mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-700">
+                  <SelectItem value="add">
+                    <div className="flex items-center gap-2">
+                      <Plus className="h-4 w-4 text-green-400" />
+                      <span>Add to Balance</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="subtract">
+                    <div className="flex items-center gap-2">
+                      <Minus className="h-4 w-4 text-red-400" />
+                      <span>Subtract from Balance</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="updateAmount" className="text-gray-300 text-sm font-medium">
+                Amount (USD)
+              </Label>
+              <Input
+                id="updateAmount"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                value={updateAmount}
+                onChange={(e) => setUpdateAmount(e.target.value)}
+                className="bg-gray-700 border-gray-600 text-white mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="updateDescription" className="text-gray-300 text-sm font-medium">
+                Description
+              </Label>
+              <Textarea
+                id="updateDescription"
+                placeholder="Reason for balance update..."
+                value={updateDescription}
+                onChange={(e) => setUpdateDescription(e.target.value)}
+                className="bg-gray-700 border-gray-600 text-white mt-1"
+                rows={3}
+              />
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setBalanceUpdateOpen(false)}
+                className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700"
+                disabled={processing}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleBalanceUpdate}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                disabled={processing}
+              >
+                {processing ? 'Updating...' : 'Update Balance'}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

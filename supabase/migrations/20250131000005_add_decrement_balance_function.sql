@@ -1,11 +1,12 @@
--- Migration: Fix increment_balance function to work with user_balances table
--- This ensures admin balance updates appear in the dashboard
+-- Migration: Add decrement_balance function for withdrawal processing
+-- This function decreases a user's available balance when processing withdrawals
 
--- Drop existing function
-DROP FUNCTION IF EXISTS public.increment_balance(UUID, NUMERIC);
+-- Drop existing function first to avoid parameter name conflicts
+DROP FUNCTION IF EXISTS public.decrement_balance(UUID, NUMERIC);
+DROP FUNCTION IF EXISTS public.decrement_balance(_user_id UUID, _amount NUMERIC);
 
--- Recreate the function to work with user_balances table
-CREATE OR REPLACE FUNCTION public.increment_balance(
+-- Create the decrement_balance function
+CREATE OR REPLACE FUNCTION public.decrement_balance(
     user_id_param UUID,
     amount_param NUMERIC
 )
@@ -28,12 +29,12 @@ BEGIN
         current_balance := 0;
     END IF;
     
-    -- Calculate new balance
-    new_balance := current_balance + amount_param;
+    -- Calculate new balance (subtract the amount)
+    new_balance := current_balance - amount_param;
     
     -- Check if balance would go negative
     IF new_balance < 0 THEN
-        RAISE EXCEPTION 'Insufficient balance. Current: %, Required: %', current_balance, ABS(amount_param);
+        RAISE EXCEPTION 'Insufficient balance. Current: %, Required: %', current_balance, amount_param;
     END IF;
     
     -- Update user_balances table
@@ -54,11 +55,11 @@ BEGIN
         created_at
     ) VALUES (
         user_id_param,
-        'admin_adjustment',
-        amount_param,
+        'withdrawal',
+        -amount_param, -- Negative amount for withdrawal
         current_balance,
         new_balance,
-        'Admin balance adjustment',
+        'Withdrawal processed',
         NOW()
     );
     
@@ -67,5 +68,5 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Grant permissions
-GRANT EXECUTE ON FUNCTION public.increment_balance(UUID, NUMERIC) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.increment_balance(UUID, NUMERIC) TO anon; 
+GRANT EXECUTE ON FUNCTION public.decrement_balance(UUID, NUMERIC) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.decrement_balance(UUID, NUMERIC) TO anon;

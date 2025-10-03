@@ -133,7 +133,7 @@ const LiveNotifications: React.FC = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="bg-black/80 backdrop-blur-sm border border-white/10 rounded-lg p-3 sm:p-4 shadow-lg"
+            className="bg-card/90 backdrop-blur-sm border border-border rounded-lg p-3 sm:p-4 shadow-lg"
           >
             <div className="flex items-start space-x-2 sm:space-x-3">
               <div className={`flex-shrink-0 ${getTypeColor(currentMessage.type)}`}>
@@ -146,11 +146,11 @@ const LiveNotifications: React.FC = () => {
                   <div className="h-1 w-1 bg-green-400 rounded-full animate-pulse"></div>
                 </div>
                 
-                <p className="text-xs sm:text-sm text-white/90 leading-relaxed">
+                <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed">
                   {messageParts.map((part, index) => {
                     if (part.match(/^\$[\d,]+\.?\d*$/)) {
                       return (
-                        <span key={index} className="text-green-400 font-semibold">
+                        <span key={index} className="text-success font-semibold">
                           {part}
                         </span>
                       );
@@ -162,7 +162,7 @@ const LiveNotifications: React.FC = () => {
             </div>
             
             {/* Progress bar */}
-            <div className="mt-2 sm:mt-3 h-0.5 bg-white/10 rounded-full overflow-hidden">
+            <div className="mt-2 sm:mt-3 h-0.5 bg-muted rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-to-r from-green-500 to-blue-500"
                 initial={{ width: "0%" }}

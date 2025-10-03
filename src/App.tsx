@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { useEffect } from "react";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -15,6 +16,7 @@ import History from "./pages/History";
 import Referrals from "./pages/Referrals";
 import Profile from "./pages/Profile";
 import Investments from "./pages/Investments";
+import Calculator from "./pages/Calculator";
 
 import NotFound from "./pages/NotFound";
 
@@ -48,11 +50,12 @@ const App = () => {
 
   return (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+    <ThemeProvider>
+      <AuthProvider>
+        <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -64,6 +67,7 @@ const App = () => {
             <Route path="/referrals" element={<Referrals />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/investments" element={<Investments />} />
+            <Route path="/calculator" element={<Calculator />} />
 
             
             {/* Admin Routes */}
@@ -100,7 +104,8 @@ const App = () => {
           <FloatingChatButton />
         </BrowserRouter>
         </TooltipProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </QueryClientProvider>
   );
 };

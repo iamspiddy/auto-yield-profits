@@ -1,117 +1,138 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Search, Filter, Download, ArrowUpRight, ArrowDownLeft, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { History as HistoryIcon, ArrowUpRight, ArrowDownLeft, TrendingUp, Users, RefreshCw, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Transaction {
   id: string;
-  type: 'deposit' | 'withdrawal' | 'earning';
+  type: 'deposit' | 'profit' | 'withdrawal' | 'referral_bonus';
   amount: number;
-  status: 'pending' | 'completed' | 'failed';
+  currency: string;
+  status: 'pending' | 'approved' | 'rejected' | 'completed';
   description: string;
   created_at: string;
-  transaction_hash?: string;
-  wallet_address?: string;
 }
 
 const History = () => {
   const { user, loading } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [filter, setFilter] = useState('all');
   const [loadingTransactions, setLoadingTransactions] = useState(true);
-  const [filterType, setFilterType] = useState<string>('all');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    if (!user) return;
-    fetchTransactions();
-  }, [user]);
-
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     if (!user) return;
     
-    setLoadingTransactions(true);
     try {
-      const { data, error } = await supabase
+      setLoadingTransactions(true);
+      let query = supabase
         .from('transactions')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
+      if (filter !== 'all') {
+        query = query.eq('type', filter as 'deposit' | 'profit' | 'withdrawal' | 'referral_bonus');
+      }
+
+      const { data, error } = await query;
+
       if (error) throw error;
-      setTransactions(data || []);
+
+      setTransactions((data || []) as Transaction[]);
     } catch (error) {
       console.error('Error fetching transactions:', error);
     } finally {
       setLoadingTransactions(false);
     }
-  };
+  }, [user, filter]);
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'pending':
-        return <Clock className="h-4 w-4 text-yellow-500" />;
-      case 'failed':
-        return <XCircle className="h-4 w-4 text-red-500" />;
-      default:
-        return <Clock className="h-4 w-4 text-muted-foreground" />;
-    }
-  };
+  const refreshTransactions = useCallback(async () => {
+    setRefreshing(true);
+    await fetchTransactions();
+    setRefreshing(false);
+  }, [fetchTransactions]);
 
-  const getTypeIcon = (type: string) => {
+  useEffect(() => {
+    if (!user) return;
+
+    fetchTransactions();
+    
+    // Set up real-time subscription for transaction changes
+    const channel = supabase
+      .channel('transaction-changes')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'transactions',
+          filter: `user_id=eq.${user.id}`
+        }, 
+        () => {
+          // Refresh data when transactions are updated
+          refreshTransactions();
+        }
+      )
+      .subscribe();
+    
+    // Listen for manual refresh events
+    const handleRefresh = () => {
+      refreshTransactions();
+    };
+
+    window.addEventListener('dashboard-refresh', handleRefresh);
+
+    return () => {
+      supabase.removeChannel(channel);
+      window.removeEventListener('dashboard-refresh', handleRefresh);
+    };
+  }, [user, filter, fetchTransactions, refreshTransactions]);
+
+  const getTransactionIcon = (type: string) => {
     switch (type) {
       case 'deposit':
-        return <ArrowUpRight className="h-4 w-4 text-green-500" />;
+        return <ArrowDownLeft className="h-4 w-4 text-green-600" />;
       case 'withdrawal':
-        return <ArrowDownLeft className="h-4 w-4 text-red-500" />;
-      case 'earning':
-        return <ArrowUpRight className="h-4 w-4 text-blue-500" />;
+        return <ArrowUpRight className="h-4 w-4 text-red-600" />;
+      case 'profit':
+        return <TrendingUp className="h-4 w-4 text-blue-600" />;
+      case 'referral_bonus':
+        return <Users className="h-4 w-4 text-purple-600" />;
       default:
-        return <ArrowUpRight className="h-4 w-4 text-muted-foreground" />;
+        return <HistoryIcon className="h-4 w-4" />;
     }
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-      completed: "default",
-      pending: "secondary",
-      failed: "destructive"
+    const statusColors = {
+      pending: 'bg-yellow-100 text-yellow-800',
+      approved: 'bg-green-100 text-green-800',
+      completed: 'bg-green-100 text-green-800',
+      rejected: 'bg-red-100 text-red-800'
     };
 
     return (
-      <Badge variant={variants[status] || "outline"}>
+      <Badge variant="outline" className={statusColors[status as keyof typeof statusColors]}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </Badge>
     );
   };
 
-  const filteredTransactions = transactions.filter(transaction => {
-    const matchesType = filterType === 'all' || transaction.type === filterType;
-    const matchesStatus = filterStatus === 'all' || transaction.status === filterStatus;
-    const matchesSearch = searchTerm === '' || 
-      transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (transaction.transaction_hash && transaction.transaction_hash.toLowerCase().includes(searchTerm.toLowerCase()));
-
-    return matchesType && matchesStatus && matchesSearch;
-  });
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  const formatAmount = (amount: number, type: string) => {
+    const prefix = type === 'withdrawal' ? '-' : '+';
+    const color = type === 'withdrawal' ? 'text-red-600' : 'text-green-600';
+    return (
+      <span className={color}>
+        {prefix}${Number(amount).toFixed(2)}
+      </span>
+    );
   };
 
   if (loading) {
@@ -126,6 +147,25 @@ const History = () => {
     return <Navigate to="/auth" replace />;
   }
 
+  if (loadingTransactions) {
+    return (
+      <DashboardLayout>
+        <Card>
+          <CardContent className="p-6">
+            <div className="animate-pulse space-y-4">
+              <div className="h-4 bg-muted rounded w-1/4"></div>
+              <div className="space-y-3">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="h-12 bg-muted rounded"></div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -135,130 +175,97 @@ const History = () => {
             <h1 className="text-2xl font-bold">Transaction History</h1>
             <p className="text-muted-foreground">View all your deposits, withdrawals, and earnings</p>
           </div>
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={refreshTransactions}
+              disabled={loadingTransactions || refreshing}
+            >
+              <RefreshCw className={`h-4 w-4 mr-1 ${refreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
         </div>
 
-        {/* Filters */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search transactions..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              
-              <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Filter by type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="deposit">Deposits</SelectItem>
-                  <SelectItem value="withdrawal">Withdrawals</SelectItem>
-                  <SelectItem value="earning">Earnings</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="failed">Failed</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setFilterType('all');
-                  setFilterStatus('all');
-                  setSearchTerm('');
-                }}
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                Clear Filters
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Transactions List */}
+        {/* Transaction History Card */}
         <Card>
           <CardHeader>
-            <CardTitle>Transactions ({filteredTransactions.length})</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center">
+                <HistoryIcon className="h-5 w-5 mr-2" />
+                Transaction History
+              </CardTitle>
+              <Select value={filter} onValueChange={setFilter}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="deposit">Deposits</SelectItem>
+                  <SelectItem value="profit">Profits</SelectItem>
+                  <SelectItem value="withdrawal">Withdrawals</SelectItem>
+                  <SelectItem value="referral_bonus">Referrals</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent>
-            {loadingTransactions ? (
-              <div className="space-y-4">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="h-16 bg-muted rounded-lg"></div>
-                  </div>
-                ))}
-              </div>
-            ) : filteredTransactions.length === 0 ? (
+            {transactions.length === 0 ? (
               <div className="text-center py-8">
-                <div className="text-muted-foreground mb-4">
-                  No transactions found
-                </div>
+                <HistoryIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium text-muted-foreground">No transactions yet</h3>
                 <p className="text-sm text-muted-foreground">
-                  {searchTerm || filterType !== 'all' || filterStatus !== 'all' 
-                    ? 'Try adjusting your filters' 
-                    : 'Your transaction history will appear here'}
+                  Your transaction history will appear here once you start using the platform.
                 </p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {filteredTransactions.map((transaction) => (
-                  <div
-                    key={transaction.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-2">
-                        {getTypeIcon(transaction.type)}
-                        <div>
-                          <p className="font-medium">{transaction.description}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {formatDate(transaction.created_at)}
-                          </p>
-                          {transaction.transaction_hash && (
-                            <p className="text-xs text-muted-foreground font-mono">
-                              {transaction.transaction_hash.slice(0, 8)}...{transaction.transaction_hash.slice(-8)}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center space-x-4">
-                      <div className="text-right">
-                        <p className={`font-bold ${
-                          transaction.type === 'deposit' || transaction.type === 'earning' 
-                            ? 'text-green-600' 
-                            : 'text-red-600'
-                        }`}>
-                          {transaction.type === 'withdrawal' ? '-' : '+'}${transaction.amount.toFixed(2)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">USDT</p>
-                      </div>
-                      {getStatusIcon(transaction.status)}
-                      {getStatusBadge(transaction.status)}
-                    </div>
-                  </div>
-                ))}
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {transactions.map((transaction) => (
+                      <TableRow key={transaction.id}>
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            {getTransactionIcon(transaction.type)}
+                            <span className="capitalize">
+                              {transaction.type.replace('_', ' ')}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="max-w-xs truncate">
+                          {transaction.description}
+                        </TableCell>
+                        <TableCell>
+                          {formatAmount(transaction.amount, transaction.type)}
+                        </TableCell>
+                        <TableCell>
+                          {getStatusBadge(transaction.status)}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(transaction.created_at).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                          })}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             )}
           </CardContent>

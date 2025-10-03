@@ -18,6 +18,8 @@ import { BalanceService, type BalanceSummary } from '@/lib/balanceService';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { NetworkHealthService } from '@/lib/networkHealth';
+import { SupabaseTest } from '@/lib/supabaseTest';
 
 interface BalanceManagementProps {
   onDepositClick?: () => void;
@@ -125,6 +127,13 @@ const BalanceManagement: React.FC<BalanceManagementProps> = ({
       setLoading(true);
       setBalanceError(null); // Clear any previous errors
       
+      // Run network diagnostics first
+      await NetworkHealthService.logNetworkDiagnostics();
+      
+      // Run Supabase connection test
+      const testResults = await SupabaseTest.runAllTests();
+      console.log('🧪 Supabase test results:', testResults);
+      
       // Add retry logic for 409 conflicts
       let retryCount = 0;
       const maxRetries = 3;
@@ -172,13 +181,21 @@ const BalanceManagement: React.FC<BalanceManagementProps> = ({
     } catch (error: any) {
       console.error('Error fetching balance data:', error);
       
-      // Provide more specific error messages
-      if (error.message?.includes('409') || error.message?.includes('conflict')) {
+      // Run network diagnostics on error
+      const diagnostics = await NetworkHealthService.getNetworkDiagnostics();
+      console.log('Network diagnostics on error:', diagnostics);
+      
+      // Provide more specific error messages based on diagnostics
+      if (!diagnostics.online) {
+        setBalanceError('You appear to be offline. Please check your internet connection.');
+      } else if (!diagnostics.urlReachable) {
+        setBalanceError('Unable to reach the server. Please try again in a few moments.');
+      } else if (error.message?.includes('409') || error.message?.includes('conflict')) {
         setBalanceError('Balance data is temporarily unavailable due to a conflict. Please try again in a moment.');
-      } else if (error.message?.includes('Failed to fetch')) {
-        setBalanceError('Unable to connect to the server. Please check your connection and try again.');
+      } else if (error.message?.includes('Failed to fetch') || error.message?.includes('ERR_NAME_NOT_RESOLVED')) {
+        setBalanceError('Network connection issue detected. Please check your connection and try again.');
       } else {
-        setBalanceError('Failed to load balance data');
+        setBalanceError('Failed to load balance data. Please try refreshing the page.');
       }
       
       // Try fallback calculation on error
